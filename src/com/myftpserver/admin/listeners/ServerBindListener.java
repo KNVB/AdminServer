@@ -2,7 +2,7 @@ package com.myftpserver.admin.listeners;
 import java.net.InetSocketAddress;
 import org.apache.logging.log4j.Logger;
 
-import com.myftpserver.admin.util.MyServer;
+import com.myftpserver.admin.AdminServer;
 
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -29,14 +29,14 @@ import io.netty.channel.ChannelFutureListener;
 public class ServerBindListener implements ChannelFutureListener 
 {
 	private Logger logger;
-	private MyServer<?>server;
+	private AdminServer<?>server;
 	private int bindSuccessCount=0;
 	/**
 	 * It is triggered when a server bind a socket address process completed. 
 	 * @param logger Message logger
 	 * @param myServer {@link com.util.AdminServer} 
 	 */
-	public ServerBindListener(Logger logger, MyServer<?> server)
+	public ServerBindListener(Logger logger, AdminServer<?> server)
 	{
 		this.logger=logger;
 		this.server=server;

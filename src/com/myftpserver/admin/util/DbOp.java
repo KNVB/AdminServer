@@ -7,6 +7,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 
 import org.apache.logging.log4j.Logger;
+
+import com.myftpserver.FtpServer;
 /*
  * Copyright 2004-2005 the original author or authors.
  *
@@ -46,9 +48,32 @@ public class DbOp
 		Class.forName(jdbcDriver);
 		dbConn = DriverManager.getConnection(jdbcURL);
 	}
-	public List getServerList()
+	public List<FtpServer> getServerList()
 	{
-		List serverList=new ArrayList();
+		FtpServer ftpServer; 
+		ResultSet rs = null;
+		PreparedStatement stmt=null;
+		String sql="select config_json from server where active=?";
+		List<FtpServer> serverList=new ArrayList<FtpServer>();
+		try 
+		{
+			stmt = dbConn.prepareStatement(sql);
+			stmt.setInt(1, 1);
+			rs=stmt.executeQuery();
+			while (rs.next())
+			{
+				ftpServer=new FtpServer(rs.getString("config_json"));
+				serverList.add(ftpServer);
+			}
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			releaseResource(rs, stmt);
+		}		
 		return serverList;
 	}
 	/**
