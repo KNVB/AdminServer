@@ -1,9 +1,11 @@
 package com.myftpserver.admin;
-import com.myftpserver.FtpServer;
 import com.myftpserver.admin.util.*;
 import com.myftpserver.admin.listeners.ServerBindListener;
 
 
+
+
+import com.myftpserver.server.FtpServer;
 
 import io.netty.channel.ChannelFutureListener;
 
@@ -16,6 +18,7 @@ public class AdminServer<T> extends MyServer<T>
 {
 	private DbOp dbo;
 	private Logger logger;
+	@SuppressWarnings({ "unused", "rawtypes" })
 	private List<FtpServer> serverList=null;
 	private static int connectionCount=0;
 	public AdminServer(Logger logger) 

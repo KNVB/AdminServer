@@ -1,4 +1,4 @@
-package com.myftpserver;
+package com.myftpserver.server;
 
 import com.myftpserver.admin.util.MyServer;
 

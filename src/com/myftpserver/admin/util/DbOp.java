@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 
 import org.apache.logging.log4j.Logger;
 
-import com.myftpserver.FtpServer;
+import com.myftpserver.server.FtpServer;
 /*
  * Copyright 2004-2005 the original author or authors.
  *
