@@ -47,7 +47,7 @@ public class AdminChannelTimeoutHandler extends ChannelDuplexHandler
             IdleStateEvent e = (IdleStateEvent) evt;
             if (e.state() == IdleState.READER_IDLE) 
             {
-                logger.debug("Command Channel (Remote IP addresss="+remoteIp+")  Timeout");
+                logger.debug("Admin. Channel (Remote IP addresss="+remoteIp+")  Timeout");
                 ctx.close();
             } 
         }
