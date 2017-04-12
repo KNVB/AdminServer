@@ -6,7 +6,7 @@ import com.myftpserver.server.FtpServer;
 import io.netty.channel.ChannelFutureListener;
 
 import java.util.List;
-import java.util.Scanner;
+//import java.util.Scanner;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -90,7 +90,7 @@ public class AdminServer<T> extends MyServer<T>
 //-------------------------------------------------------------------------------------------	
 	public static void main(String[] args)  
 	{
-		Scanner scanIn = new Scanner(System.in);
+		//Scanner scanIn = new Scanner(System.in);
 		Logger logger = LogManager.getLogger(AdminServer.class.getName());
 		AdminServer<Integer> adminServer=new AdminServer<Integer>(logger);
 		adminServer.setServerPort(4466);
