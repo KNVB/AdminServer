@@ -2,11 +2,7 @@ package com.myftpserver.admin;
 import com.myftpserver.admin.util.*;
 import com.myftpserver.admin.listeners.ServerBindListener;
 
-
-
-
 import com.myftpserver.server.FtpServer;
-
 import io.netty.channel.ChannelFutureListener;
 
 import java.util.List;
@@ -50,6 +46,27 @@ public class AdminServer<T> extends MyServer<T>
 		else			
 			return true;
 	}
+	/**
+	 * Get message logger
+	 * @return message logger 
+	 */
+    public Logger getLogger() 
+	{
+		return logger;
+	}
+	/**
+	 * Called by AdminChannelClosureListener object when an admin. session is ended.
+	 * It reduce the concurrent connection count by 1.
+	 */
+	public synchronized void sessionClose() 
+	{
+		if (connectionCount>0)
+		{
+			logger.debug("Before:"+connectionCount);
+			connectionCount--;
+			logger.info("Concurrent Connection Count:"+connectionCount);
+		}
+	}
 	public void start(ChannelFutureListener bindListener)
 	{
 		super.start(bindListener);
@@ -60,6 +77,14 @@ public class AdminServer<T> extends MyServer<T>
 	public void stop()
 	{
 		super.stop();
+		try 
+		{
+			dbo.close();
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
 		logger.debug("Server shutdown gracefully.");
 	}
 //-------------------------------------------------------------------------------------------	
@@ -69,9 +94,10 @@ public class AdminServer<T> extends MyServer<T>
 		Logger logger = LogManager.getLogger(AdminServer.class.getName());
 		AdminServer<Integer> adminServer=new AdminServer<Integer>(logger);
 		adminServer.setServerPort(4466);
-		adminServer.setChildHandlers(new CommandChannelInitializer(adminServer,logger));
+		adminServer.setChildHandlers(new AdminChannelInitializer(adminServer,logger));
 		adminServer.start(new ServerBindListener(logger,adminServer));
-		scanIn.nextInt();
-		adminServer.stop();
+		//scanIn.nextInt();
+		//adminServer.stop();
 	}
+	
 }

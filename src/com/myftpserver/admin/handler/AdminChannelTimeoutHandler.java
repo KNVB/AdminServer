@@ -25,7 +25,7 @@ import io.netty.handler.timeout.IdleStateEvent;
  * @author SITO3
  *
  */
-public class CommandChannelTimeoutHandler extends ChannelDuplexHandler 
+public class AdminChannelTimeoutHandler extends ChannelDuplexHandler 
 {
 	Logger logger;
 	String remoteIp;
@@ -34,7 +34,7 @@ public class CommandChannelTimeoutHandler extends ChannelDuplexHandler
 	 * @param l Message logger
 	 * @param remoteIp The remote end of time out channel {@link io.netty.channel.Channel}
 	 */
-	public CommandChannelTimeoutHandler (Logger l, String remoteIp)
+	public AdminChannelTimeoutHandler (Logger l, String remoteIp)
 	{
 		this.logger=l;
 		this.remoteIp=remoteIp;

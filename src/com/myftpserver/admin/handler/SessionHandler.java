@@ -1,4 +1,9 @@
-package com.myftpserver.admin;
+package com.myftpserver.admin.handler;
+
+import org.apache.logging.log4j.Logger;
+
+import com.myftpserver.admin.AdminServer;
+import com.myftpserver.admin.util.Utility;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -24,15 +29,19 @@ import io.netty.channel.SimpleChannelInboundHandler;
  */
 public class SessionHandler extends SimpleChannelInboundHandler<String>
 {
-
-	public SessionHandler(AdminServer<Integer> adminServer, String remoteIp) 
+	private Logger logger;
+	private String remoteIp;
+	private AdminServer<?> adminServer;
+	public SessionHandler(AdminServer<?> adminServer, String remoteIp) 
 	{
-		// TODO Auto-generated constructor stub
+		this.remoteIp=remoteIp;
+		this.adminServer=adminServer;
+		this.logger=this.adminServer.getLogger();
 	}
 	@Override
 	public void channelActive(ChannelHandlerContext ctx)
 	{
-	
+		Utility.sendMessageToClient(ctx.channel(),logger,remoteIp,"220");
 	}
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, String arg1) throws Exception 

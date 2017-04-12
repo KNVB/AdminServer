@@ -1,6 +1,6 @@
 package com.myftpserver.admin.listeners;
 
-import com.myftpserver.admin.SessionHandler;
+import com.myftpserver.admin.handler.SessionHandler;
 
 import org.apache.logging.log4j.Logger;
 

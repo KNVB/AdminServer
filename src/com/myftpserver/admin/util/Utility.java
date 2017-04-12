@@ -20,11 +20,11 @@ public class Utility
 	 * @param ch ftp channel
 	 * @param logger  message logger
 	 * @param remoteIp client IP address 
-	 * @param responseMessage response message
+	 * @param ftpMessage response message
 	 */
-	public static void sendResultToClient(Channel ch, Logger logger,String remoteIp,String responseMessage) 
+	public static void sendMessageToClient(Channel ch, Logger logger,String remoteIp,String ftpMessage) 
 	{
-		ch.writeAndFlush(Unpooled.copiedBuffer(responseMessage+"\r\n",CharsetUtil.UTF_8)).addListener(new CommandCompleteListener(logger,remoteIp,responseMessage));
+		ch.writeAndFlush(Unpooled.copiedBuffer(ftpMessage+"\r\n",CharsetUtil.UTF_8)).addListener(new CommandCompleteListener(logger,remoteIp,ftpMessage));
 	}
 	/**
 	 * It sends a good bye message to client and then close a ftp command channel
