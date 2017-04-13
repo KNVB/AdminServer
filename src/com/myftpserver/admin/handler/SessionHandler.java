@@ -44,11 +44,20 @@ public class SessionHandler extends SimpleChannelInboundHandler<String>
 		Utility.sendMessageToClient(ctx.channel(),logger,remoteIp,"220");
 	}
 	@Override
-	protected void channelRead0(ChannelHandlerContext ctx, String arg1) throws Exception 
+	protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception 
 	{
-		// TODO Auto-generated method stub
+		logger.debug("server receive:"+msg+"|");
 		
 	}
+	/**
+	 * Calls ChannelHandlerContext.fireExceptionCaught(Throwable) to forward to the next ChannelHandler in the ChannelPipeline. Sub-classes may override this method to change behavior.
+	 * @param ctx the channel that user input command
+	 * @param cause the exception cause  
+	 */
+	public void exceptionCaught(ChannelHandlerContext ctx,Throwable cause) 
+    {
+		logger.debug(cause.getMessage());
+    }
 	/**
 	 * Close the admin session
 	 */
