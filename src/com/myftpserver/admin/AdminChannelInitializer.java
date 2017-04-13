@@ -8,7 +8,6 @@ import com.myftpserver.admin.AdminServer;
 import com.myftpserver.admin.handler.AdminChannelTimeoutHandler;
 import com.myftpserver.admin.handler.SessionHandler;
 import com.myftpserver.admin.listeners.AdminChannelClosureListener;
-import com.myftpserver.admin.listeners.SessionClosureListener;
 import com.myftpserver.admin.util.Utility;
 
 import io.netty.channel.Channel;
