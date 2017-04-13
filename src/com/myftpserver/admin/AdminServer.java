@@ -14,8 +14,7 @@ public class AdminServer<T> extends MyServer<T>
 {
 	private DbOp dbo;
 	private Logger logger;
-	@SuppressWarnings({ "unused", "rawtypes" })
-	private List<FtpServer> serverList=null;
+	private List<FtpServer<?>> serverList=null;
 	private static int connectionCount=0;
 	public AdminServer(Logger logger) 
 	{

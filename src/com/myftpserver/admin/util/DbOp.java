@@ -48,13 +48,13 @@ public class DbOp
 		Class.forName(jdbcDriver);
 		dbConn = DriverManager.getConnection(jdbcURL);
 	}
-	public List<FtpServer> getServerList()
+	public List<FtpServer<?>> getServerList()
 	{
-		FtpServer ftpServer; 
+		FtpServer<?> ftpServer; 
 		ResultSet rs = null;
 		PreparedStatement stmt=null;
 		String sql="select config_json from server where active=?";
-		List<FtpServer> serverList=new ArrayList<FtpServer>();
+		List<FtpServer<?>> serverList=new ArrayList<FtpServer<?>>();
 		try 
 		{
 			stmt = dbConn.prepareStatement(sql);
