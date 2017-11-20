@@ -1,8 +1,10 @@
-package com.admin;
+package com.admin.handler;
 import com.util.*;
 
 import java.util.Locale;
+
 import org.apache.logging.log4j.Logger;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -77,4 +79,10 @@ public class AdminSessionHandler extends SimpleChannelInboundHandler<WebSocketFr
         	ctx.channel().writeAndFlush(new TextWebSocketFrame(request.toUpperCase(Locale.US)));
         }
 	}
+	@Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) 
+	{
+        cause.printStackTrace();
+        ctx.close();
+    }
 }
