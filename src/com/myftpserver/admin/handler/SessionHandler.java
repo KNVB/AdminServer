@@ -46,8 +46,8 @@ public class SessionHandler extends SimpleChannelInboundHandler<String>
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception 
 	{
+		msg=msg.trim();
 		logger.debug("server receive:"+msg+"|");
-		
 	}
 	/**
 	 * Calls ChannelHandlerContext.fireExceptionCaught(Throwable) to forward to the next ChannelHandler in the ChannelPipeline. Sub-classes may override this method to change behavior.
