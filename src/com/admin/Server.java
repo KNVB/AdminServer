@@ -24,18 +24,14 @@ public class Server
 	
 	public Server()
 	{
-		// Configure SSL.
-        final SslContext sslCtx;
         SelfSignedCertificate ssc;
 		try {
-//			ssc = new SelfSignedCertificate();
-//			sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
 			logger = LogManager.getLogger(Server.class.getName());
 			st=new ServerTemplate<Integer>(ServerTemplate.ACCEPT_SINGLE_CONNECTION,logger);
 			st.setServerPort(port);
 			st.setHandlers(new LoggingHandler(LogLevel.INFO));
-			//st.setChildHandlers(new ServerInitializer(logger,sslCtx));
-			st.setChildHandlers(new ServerInitializer(logger,null));
+			
+			st.setChildHandlers(new ServerInitializer(logger));
 		} 
 		catch (Exception e) 
 		{
