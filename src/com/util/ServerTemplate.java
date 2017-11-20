@@ -84,6 +84,15 @@ public class ServerTemplate<T>
 		bootStrap.childOption(childOption, value);
 	}
 	/**
+	 * Set the  handler
+	 * @param ci handler
+	 */
+	public void setHandlers(ChannelHandler  ci)
+	{
+		bootStrap.handler(ci);
+	}
+	
+	/**
 	 * Set the child handler
 	 * @param ci child handler
 	 */
