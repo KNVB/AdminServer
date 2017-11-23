@@ -1,21 +1,31 @@
 package com.admin;
-
-
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.util.SelfSignedCertificate;
-
 import com.util.ServerTemplate;
-
-
-
-
+/*
+ * Copyright 2004-2005 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * 
+ * @author SITO3
+ *
+ */
 public class Server 
 {
 	private int port=4466;
@@ -24,13 +34,11 @@ public class Server
 	
 	public Server()
 	{
-        SelfSignedCertificate ssc;
 		try {
 			logger = LogManager.getLogger(Server.class.getName());
 			st=new ServerTemplate<Integer>(ServerTemplate.ACCEPT_SINGLE_CONNECTION,logger);
 			st.setServerPort(port);
 			st.setHandlers(new LoggingHandler(LogLevel.INFO));
-			
 			st.setChildHandlers(new ServerInitializer(logger));
 		} 
 		catch (Exception e) 

@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 
 
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -19,7 +20,6 @@ public class AdminSessionHandler extends SimpleChannelInboundHandler<WebSocketFr
 	private String returnEncoder=new String();
 	private String responseString,request;
 	private RSA myRSA;
-
 	private JSONObject requestObj=null;
 	public AdminSessionHandler(Logger logger)
 	{
@@ -52,7 +52,7 @@ public class AdminSessionHandler extends SimpleChannelInboundHandler<WebSocketFr
 	public void channelInactive(ChannelHandlerContext ctx)
             throws java.lang.Exception
     {
-		logger.info("Channel In Activated");
+		logger.info("Channel Inactivated");
 		
     }
 	@Override
@@ -69,7 +69,6 @@ public class AdminSessionHandler extends SimpleChannelInboundHandler<WebSocketFr
 	}
 	private void handleRequest(ChannelHandlerContext ctx, WebSocketFrame frame) throws Exception
 	{
-		 // Send the uppercase string back.
         request = ((TextWebSocketFrame) frame).text();
         logger.debug("{} received {}", ctx.channel(),request);
         
@@ -87,7 +86,7 @@ public class AdminSessionHandler extends SimpleChannelInboundHandler<WebSocketFr
         }
         else
         {                
-        	request=unescape(new String(myRSA.decode(hexStringToByteArray(request))));
+        	request=Utility.unescape(new String(myRSA.decode(Utility.hexStringToByteArray(request))));
         	requestObj=new JSONObject(request);
         	logger.debug("Request action:{}",requestObj.get("action"));
         	Response actionResponse=new Response();
@@ -108,57 +107,4 @@ public class AdminSessionHandler extends SimpleChannelInboundHandler<WebSocketFr
         cause.printStackTrace();
         ctx.close();
     }
-	/**
-     * Convert hex decimal string to byte array
-     * @param data hex decimal string
-     * @return byte array
-     */
-    public static byte[] hexStringToByteArray(String data) {
-		int k = 0;
-		byte[] results = new byte[data.length() / 2];
-		for (int i = 0; i < data.length();) {
-			results[k] = (byte) (Character.digit(data.charAt(i++), 16) << 4);
-			results[k] += (byte) (Character.digit(data.charAt(i++), 16));
-			k++;
-		}
- 
-		return results;
-	} 
-    /**
-     *Unescape javascript escaped string
-     *@param src javascript escaped string
-     *@return unescaped string
-   */
-  public static String unescape(String src) 
-  	{   
-          StringBuffer tmp = new StringBuffer();   
-          tmp.ensureCapacity(src.length());   
-          int lastPos = 0, pos = 0;   
-          char ch;   
-          while (lastPos < src.length()) {   
-              pos = src.indexOf("%", lastPos);   
-              if (pos == lastPos) {   
-                  if (src.charAt(pos + 1) == 'u') {   
-                      ch = (char) Integer.parseInt(src   
-                              .substring(pos + 2, pos + 6), 16);   
-                      tmp.append(ch);   
-                      lastPos = pos + 6;   
-                  } else {   
-                      ch = (char) Integer.parseInt(src   
-                              .substring(pos + 1, pos + 3), 16);   
-                      tmp.append(ch);   
-                      lastPos = pos + 3;   
-                  }   
-              } else {   
-                  if (pos == -1) {   
-                      tmp.append(src.substring(lastPos));   
-                      lastPos = src.length();   
-                  } else {   
-                      tmp.append(src.substring(lastPos, pos));   
-                      lastPos = pos;   
-                  }   
-              }   
-          }   
-          return tmp.toString();   
-      }
 }

@@ -1,4 +1,9 @@
-package com.util;
+package com.admin.listeners;
+
+import org.apache.logging.log4j.Logger;
+
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 /*
  * Copyright 2004-2005 the original author or authors.
  *
@@ -19,27 +24,20 @@ package com.util;
  * @author SITO3
  *
  */
-public class Response 
+public class AdminChannelClosureListener implements ChannelFutureListener 
 {
-	private String action;
-	private int responseCode=0;
-	private String returnMessage;
-	public String getAction() {
-		return action;
+	private Logger logger;
+	private String remoteIp=null;
+	public AdminChannelClosureListener(Logger logger, String remoteIp) 
+	{
+		this.logger=logger;
+		this.remoteIp=remoteIp;
 	}
-	public void setAction(String action) {
-		this.action = action;
+
+	@Override
+	public void operationComplete(ChannelFuture arg0) throws Exception {
+		// TODO Auto-generated method stub
+		logger.info("admin. Channel (Remote IP:"+remoteIp+") is closed.");
 	}
-	public int getResponseCode() {
-		return responseCode;
-	}
-	public void setResponseCode(int responseCode) {
-		this.responseCode = responseCode;
-	}
-	public String getReturnMessage() {
-		return returnMessage;
-	}
-	public void setReturnMessage(String returnMessage) {
-		this.returnMessage = returnMessage;
-	}	
+
 }
