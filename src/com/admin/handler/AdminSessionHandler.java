@@ -94,9 +94,12 @@ public class AdminSessionHandler extends SimpleChannelInboundHandler<WebSocketFr
 	        				 actionResponse.setReturnMessage("中文");
 	        				 //actionResponse.setReturnMessage("abc");
 	        				 responseString=(new JSONObject(actionResponse)).toString();
+	        				 responseString=StringEscapeUtils.escapeEcmaScript(responseString);
 	        				 byte [] encrypted=myRSA.encode(responseString.getBytes("UTF-8"));
-	        				 byte[] secret=myRSA.decode(encrypted);
-	        				 logger.debug(new String(secret));
+	        				 responseString=new String(encrypted);
+	        				 
+	        				 // byte[] secret=myRSA.decode(encrypted);
+	        				 //logger.debug(new String(secret));
 	        				break;
         	}
         	ctx.channel().writeAndFlush(new TextWebSocketFrame(responseString));
