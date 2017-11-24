@@ -15,6 +15,9 @@
  */
 package com.util;
 import javax.crypto.*;
+
+import org.json.JSONObject;
+
 import java.security.*;
 import java.math.BigInteger;
 import java.security.interfaces.*;
@@ -128,4 +131,15 @@ public class RSA
 		buf.append(hexChars[high]);
 		buf.append(hexChars[low]);
 	}
+	/*public static void main(String[] args) throws Exception 
+	{
+		Response actionResponse=new Response();
+    	actionResponse.setResponseCode(0);
+    	actionResponse.setReturnMessage("中文");
+    	RSA myRSA=new RSA(1024);
+    	byte [] encrypted = myRSA.encode((new JSONObject(actionResponse)).toString().getBytes());
+    	System.out.println(new String(encrypted));
+    	byte[] secret = myRSA.decode(encrypted);
+    	System.out.println(new String(secret)); 
+	}*/
 }

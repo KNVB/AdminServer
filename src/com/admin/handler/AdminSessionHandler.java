@@ -1,8 +1,10 @@
 package com.admin.handler;
 import com.util.*;
 
-import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
+import org.apache.commons.text.StringEscapeUtils;
+import org.apache.logging.log4j.Logger;
+
 
 
 
@@ -17,7 +19,7 @@ public class AdminSessionHandler extends SimpleChannelInboundHandler<WebSocketFr
 {
 	private boolean isFirstConnect=true;
 	private static Logger logger=null;
-	private String returnEncoder=new String();
+	private String returnCoder=new String();
 	private String responseString,request;
 	private RSA myRSA;
 	private JSONObject requestObj=null;
@@ -34,14 +36,8 @@ public class AdminSessionHandler extends SimpleChannelInboundHandler<WebSocketFr
 		try 
 		{
 		   myRSA = new RSA(1024);
-		   returnEncoder ="function Encoder(){\n";
-	       returnEncoder+="setMaxDigits(130);\n";
-	       returnEncoder+="key = new RSAKeyPair(\""+myRSA.getPublicExponent()+"\",\"\",\""+myRSA.getPublicModulus()+"\");\n";
-	       returnEncoder+="}\n";	
-	       returnEncoder+="Encoder.prototype.encode=function(data)\n";
-	       returnEncoder+="{\n";
-	       returnEncoder+="		 return encryptedString(key,data);\n";
-	       returnEncoder+="}\n";							 							 
+		   returnCoder="coder=new Coder(\""+myRSA.getPublicExponent()+"\",\""+myRSA.getPrivateExponent()+"\",\""+myRSA.getPublicModulus()+"\");";
+	       
 		} 
 		catch (Exception e) 
 		{
@@ -76,7 +72,7 @@ public class AdminSessionHandler extends SimpleChannelInboundHandler<WebSocketFr
         {
 			if (isFirstConnect)
 			{	
-				ctx.channel().writeAndFlush(new TextWebSocketFrame(returnEncoder));
+				ctx.channel().writeAndFlush(new TextWebSocketFrame(returnCoder));
 				isFirstConnect=false;
 			}
 			else
@@ -87,15 +83,20 @@ public class AdminSessionHandler extends SimpleChannelInboundHandler<WebSocketFr
         else
         {                
         	request=Utility.unescape(new String(myRSA.decode(Utility.hexStringToByteArray(request))));
-        	requestObj=new JSONObject(request);
+        	logger.debug("Request action:{}",request);
+      	    requestObj=new JSONObject(request);
         	logger.debug("Request action:{}",requestObj.get("action"));
         	Response actionResponse=new Response();
 			actionResponse.setAction((String)requestObj.get("action"));	
         	switch ((String)requestObj.get("action"))
         	{
 	        	case "LOGIN":actionResponse.setResponseCode(0);
-	        				 actionResponse.setReturnMessage("Login success");
+	        				 actionResponse.setReturnMessage("中文");
+	        				 //actionResponse.setReturnMessage("abc");
 	        				 responseString=(new JSONObject(actionResponse)).toString();
+	        				 byte [] encrypted=myRSA.encode(responseString.getBytes("UTF-8"));
+	        				 byte[] secret=myRSA.decode(encrypted);
+	        				 logger.debug(new String(secret));
 	        				break;
         	}
         	ctx.channel().writeAndFlush(new TextWebSocketFrame(responseString));
