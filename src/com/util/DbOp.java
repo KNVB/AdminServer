@@ -75,6 +75,40 @@ public class DbOp {
 		}		
 		return serverList;
 	}*/
+	public boolean login(String userName, String password) 
+	{
+		boolean loginResult=false;
+		ResultSet rs = null;
+		PreparedStatement stmt=null;
+		String sql="select count(*) from server where username=? and password=? and active=1";
+		try 
+		{
+			stmt = dbConn.prepareStatement(sql);
+			stmt.setString(1, userName);
+			stmt.setString(2, password);
+			stmt.setInt(3, 1);
+			rs=stmt.executeQuery();
+			if (rs.next())
+			{
+				loginResult=true;
+				logger.debug("Login success");
+			}
+			else
+			{
+				logger.debug("Login Failure");				
+			}			
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			releaseResource(rs, stmt);
+		}		
+		return loginResult;
+		
+	}
 	/**
 	 * Close db connection
 	 * @throws Exception
@@ -115,5 +149,5 @@ public class DbOp {
 		}
 		r = null;
 		s = null;
-	}	
+	}		
 }
