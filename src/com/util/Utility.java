@@ -41,6 +41,17 @@ public class Utility
  
 		return results;
 	}
+  //Converting a bytes array to string of hex character
+    public static String byteArrayToHexString(byte[] b) {
+     int len = b.length;
+     String data = new String();
+
+     for (int i = 0; i < len; i++){
+     data += Integer.toHexString((b[i] >> 4) & 0xf);
+     data += Integer.toHexString(b[i] & 0xf);
+     }
+     return data;
+    }
     /**
      *Unescape javascript escaped string
      *@param src javascript escaped string

@@ -15,12 +15,10 @@
  */
 package com.util;
 import javax.crypto.*;
-
-import org.json.JSONObject;
-
 import java.security.*;
 import java.math.BigInteger;
 import java.security.interfaces.*;
+//import org.json.JSONObject;
 /**
  * @author Roy Tsang
  *

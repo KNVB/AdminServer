@@ -35,8 +35,8 @@ public class AdminChannelClosureListener implements ChannelFutureListener
 	}
 
 	@Override
-	public void operationComplete(ChannelFuture arg0) throws Exception {
-		// TODO Auto-generated method stub
+	public void operationComplete(ChannelFuture arg0) throws Exception 
+	{
 		logger.info("admin. Channel (Remote IP:"+remoteIp+") is closed.");
 	}
 

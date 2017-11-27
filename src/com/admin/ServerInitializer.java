@@ -41,7 +41,7 @@ import io.netty.handler.timeout.IdleStateHandler;
  */
 public class ServerInitializer extends ChannelInitializer<SocketChannel> 
 {
-	private static Logger logger=null;
+	private Logger logger=null;
 	private static final String WEBSOCKET_PATH = "/websocket";
 	public ServerInitializer(Logger logger) 
 	{

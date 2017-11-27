@@ -1,0 +1,105 @@
+<html>
+   <head>
+	<meta charset="UTF-8" />
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+	<script src="http://code.jquery.com/jquery-3.2.1.js"></script>
+	
+	<script language="JavaScript" src="js/BigInt.js"></script>
+	<script language="JavaScript" src="js/Barrett.js"></script>
+	<script language="JavaScript" src="js/RSA.js"></script>
+	<script language="JavaScript" src="js/Utility.js"></script>
+	<script language="JavaScript" src="js/Coder.js"></script>
+	<script language="javascript">
+		var ws = null;
+		var coder=null;
+		var isFirstConnect=true;
+		function connect()
+		{
+			var hostName=document.getElementById("hostName").value;
+			var portNo=document.getElementById("portNo").value;
+			// Let us open a web socket
+			ws = new WebSocket("ws://"+hostName+":"+portNo+"/websocket");
+			ws.onopen=sendGreetingMessage;	
+			ws.onmessage=serverResponseHandler;
+		}
+		function sendGreetingMessage()
+		{
+			 ws.send("Hello");
+		}
+		function serverResponseHandler(evt)
+		{
+			var received_msg = evt.data;
+			if (isFirstConnect)
+			{	
+				eval(received_msg);
+				var login=new Login(document.getElementById("userName").value,document.getElementById("password").value);
+				login=Utility.stringReverse(encodeURIComponent(JSON.stringify(login)));
+				ws.send(coder.encode(login));
+				isFirstConnect=false;
+			}
+			else
+			{	
+				responseString=Utility.stringReverse(coder.decode(received_msg));
+				console.log(decodeURIComponent(responseString));
+				/*responseString=Utility.ascii2native(responseString);
+				responseString=responseString.replace(/\\/g,"");
+				responseObj=JSON.parse(responseString);
+				console.log(responseObj.action);*/
+			}
+		}
+		function disConnect()
+		{
+			if (ws != null)
+			{	
+				ws.close();
+				isFirstConnect=true;
+			}
+		}
+		function Login(userName,password)
+		{
+			this.action="LOGIN";
+			this.userName=userName;
+			this.password=password;
+		}
+		function openNav() 
+		{
+			document.getElementById("mySidenav").style.width = "250px";
+		}
+		function closeNav() 
+		{
+			document.getElementById("mySidenav").style.width = "0";
+		}		
+	</script>
+   </head>
+   <body>
+		<div id="mySidenav" class="sidenav">
+			<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+			<table class="loginTable">
+				<tr>
+					<td colspan=2 align=center>Admin. Server login</td>
+				</tr>
+				<tr>
+					<td class="loginCaption">server name:</td>
+					<td><input type=text value="localhost" id="hostName" size="10" required ></td>
+				</tr>
+				<tr>
+					<td class="loginCaption">server port no:</td>
+					<td><input type=number value="4466" id="portNo" min="1" max="999999" required ></td>
+				</tr>
+				<tr>
+					<td class="loginCaption">user name:</td>
+					<td><input type="text" value ="中文" id="userName" size="10" required></td>
+				</tr>
+				<tr>
+					<td class="loginCaption">password:</td>
+					<td><input type="password" value ="密碼" id="password" size="10" required></td>
+				</tr>
+				<tr>
+					<td ><button onclick="connect()" style="float:right">Connect</button></td>
+					<td><button onclick="disConnect()">Disconnect</button></td>
+				</tr>	
+			</table>	
+		</div>
+		<span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; open</span>
+   </body>
+ </html>  
