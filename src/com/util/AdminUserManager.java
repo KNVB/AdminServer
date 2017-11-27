@@ -11,6 +11,6 @@ public class AdminUserManager
 	}
 	public boolean login(String userName,String password)
 	{
-		return dbo.login( userName, password);
+		return dbo.adminLogin(userName, password);
 	}
 }

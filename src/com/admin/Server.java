@@ -5,6 +5,7 @@ import io.netty.handler.logging.LoggingHandler;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
+import com.util.DbOp;
 import com.util.ServerTemplate;
 /*
  * Copyright 2004-2005 the original author or authors.
@@ -28,6 +29,7 @@ import com.util.ServerTemplate;
  */
 public class Server 
 {
+	private DbOp dbo=null;
 	private int port=4466;
 	private ServerTemplate<Integer> st=null;
 	private static Logger logger=null;
@@ -36,10 +38,11 @@ public class Server
 	{
 		try {
 			logger = LogManager.getLogger(Server.class.getName());
+			dbo=new DbOp(logger);
 			st=new ServerTemplate<Integer>(ServerTemplate.ACCEPT_SINGLE_CONNECTION,logger);
 			st.setServerPort(port);
 			st.setHandlers(new LoggingHandler(LogLevel.INFO));
-			st.setChildHandlers(new ServerInitializer(logger));
+			st.setChildHandlers(new ServerInitializer(logger,dbo));
 		} 
 		catch (Exception e) 
 		{
@@ -51,10 +54,12 @@ public class Server
 		if (st!=null)
 			st.start();
 	}
-	public void stop()
+	public void stop() throws Exception
 	{
 		if (st!=null)
 			st.stop();
+		if (dbo!=null)
+			dbo.close();
 	}
 	public static void main(String[] args) 
 	{

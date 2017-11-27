@@ -13,7 +13,7 @@
 		var ws = null;
 		var coder=null;
 		var isFirstConnect=true;
-		function connect()
+		function login()
 		{
 			var hostName=document.getElementById("hostName").value;
 			var portNo=document.getElementById("portNo").value;
@@ -40,11 +40,17 @@
 			else
 			{	
 				responseString=Utility.stringReverse(coder.decode(received_msg));
-				console.log(decodeURIComponent(responseString));
-				/*responseString=Utility.ascii2native(responseString);
-				responseString=responseString.replace(/\\/g,"");
-				responseObj=JSON.parse(responseString);
-				console.log(responseObj.action);*/
+				responseObj=JSON.parse(decodeURIComponent(responseString));
+				if(responseObj.responseCode==0)
+				{
+					$(".loginTable").toggle();
+					$(".adminTable").toggle();
+				}
+				else
+				{
+					disConnect();
+					alert("Invalid user name or password");	
+				}
 			}
 		}
 		function disConnect()
@@ -53,6 +59,8 @@
 			{	
 				ws.close();
 				isFirstConnect=true;
+				$(".loginTable").toggle();
+				$(".adminTable").toggle();
 			}
 		}
 		function Login(userName,password)
@@ -95,8 +103,19 @@
 					<td><input type="password" value ="密碼" id="password" size="10" required></td>
 				</tr>
 				<tr>
-					<td ><button onclick="connect()" style="float:right">Connect</button></td>
+					<td ><button onclick="login()" style="float:right">Login</button></td>
 					<td><button onclick="disConnect()">Disconnect</button></td>
+				</tr>	
+			</table>
+			<table class="adminTable">
+				<tr>
+					<td><a href="javascript:listServers()">List servers</a></td>
+				</tr>
+				<tr>
+					<td><a href="javascript:changeAdminPwd()">Change admin. password</a></td>
+				</tr>
+				<tr>	
+					<td><a href="javascript:disConnect()">Logout</a></td>
 				</tr>	
 			</table>	
 		</div>

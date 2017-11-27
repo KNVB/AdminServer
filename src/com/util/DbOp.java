@@ -75,12 +75,12 @@ public class DbOp {
 		}		
 		return serverList;
 	}*/
-	public boolean login(String userName, String password) 
+	public boolean adminLogin(String userName, String password) 
 	{
 		boolean loginResult=false;
 		ResultSet rs = null;
 		PreparedStatement stmt=null;
-		String sql="select count(*) from server where username=? and password=? and active=1";
+		String sql="select * from admin_user where username=? and password=? and active=?";
 		try 
 		{
 			stmt = dbConn.prepareStatement(sql);
@@ -88,7 +88,7 @@ public class DbOp {
 			stmt.setString(2, password);
 			stmt.setInt(3, 1);
 			rs=stmt.executeQuery();
-			if (rs.next())
+			if (rs.next()) 
 			{
 				loginResult=true;
 				logger.debug("Login success");

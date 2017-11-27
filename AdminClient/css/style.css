@@ -51,3 +51,8 @@ body {
 {
 	text-align:right;
 }
+.adminTable
+{
+	color:white;
+	display:none;
+}

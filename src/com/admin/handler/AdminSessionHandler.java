@@ -1,6 +1,7 @@
 package com.admin.handler;
 
 import com.util.*;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -18,16 +19,17 @@ import org.apache.logging.log4j.Logger;
 public class AdminSessionHandler extends SimpleChannelInboundHandler<WebSocketFrame>
 {
 	private boolean isFirstConnect=true;
+	private DbOp dbo;
+	private JSONObject requestObj=null;
 	private Logger logger=null;
 	private String returnCoder=new String();
 	private String responseString,request;
 	private RSA myRSA;
-	private JSONObject requestObj=null;
-	public AdminSessionHandler(Logger logger)
+	public AdminSessionHandler(Logger logger, DbOp dbo)
 	{
 		
 		this.logger=logger;
-
+		this.dbo=dbo;
 	}
 	@Override
 	public void channelActive(ChannelHandlerContext ctx)
@@ -91,12 +93,24 @@ public class AdminSessionHandler extends SimpleChannelInboundHandler<WebSocketFr
 			actionResponse.setAction((String)requestObj.get("action"));	
         	switch ((String)requestObj.get("action"))
         	{
-	        	case "LOGIN":actionResponse.setResponseCode(0);
-	        				 actionResponse.setReturnMessage("中文");
-	        				 responseString=(new JSONObject(actionResponse)).toString();
-	        				 responseString=URLEncoder.encode(responseString,"UTF-8");
-	        				 responseString=Utility.byteArrayToHexString(myRSA.encode(responseString.getBytes()));
-	        				 break;
+	        	case "LOGIN":
+        					String userName=(String)requestObj.get("userName");
+        					String password=(String)requestObj.get("password");
+        					logger.debug("user name={},password={}",userName,password);
+        					if (dbo.adminLogin(userName, password))
+	        				{
+	        					actionResponse.setResponseCode(0);
+	        					actionResponse.setReturnMessage("Login success");
+	        				}
+        					else
+        					{
+	        					actionResponse.setResponseCode(-1);
+	        					actionResponse.setReturnMessage("Login failure");
+        					}
+							responseString=(new JSONObject(actionResponse)).toString();
+							responseString=URLEncoder.encode(responseString,"UTF-8");
+							responseString=Utility.byteArrayToHexString(myRSA.encode(responseString.getBytes()));
+	        				break;
         	}
         	ctx.channel().writeAndFlush(new TextWebSocketFrame(responseString));
         }

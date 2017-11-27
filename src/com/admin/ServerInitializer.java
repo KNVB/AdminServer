@@ -11,6 +11,7 @@ import com.admin.handler.AdminSessionHandler;
 
 
 import com.admin.listeners.AdminChannelClosureListener;
+import com.util.DbOp;
 
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelInitializer;
@@ -42,10 +43,12 @@ import io.netty.handler.timeout.IdleStateHandler;
 public class ServerInitializer extends ChannelInitializer<SocketChannel> 
 {
 	private Logger logger=null;
+	private DbOp dbo;
 	private static final String WEBSOCKET_PATH = "/websocket";
-	public ServerInitializer(Logger logger) 
+	public ServerInitializer(Logger logger, DbOp dbo) 
 	{
 		this.logger=logger;
+		this.dbo=dbo;
 	}
 
 	@Override
@@ -59,6 +62,6 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel>
 		pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpObjectAggregator(65536));
         pipeline.addLast(new WebSocketServerProtocolHandler(WEBSOCKET_PATH, null, true));
-        pipeline.addLast(new AdminSessionHandler(logger));
+        pipeline.addLast(new AdminSessionHandler(logger,dbo));
 	}
 }
