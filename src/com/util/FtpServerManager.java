@@ -1,6 +1,7 @@
 package com.util;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.logging.log4j.Logger;
 
@@ -17,7 +18,7 @@ public class FtpServerManager
 	}
 	public <T> ArrayList<FtpServer<T>> getAllServerList()
 	{
-		ArrayList<FtpServer<T>> serverList=new ArrayList<FtpServer<T>>();
+		ArrayList<FtpServer<T>> serverList=dbo.getAllServerList();
 		return serverList;
 	}	
 }

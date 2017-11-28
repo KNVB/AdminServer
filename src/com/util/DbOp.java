@@ -49,17 +49,17 @@ public class DbOp {
 		Class.forName(jdbcDriver);
 		dbConn = DriverManager.getConnection(jdbcURL);
 	}
-	public <T> List<FtpServer<T>> getAllServerList()
+	public <T> ArrayList<FtpServer<T>> getAllServerList()
 	{
 		FtpServer<T> ftpServer; 
 		ResultSet rs = null;
 		PreparedStatement stmt=null;
 		String sql="select * from server";
-		List<FtpServer<T>> serverList=new ArrayList<FtpServer<T>>();
+		ArrayList<FtpServer<T>> serverList=new ArrayList<FtpServer<T>>();
 		try 
 		{
 			stmt = dbConn.prepareStatement(sql);
-			stmt.setInt(1, 1);
+			//stmt.setInt(1, 1);
 			rs=stmt.executeQuery();
 			while (rs.next())
 			{

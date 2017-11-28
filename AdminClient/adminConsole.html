@@ -59,7 +59,8 @@
 									ws.send(coder.encode(Utility.stringReverse("{\"action\":\"GETServerList\"}")));
 									break;
 						case "GETServerList":
-									console.log(responseObj);
+									var serverList=JSON.parse(responseObj.returnMessage);
+									console.log(serverList);
 									break;
 					}
 				}
