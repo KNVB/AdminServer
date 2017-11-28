@@ -1,13 +1,14 @@
-package com.admin;
+package com.ftp;
+
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import com.util.AdminUserManager;
+import com.admin.Server;
+import com.admin.ServerInitializer;
 import com.util.DbOp;
-import com.util.FtpServerManager;
 import com.util.ServerTemplate;
 /*
  * Copyright 2004-2005 the original author or authors.
@@ -28,66 +29,29 @@ import com.util.ServerTemplate;
  * 
  * @author SITO3
  * @param <T>
+ * @param <T>
  *
  */
-public class Server
+public class FtpServer<T>
 {
-	private int port=4466;
 	private DbOp dbo=null;
-	private FtpServerManager ftpServerManager=null; 
-	private AdminUserManager adminUserManager=null;
-	private ServerTemplate<Integer> st=null;
+	private int port;
+	private ServerTemplate<T> st=null;
 	private static Logger logger=null;
-	
-	public Server()
+	private String description=null;
+	public FtpServer(String jsonString) 
 	{
-		try {
+		/*try {
 			logger = LogManager.getLogger(Server.class.getName());
 			dbo=new DbOp(logger);
-			adminUserManager=new AdminUserManager(dbo,logger);
-			ftpServerManager=new FtpServerManager(dbo,logger);  
-			st=new ServerTemplate<Integer>(ServerTemplate.ACCEPT_SINGLE_CONNECTION,logger);
+			st=new ServerTemplate<T>(ServerTemplate.ACCEPT_SINGLE_CONNECTION,logger);
 			st.setServerPort(port);
 			st.setHandlers(new LoggingHandler(LogLevel.INFO));
-			st.setChildHandlers(new ServerInitializer(this));
+			st.setChildHandlers(new ServerInitializer(logger,dbo));
 		} 
 		catch (Exception e) 
 		{
 			e.printStackTrace();
-		}
+		}*/
 	}
-	
-	public FtpServerManager getFtpServerManager() 
-	{
-		return ftpServerManager;
-	}
-	public AdminUserManager getAdminUserManager() 
-	{
-		return adminUserManager;
-	}	
-	public Logger getLogger()
-	{
-		return logger;
-	}
-	public void start()
-	{
-		if (st!=null)
-			st.start();
-	}
-	public void stop() throws Exception
-	{
-		if (st!=null)
-			st.stop();
-		if (dbo!=null)
-			dbo.close();
-	}
-	public static void main(String[] args) 
-	{
-		Server s=new Server();
-		s.start();
-		
-	}
-
-	
-
 }

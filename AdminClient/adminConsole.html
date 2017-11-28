@@ -18,14 +18,21 @@
 		{
 			var hostName=document.getElementById("hostName").value;
 			var portNo=document.getElementById("portNo").value;
+
 			// Let us open a web socket
 			ws = new WebSocket("ws://"+hostName+":"+portNo+"/websocket");
+			ws.onerror=errorHandler;
 			ws.onopen=sendGreetingMessage;	
 			ws.onmessage=serverResponseHandler;
+			
 		}
 		function sendGreetingMessage()
 		{
 			 ws.send("Hello");
+		}
+		function errorHandler(evt)
+		{
+			alert("Cannot connect to Admin. Server");
 		}
 		function serverResponseHandler(evt)
 		{
@@ -44,8 +51,17 @@
 				responseObj=JSON.parse(decodeURIComponent(responseString));
 				if(responseObj.responseCode==0)
 				{
-					$(".adminTable").toggle();
-					$(".loginTable").toggle();
+					switch (responseObj.action)
+					{
+						case "LOGIN":
+									$(".adminTable").show();
+									$('.loginDiv').animate({opacity: 'hide', height: 'hide'}, 500);
+									ws.send(coder.encode(Utility.stringReverse("{\"action\":\"GETServerList\"}")));
+									break;
+						case "GETServerList":
+									console.log(responseObj);
+									break;
+					}
 				}
 				else
 				{
@@ -60,8 +76,9 @@
 			{	
 				ws.close();
 				isFirstConnect=true;
-				$(".loginTable").toggle();
-				$(".adminTable").toggle();
+				$(".loginDiv").animate({opacity: 'show', height: 'show'}, 1000);
+				$('.adminTable').animate({opacity: 'hide', height: 'hide'}, 1000);
+				
 			}
 		}
 		function Login(userName,password)
@@ -83,45 +100,51 @@
    <body>
 		<div id="mySidenav" class="sidenav">
 			<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-			<table class="loginTable">
-				<tr>
-					<td colspan=2 align=center>Admin. Server login</td>
-				</tr>
-				<tr>
-					<td class="loginCaption">server name:</td>
-					<td><input type=text value="localhost" id="hostName" size="10" required ></td>
-				</tr>
-				<tr>
-					<td class="loginCaption">server port no:</td>
-					<td><input type=number value="4466" id="portNo" min="1" max="999999" required ></td>
-				</tr>
-				<tr>
-					<td class="loginCaption">user name:</td>
-					<td><input type="text" value ="中文" id="userName" size="10" required></td>
-				</tr>
-				<tr>
-					<td class="loginCaption">password:</td>
-					<td><input type="password" value ="密碼" id="password" size="10" required></td>
-				</tr>
-				<tr>
-					<td colspan=2 style="text-align:center;"><button onclick="login()">Login</button></td>
-					<!--<td><button onclick="login()" style="float:right">Login</button></td>
-					<td><button onclick="disConnect()">Disconnect</button></td>-->
-				</tr>	
-			</table>
-			<table class="adminTable">
-				<tr>
-					<td>
-						<a href="javascript:listServers()">List servers</a>
-					</td>
-				</tr>
-				<tr>
-					<td><a href="javascript:changeAdminPwd()">Change admin. password</a></td>
-				</tr>
-				<tr>	
-					<td><a href="javascript:disConnect()">Logout</a></td>
-				</tr>	
-			</table>	
+			<div class="loginDiv">
+				<table class="loginTable">
+					<tr>
+						<td colspan=2 align=center>Admin. Server login</td>
+					</tr>
+					<tr>
+						<td class="loginCaption">server name:</td>
+						<td><input type=text value="localhost" id="hostName" size="10" required ></td>
+					</tr>
+					<tr>
+						<td class="loginCaption">server port no:</td>
+						<td><input type=number value="4466" id="portNo" min="1" max="999999" required ></td>
+					</tr>
+					<tr>
+						<td class="loginCaption">user name:</td>
+						<td><input type="text" value ="admin" id="userName" size="10" required></td>
+					</tr>
+					<tr>
+						<td class="loginCaption">password:</td>
+						<td><input type="password" value ="password" id="password" size="10" required></td>
+					</tr>
+					<tr>
+						<td colspan=2 style="text-align:center;"><button onclick="login()">Login</button></td>
+						<!--<td><button onclick="login()" style="float:right">Login</button></td>
+						<td><button onclick="disConnect()">Disconnect</button></td>-->
+					</tr>	
+				</table>
+			</div>
+			<div class="adminTable">
+				<table>
+					<tr>
+						<td>
+							<a href="javascript:listServers()">Server list</a>
+							<ol id="serverList">
+							</ol>
+						</td>
+					</tr>
+					<tr>
+						<td><a href="javascript:changeAdminPwd()">Change admin. password</a></td>
+					</tr>
+					<tr>	
+						<td><a href="javascript:disConnect()">Logout</a></td>
+					</tr>	
+				</table>
+			</div>			
 		</div>
 		<span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; open</span>
    </body>

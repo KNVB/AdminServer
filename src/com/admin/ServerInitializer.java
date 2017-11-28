@@ -42,13 +42,11 @@ import io.netty.handler.timeout.IdleStateHandler;
  */
 public class ServerInitializer extends ChannelInitializer<SocketChannel> 
 {
-	private Logger logger=null;
-	private DbOp dbo;
+	private Server adminServer=null;
 	private static final String WEBSOCKET_PATH = "/websocket";
-	public ServerInitializer(Logger logger, DbOp dbo) 
+	public ServerInitializer(Server server) 
 	{
-		this.logger=logger;
-		this.dbo=dbo;
+		this.adminServer=server;
 	}
 
 	@Override
@@ -56,12 +54,12 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel>
 	{
 		ChannelPipeline pipeline = ch.pipeline();
 		String remoteIp=(((InetSocketAddress) ch.remoteAddress()).getAddress().getHostAddress());
-		ch.closeFuture().addListener(new AdminChannelClosureListener(logger,remoteIp));
-		pipeline.addLast("CommandChannelTimeoutHandler", new AdminChannelTimeoutHandler(logger,remoteIp));
+		ch.closeFuture().addListener(new AdminChannelClosureListener(adminServer.getLogger(),remoteIp));
+		pipeline.addLast("CommandChannelTimeoutHandler", new AdminChannelTimeoutHandler(adminServer.getLogger(),remoteIp));
 		pipeline.addLast("idleStateHandler", new IdleStateHandler(30, 30, 30));
 		pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpObjectAggregator(65536));
         pipeline.addLast(new WebSocketServerProtocolHandler(WEBSOCKET_PATH, null, true));
-        pipeline.addLast(new AdminSessionHandler(logger,dbo));
+        pipeline.addLast(new AdminSessionHandler(adminServer));
 	}
 }

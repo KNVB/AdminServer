@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 
 import org.apache.logging.log4j.Logger;
 
+import com.ftp.FtpServer;
+
 //import com.myftpserver.server.FtpServer;
 /*
  * Copyright 2004-2005 the original author or authors.
@@ -47,13 +49,13 @@ public class DbOp {
 		Class.forName(jdbcDriver);
 		dbConn = DriverManager.getConnection(jdbcURL);
 	}
-	/*public List<FtpServer<?>> getServerList()
+	public <T> List<FtpServer<T>> getAllServerList()
 	{
-		FtpServer<?> ftpServer; 
+		FtpServer<T> ftpServer; 
 		ResultSet rs = null;
 		PreparedStatement stmt=null;
-		String sql="select config_json from server where active=?";
-		List<FtpServer<?>> serverList=new ArrayList<FtpServer<?>>();
+		String sql="select * from server";
+		List<FtpServer<T>> serverList=new ArrayList<FtpServer<T>>();
 		try 
 		{
 			stmt = dbConn.prepareStatement(sql);
@@ -61,7 +63,7 @@ public class DbOp {
 			rs=stmt.executeQuery();
 			while (rs.next())
 			{
-				ftpServer=new FtpServer(rs.getString("config_json"));
+				ftpServer=new FtpServer<T>(rs.getString("config_json"));
 				serverList.add(ftpServer);
 			}
 		} 
@@ -74,7 +76,7 @@ public class DbOp {
 			releaseResource(rs, stmt);
 		}		
 		return serverList;
-	}*/
+	}
 	public boolean adminLogin(String userName, String password) 
 	{
 		boolean loginResult=false;

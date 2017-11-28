@@ -1,5 +1,7 @@
 package com.admin.handler;
 
+import com.admin.Server;
+import com.ftp.FtpServer;
 import com.util.*;
 
 import io.netty.channel.ChannelHandlerContext;
@@ -10,26 +12,30 @@ import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 import org.json.JSONObject;
 import org.apache.logging.log4j.Logger;
 
 
 @Sharable
-public class AdminSessionHandler extends SimpleChannelInboundHandler<WebSocketFrame>
+public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocketFrame>
 {
 	private boolean isFirstConnect=true;
-	private DbOp dbo;
 	private JSONObject requestObj=null;
 	private Logger logger=null;
 	private String returnCoder=new String();
 	private String responseString,request;
 	private RSA myRSA;
-	public AdminSessionHandler(Logger logger, DbOp dbo)
+	private Server adminServer=null;
+	private FtpServerManager ftpServerManager=null;  
+	private AdminUserManager adminUserManager=null;
+	public AdminSessionHandler(Server adminServer)
 	{
-		
-		this.logger=logger;
-		this.dbo=dbo;
+		this.adminServer=adminServer;
+		this.logger=adminServer.getLogger();
+		this.adminUserManager=adminServer.getAdminUserManager();
+		this.ftpServerManager=adminServer.getFtpServerManager();
 	}
 	@Override
 	public void channelActive(ChannelHandlerContext ctx)
@@ -94,24 +100,31 @@ public class AdminSessionHandler extends SimpleChannelInboundHandler<WebSocketFr
         	switch ((String)requestObj.get("action"))
         	{
 	        	case "LOGIN":
-        					String userName=(String)requestObj.get("userName");
-        					String password=(String)requestObj.get("password");
-        					logger.debug("user name={},password={}",userName,password);
-        					if (dbo.adminLogin(userName, password))
-	        				{
-	        					actionResponse.setResponseCode(0);
-	        					actionResponse.setReturnMessage("Login success");
-	        				}
-        					else
-        					{
-	        					actionResponse.setResponseCode(-1);
-	        					actionResponse.setReturnMessage("Login failure");
-        					}
-							responseString=(new JSONObject(actionResponse)).toString();
-							responseString=URLEncoder.encode(responseString,"UTF-8");
-							responseString=Utility.byteArrayToHexString(myRSA.encode(responseString.getBytes()));
-	        				break;
+    					String userName=(String)requestObj.get("userName");
+    					String password=(String)requestObj.get("password");
+    					logger.debug("user name={},password={}",userName,password);
+    					if (adminUserManager.login(userName, password))
+        				{
+        					actionResponse.setResponseCode(0);
+        					actionResponse.setReturnMessage("Login success");
+        				}
+    					else
+    					{
+        					actionResponse.setResponseCode(-1);
+        					actionResponse.setReturnMessage("Login failure");
+    					}
+						responseString=(new JSONObject(actionResponse)).toString();
+					
+        				break;
+	        	case "GETServerList":
+	        			ArrayList<FtpServer<T>> ftpServerList=ftpServerManager.getAllServerList();
+	        			actionResponse.setResponseCode(0);
+	        			actionResponse.setReturnMessage((new JSONObject(ftpServerList)).toString());
+	        			responseString=(new JSONObject(actionResponse)).toString();
+	        			break;
         	}
+        	responseString=URLEncoder.encode(responseString,"UTF-8");
+			responseString=Utility.byteArrayToHexString(myRSA.encode(responseString.getBytes()));
         	ctx.channel().writeAndFlush(new TextWebSocketFrame(responseString));
         }
 	}
