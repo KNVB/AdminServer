@@ -9,6 +9,7 @@
 	<script language="JavaScript" src="js/RSA.js"></script>
 	<script language="JavaScript" src="js/Utility.js"></script>
 	<script language="JavaScript" src="js/Coder.js"></script>
+	<script language="JavaScript" src="js/Login.js"></script>
 	<script language="javascript">
 		var ws = null;
 		var coder=null;
@@ -43,8 +44,8 @@
 				responseObj=JSON.parse(decodeURIComponent(responseString));
 				if(responseObj.responseCode==0)
 				{
-					$(".loginTable").toggle();
 					$(".adminTable").toggle();
+					$(".loginTable").toggle();
 				}
 				else
 				{
@@ -103,13 +104,16 @@
 					<td><input type="password" value ="密碼" id="password" size="10" required></td>
 				</tr>
 				<tr>
-					<td ><button onclick="login()" style="float:right">Login</button></td>
-					<td><button onclick="disConnect()">Disconnect</button></td>
+					<td colspan=2 style="text-align:center;"><button onclick="login()">Login</button></td>
+					<!--<td><button onclick="login()" style="float:right">Login</button></td>
+					<td><button onclick="disConnect()">Disconnect</button></td>-->
 				</tr>	
 			</table>
 			<table class="adminTable">
 				<tr>
-					<td><a href="javascript:listServers()">List servers</a></td>
+					<td>
+						<a href="javascript:listServers()">List servers</a>
+					</td>
 				</tr>
 				<tr>
 					<td><a href="javascript:changeAdminPwd()">Change admin. password</a></td>
