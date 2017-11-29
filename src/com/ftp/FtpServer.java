@@ -39,8 +39,10 @@ public class FtpServer<T>
 	private ServerTemplate<T> st=null;
 	private static Logger logger=null;
 	private String description=null;
+	
 	public FtpServer(String jsonString) 
 	{
+		description=jsonString;
 		/*try {
 			logger = LogManager.getLogger(Server.class.getName());
 			dbo=new DbOp(logger);
@@ -53,5 +55,11 @@ public class FtpServer<T>
 		{
 			e.printStackTrace();
 		}*/
+	}
+	public int getPort() {
+		return port;
+	}
+	public String getDescription() {
+		return description;
 	}
 }

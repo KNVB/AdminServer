@@ -18,7 +18,6 @@ import javax.crypto.*;
 import java.security.*;
 import java.math.BigInteger;
 import java.security.interfaces.*;
-//import org.json.JSONObject;
 /**
  * @author Roy Tsang
  *

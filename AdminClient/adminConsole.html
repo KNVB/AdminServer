@@ -1,3 +1,4 @@
+<!DOCTYPE html> 
 <html>
    <head>
 	<meta charset="UTF-8" />
@@ -32,7 +33,7 @@
 		}
 		function errorHandler(evt)
 		{
-			alert("Cannot connect to Admin. Server");
+			alert(evt.type);
 		}
 		function serverResponseHandler(evt)
 		{
@@ -47,27 +48,39 @@
 			}
 			else
 			{	
-				responseString=Utility.stringReverse(coder.decode(received_msg));
-				responseObj=JSON.parse(decodeURIComponent(responseString));
-				if(responseObj.responseCode==0)
+				//responseString=decodeURIComponent(Utility.stringReverse(coder.decode(received_msg)));
+				responseString=decodeURIComponent(received_msg);
+				console.log("responseString="+responseString);
+				responseObj=JSON.parse(responseString);
+				switch (responseObj.action)
 				{
-					switch (responseObj.action)
-					{
-						case "LOGIN":
+					case "LOGIN":
+								if(responseObj.responseCode==0)
+								{
 									$(".adminTable").show();
 									$('.loginDiv').animate({opacity: 'hide', height: 'hide'}, 500);
-									ws.send(coder.encode(Utility.stringReverse("{\"action\":\"GETServerList\"}")));
-									break;
-						case "GETServerList":
+									listServers();
+								}
+								else
+								{
+									disConnect();
+									alert("Invalid user name or password");	
+								}
+								break;
+					case "GETServerList":
+								if(responseObj.responseCode==0)
+								{
 									var serverList=JSON.parse(responseObj.returnMessage);
-									console.log(serverList);
-									break;
-					}
-				}
-				else
-				{
-					disConnect();
-					alert("Invalid user name or password");	
+									for (i=0;i<serverList.length;i++)
+									{
+										console.log(serverList[i]);									
+									}
+								}
+								else
+								{
+									alert("Getting server list failure.");	
+								}
+								break;
 				}
 			}
 		}
@@ -82,12 +95,10 @@
 				
 			}
 		}
-		function Login(userName,password)
+		function listServers()
 		{
-			this.action="LOGIN";
-			this.userName=userName;
-			this.password=password;
-		}
+			ws.send(coder.encode(Utility.stringReverse("{\"action\":\"GETServerList\"}")));
+		}		
 		function openNav() 
 		{
 			document.getElementById("mySidenav").style.width = "250px";
@@ -99,7 +110,7 @@
 	</script>
    </head>
    <body>
-		<div id="mySidenav" class="sidenav">
+		<div class="sidenav" id="mySidenav">
 			<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
 			<div class="loginDiv">
 				<table class="loginTable">
@@ -108,7 +119,7 @@
 					</tr>
 					<tr>
 						<td class="loginCaption">server name:</td>
-						<td><input type=text value="localhost" id="hostName" size="10" required ></td>
+						<td><input type=text value="10.53.11.32" id="hostName" size="10" required ></td>
 					</tr>
 					<tr>
 						<td class="loginCaption">server port no:</td>
@@ -128,25 +139,26 @@
 						<td><button onclick="disConnect()">Disconnect</button></td>-->
 					</tr>	
 				</table>
-			</div>
+			</div>			
 			<div class="adminTable">
 				<table>
 					<tr>
 						<td>
 							<a href="javascript:listServers()">Server list</a>
-							<ol id="serverList">
-							</ol>
+							<ul id="serverList">
+								<li>add new server</li>
+							</ul>
 						</td>
 					</tr>
 					<tr>
-						<td><a href="javascript:changeAdminPwd()">Change admin. password</a></td>
+						<td style="text-align:left"><a href="javascript:changeAdminPwd()">Change admin. password</a></td>
 					</tr>
 					<tr>	
 						<td><a href="javascript:disConnect()">Logout</a></td>
 					</tr>	
 				</table>
-			</div>			
-		</div>
+			</div>	
+		</div>		
 		<span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; open</span>
    </body>
  </html>  

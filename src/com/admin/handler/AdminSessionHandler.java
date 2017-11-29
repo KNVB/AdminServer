@@ -14,6 +14,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.apache.logging.log4j.Logger;
 
@@ -113,18 +114,24 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
         					actionResponse.setResponseCode(-1);
         					actionResponse.setReturnMessage("Login failure");
     					}
-						responseString=(new JSONObject(actionResponse)).toString();
-					
+    					//logger.debug((new JSONObject(actionResponse)).toString());
         				break;
 	        	case "GETServerList":
 	        			ArrayList<FtpServer<T>> ftpServerList=ftpServerManager.getAllServerList();
 	        			actionResponse.setResponseCode(0);
-	        			actionResponse.setReturnMessage((new JSONObject(ftpServerList)).toString());
-	        			responseString=(new JSONObject(actionResponse)).toString();
+	        			ftpServerList.add(new FtpServer<T>("abc"));
+	        			JSONObject obj=new JSONObject();
+	        			obj.put("ftpServerList", ftpServerList);
+	        			JSONArray jArray=obj.getJSONArray("ftpServerList");
+	        			actionResponse.setReturnMessage(jArray.toString());
+	        			//responseString=(new JSONObject(actionResponse)).toString();
+	        			
 	        			break;
         	}
+        	responseString=actionResponse.toJSONString();
+        	logger.debug("responseString={}",responseString);
         	responseString=URLEncoder.encode(responseString,"UTF-8");
-			responseString=Utility.byteArrayToHexString(myRSA.encode(responseString.getBytes()));
+			//responseString=Utility.byteArrayToHexString(myRSA.encode(responseString.getBytes()));
         	ctx.channel().writeAndFlush(new TextWebSocketFrame(responseString));
         }
 	}
