@@ -23,7 +23,7 @@ public class Response
 {
 	private String action;
 	private int responseCode=0;
-	private String returnMessage;
+	private String returnMessage="";
 	public String getAction() {
 		return action;
 	}

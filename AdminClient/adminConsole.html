@@ -70,7 +70,7 @@
 					case "GETServerList":
 								if(responseObj.responseCode==0)
 								{
-									var serverList=JSON.parse(responseObj.returnMessage);
+									var serverList=responseObj.returnMessage;
 									for (i=0;i<serverList.length;i++)
 									{
 										console.log(serverList[i]);									
@@ -119,7 +119,7 @@
 					</tr>
 					<tr>
 						<td class="loginCaption">server name:</td>
-						<td><input type=text value="10.53.11.32" id="hostName" size="10" required ></td>
+						<td><input type=text value="localhost" id="hostName" size="10" required ></td>
 					</tr>
 					<tr>
 						<td class="loginCaption">server port no:</td>

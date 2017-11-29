@@ -115,7 +115,8 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
         					actionResponse.setReturnMessage("Login failure");
     					}
     					//logger.debug((new JSONObject(actionResponse)).toString());
-        				break;
+    					responseString=(new JSONObject(actionResponse)).toString();
+    					break;
 	        	case "GETServerList":
 	        			ArrayList<FtpServer<T>> ftpServerList=ftpServerManager.getAllServerList();
 	        			actionResponse.setResponseCode(0);
@@ -123,12 +124,13 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	        			JSONObject obj=new JSONObject();
 	        			obj.put("ftpServerList", ftpServerList);
 	        			JSONArray jArray=obj.getJSONArray("ftpServerList");
-	        			actionResponse.setReturnMessage(jArray.toString());
+	        			responseString=actionResponse.toJSONString();
+	        			responseString=responseString.replace("\"returnMessage\":\"\"", "\"returnMessage\":"+jArray.toString());
 	        			//responseString=(new JSONObject(actionResponse)).toString();
 	        			
 	        			break;
         	}
-        	responseString=actionResponse.toJSONString();
+        	
         	logger.debug("responseString={}",responseString);
         	responseString=URLEncoder.encode(responseString,"UTF-8");
 			//responseString=Utility.byteArrayToHexString(myRSA.encode(responseString.getBytes()));
