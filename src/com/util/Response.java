@@ -42,12 +42,12 @@ public class Response
 	public void setReturnMessage(String returnMessage) {
 		this.returnMessage = returnMessage;
 	}
-	public String toJSONString()
+	/*public String toJSONString()
 	{
 		String result;
 		result ="{\"action\":\""+action+"\",";
 		result+="\"responseCode\":"+responseCode+",";
 		result+="\"returnMessage\":\""+returnMessage+"\"}";
 		return result;
-	}
+	}*/
 }

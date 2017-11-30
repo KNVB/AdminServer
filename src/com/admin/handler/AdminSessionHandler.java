@@ -124,7 +124,7 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	        			JSONObject obj=new JSONObject();
 	        			obj.put("ftpServerList", ftpServerList);
 	        			JSONArray jArray=obj.getJSONArray("ftpServerList");
-	        			responseString=actionResponse.toJSONString();
+	        			responseString=(new JSONObject(actionResponse)).toString();
 	        			responseString=responseString.replace("\"returnMessage\":\"\"", "\"returnMessage\":"+jArray.toString());
 	        			//responseString=(new JSONObject(actionResponse)).toString();
 	        			

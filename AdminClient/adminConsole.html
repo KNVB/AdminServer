@@ -38,6 +38,7 @@
 		function serverResponseHandler(evt)
 		{
 			var received_msg = evt.data;
+			console.log("received_msg="+received_msg);
 			if (isFirstConnect)
 			{	
 				eval(received_msg);
@@ -82,6 +83,7 @@
 								}
 								break;
 				}
+
 			}
 		}
 		function disConnect()
