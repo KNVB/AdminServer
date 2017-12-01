@@ -8,9 +8,13 @@
 	<script language="JavaScript" src="js/BigInt.js"></script>
 	<script language="JavaScript" src="js/Barrett.js"></script>
 	<script language="JavaScript" src="js/RSA.js"></script>
-	<script language="JavaScript" src="js/Utility.js"></script>
+	<script language="JavaScript" src="js/KeyCoder.js"></script>
 	<script language="JavaScript" src="js/Coder.js"></script>
+	<script language="JavaScript" src="js/Utility.js"></script>
 	<script language="JavaScript" src="js/Login.js"></script>
+	<script src="js/cryptojs/rollups/aes.js"></script>
+	<script src="js/cryptojs/components/mode-ctr-min.js"></script>
+	<script src="js/cryptojs/components/pad-nopadding.js"></script>
 	<script language="javascript">
 		var ws = null;
 		var coder=null;
@@ -38,20 +42,20 @@
 		function serverResponseHandler(evt)
 		{
 			var received_msg = evt.data;
-			console.log("received_msg="+received_msg);
+			console.log("server response message="+received_msg);
 			if (isFirstConnect)
 			{	
 				eval(received_msg);
 				var login=new Login(document.getElementById("userName").value,document.getElementById("password").value);
-				login=Utility.stringReverse(encodeURIComponent(JSON.stringify(login)));
+				//login=Utility.stringReverse(encodeURIComponent(JSON.stringify(login)));
+				login=JSON.stringify(login);
 				ws.send(coder.encode(login));
 				isFirstConnect=false;
 			}
 			else
 			{	
-				//responseString=decodeURIComponent(Utility.stringReverse(coder.decode(received_msg)));
-				responseString=decodeURIComponent(received_msg);
-				console.log("responseString="+responseString);
+				responseString=coder.decode(received_msg);
+				console.log("decode message="+responseString);
 				responseObj=JSON.parse(responseString);
 				switch (responseObj.action)
 				{
@@ -83,7 +87,6 @@
 								}
 								break;
 				}
-
 			}
 		}
 		function disConnect()
@@ -94,12 +97,11 @@
 				isFirstConnect=true;
 				$(".loginDiv").animate({opacity: 'show', height: 'show'}, 1000);
 				$('.adminTable').animate({opacity: 'hide', height: 'hide'}, 1000);
-				
 			}
 		}
 		function listServers()
 		{
-			ws.send(coder.encode(Utility.stringReverse("{\"action\":\"GETServerList\"}")));
+			ws.send(coder.encode("{\"action\":\"GETServerList\"}"));
 		}		
 		function openNav() 
 		{

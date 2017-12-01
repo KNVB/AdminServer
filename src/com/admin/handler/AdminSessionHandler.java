@@ -25,9 +25,10 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	private boolean isFirstConnect=true;
 	private JSONObject requestObj=null;
 	private Logger logger=null;
+	private MessageCoder messageCoder;
+	private RSA keyCoder;
 	private String returnCoder=new String();
 	private String responseString,request;
-	private RSA myRSA;
 	private Server adminServer=null;
 	private FtpServerManager ftpServerManager=null;  
 	private AdminUserManager adminUserManager=null;
@@ -44,9 +45,13 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
     {
 		try 
 		{
-		   myRSA = new RSA(1024);
-		   returnCoder="coder=new Coder(\""+myRSA.getPublicExponent()+"\",\""+myRSA.getPrivateExponent()+"\",\""+myRSA.getPublicModulus()+"\");";
-	       
+			keyCoder = new RSA(1024);
+			messageCoder=new MessageCoder();
+			String messageKey=Utility.byteArrayToHexString(keyCoder.encode(messageCoder.key.getBytes()));
+			String ivText=Utility.byteArrayToHexString(keyCoder.encode(messageCoder.ivText.getBytes()));
+			logger.debug("messageKey={}",messageCoder.key);
+			logger.debug("ivText={}",messageCoder.ivText);
+			returnCoder="coder=new Coder(\""+messageKey+"\",\""+ivText+"\",\""+keyCoder.getPrivateExponent()+"\",\""+keyCoder.getPublicModulus()+"\");";
 		} 
 		catch (Exception e) 
 		{
@@ -91,8 +96,7 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
         }
         else
         {                
-        	request=(new String(myRSA.decode(Utility.hexStringToByteArray(request))));
-        	request=URLDecoder.decode(request,"UTF-8");
+        	request=messageCoder.decode(request);
         	logger.debug("Request String:{}",request);
       	    requestObj=new JSONObject(request);
         	logger.debug("Request action:{}",requestObj.get("action"));
@@ -126,14 +130,13 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	        			JSONArray jArray=obj.getJSONArray("ftpServerList");
 	        			responseString=(new JSONObject(actionResponse)).toString();
 	        			responseString=responseString.replace("\"returnMessage\":\"\"", "\"returnMessage\":"+jArray.toString());
-	        			//responseString=(new JSONObject(actionResponse)).toString();
-	        			
 	        			break;
         	}
         	
         	logger.debug("responseString={}",responseString);
-        	responseString=URLEncoder.encode(responseString,"UTF-8");
-			//responseString=Utility.byteArrayToHexString(myRSA.encode(responseString.getBytes()));
+        	//responseString=URLEncoder.encode(responseString,"UTF-8");
+        	responseString=messageCoder.encode(responseString);        	
+        	//responseString=Utility.byteArrayToHexString(myRSA.encode(responseString.getBytes()));
         	ctx.channel().writeAndFlush(new TextWebSocketFrame(responseString));
         }
 	}
