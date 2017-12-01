@@ -8,6 +8,14 @@ function KeyCoder(encryptionExponent, decryptionExponent, modulus)
 				}							
 	this.decode=function(data)
 				{
-				 return decryptedString(key,data);
-				}			
+				 return stringReverse(decryptedString(key,data));
+				}
+	function stringReverse(str) 
+	{
+	   if (!str) return '';
+	   var revstr='';
+	   for (i = str.length-1; i>=0; i--)
+	       revstr+=str.charAt(i)
+	   return revstr;
+	};
 }

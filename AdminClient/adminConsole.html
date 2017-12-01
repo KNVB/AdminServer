@@ -10,7 +10,7 @@
 	<script language="JavaScript" src="js/RSA.js"></script>
 	<script language="JavaScript" src="js/KeyCoder.js"></script>
 	<script language="JavaScript" src="js/Coder.js"></script>
-	<script language="JavaScript" src="js/Utility.js"></script>
+	<!-- script language="JavaScript" src="js/Utility.js"></script-->
 	<script language="JavaScript" src="js/Login.js"></script>
 	<script src="js/cryptojs/rollups/aes.js"></script>
 	<script src="js/cryptojs/components/mode-ctr-min.js"></script>
@@ -55,7 +55,7 @@
 			else
 			{	
 				responseString=coder.decode(received_msg);
-				console.log("decode message="+responseString);
+				console.log("decoded server response="+responseString);
 				responseObj=JSON.parse(responseString);
 				switch (responseObj.action)
 				{

@@ -10,8 +10,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import org.json.JSONArray;
@@ -134,9 +132,7 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
         	}
         	
         	logger.debug("responseString={}",responseString);
-        	//responseString=URLEncoder.encode(responseString,"UTF-8");
         	responseString=messageCoder.encode(responseString);        	
-        	//responseString=Utility.byteArrayToHexString(myRSA.encode(responseString.getBytes()));
         	ctx.channel().writeAndFlush(new TextWebSocketFrame(responseString));
         }
 	}

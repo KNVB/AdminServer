@@ -1,8 +1,8 @@
 function Coder(messageKey,ivText,privateKey,modulus)
 {
 	keyCoder=new KeyCoder("",privateKey,modulus);
-	messageKey=Utility.stringReverse(keyCoder.decode(messageKey));
-	ivText=Utility.stringReverse(keyCoder.decode(ivText));
+	messageKey=keyCoder.decode(messageKey);
+	ivText=keyCoder.decode(ivText);
 	var messageCoder=new MessageCoder(messageKey,ivText);
 	this.encode=function(plainText)
 				{

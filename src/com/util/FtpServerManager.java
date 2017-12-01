@@ -1,11 +1,9 @@
 package com.util;
-
+import com.ftp.FtpServer;
 import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.logging.log4j.Logger;
 
-import com.ftp.FtpServer;
+
 
 public class FtpServerManager 
 {
