@@ -26,7 +26,7 @@
 			ws.onerror=errorHandler;
 			ws.onopen=sendGreetingMessage;	
 			ws.onmessage=serverResponseHandler;
-			mainStage=document.getElementById("mainStage");
+			mainStage=$("#mainStage");
 		}
 		function sendGreetingMessage()
 		{
@@ -69,7 +69,7 @@
 				responseString=messageCoder.decode(serverResponseMessage);
 				console.log("decoded server response message="+responseString)
 				responseObj=JSON.parse(responseString);
-				$("#mainStage").empty();
+				mainStage.empty();
 				
 				switch (responseObj.action)
 				{
@@ -118,7 +118,7 @@
 				ws.close();
 				isFirstConnect=true;
 				openNav();
-				$("#mainStage").empty();
+				mainStage.empty();
 			}
 		}
 		function listServers()
