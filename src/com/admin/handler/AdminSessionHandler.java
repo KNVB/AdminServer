@@ -78,8 +78,6 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
         logger.debug("{} received {}", ctx.channel(),requestString);
         if (isFirstConnect)
         {
-        	requestString=requestString.replaceAll("-----BEGIN PUBLIC KEY-----\n", "");
-    		requestString=requestString.replaceAll("\n-----END PUBLIC KEY-----", "");
         	KeyCoder keyCoder=new KeyCoder(requestString);
         	responseString ="{\"messageKey\":\""+messageCoder.key+"\",";
     		responseString+="\"ivText\":\""+messageCoder.ivText+"\"}";

@@ -36,8 +36,12 @@
 			var dt = new Date();
 			var time = -(dt.getTime());
 			keyCoder.getKey();
-			console.log("Public key="+keyCoder.getPublicKey());
-			ws.send(keyCoder.getPublicKey());
+			//console.log("Public key="+keyCoder.getPublicKey());
+			var publicKey=keyCoder.getPublicKey();
+			publicKey=publicKey.replace("-----BEGIN PUBLIC KEY-----\n","");
+			publicKey=publicKey.replace("\n-----END PUBLIC KEY-----","");
+			console.log("Public key="+publicKey);
+			ws.send(publicKey);
 			keyCoder.setPrivateKey(keyCoder.getPrivateKey());
 		}
 		function errorHandler(evt)
