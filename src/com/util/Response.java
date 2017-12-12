@@ -1,4 +1,5 @@
 package com.util;
+import java.util.ArrayList;
 /*
  * Copyright 2004-2005 the original author or authors.
  *
@@ -24,6 +25,8 @@ public class Response
 	private String action;
 	private int responseCode=0;
 	private String returnMessage="";
+	@SuppressWarnings("rawtypes")
+	private ArrayList returnObjects=new ArrayList();
 	public String getAction() {
 		return action;
 	}
@@ -42,6 +45,14 @@ public class Response
 	public void setReturnMessage(String returnMessage) {
 		this.returnMessage = returnMessage;
 	}
+	@SuppressWarnings("rawtypes")
+	public ArrayList getReturnObjects() {
+		return returnObjects;
+	}
+	public void setReturnObjects(@SuppressWarnings("rawtypes") ArrayList returnObjects) {
+		this.returnObjects = returnObjects;
+	}
+	
 	/*public String toJSONString()
 	{
 		String result;

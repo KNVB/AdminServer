@@ -12,6 +12,7 @@
 	<script language="JavaScript" src="js/MessageCoder.js"></script>
 	<script language="javascript">
 		var ws = null;
+		var mainStage=null;
 		var messageCoder=null;
 		var isFirstConnect=true;
 		function login()
@@ -24,12 +25,12 @@
 			ws.onerror=errorHandler;
 			ws.onopen=sendGreetingMessage;	
 			ws.onmessage=serverResponseHandler;
-			
+			mainStage=document.getElementById("mainStage");
 		}
 		function sendGreetingMessage()
 		{
 			keyCoder = new JSEncrypt({
-			    default_key_size: 2048
+			    default_key_size: 1234
 			});
 			var dt = new Date();
 			var time = -(dt.getTime());
@@ -63,6 +64,8 @@
 				responseString=messageCoder.decode(serverResponseMessage);
 				console.log("decoded server response message="+responseString)
 				responseObj=JSON.parse(responseString);
+				$("#mainStage").empty();
+				
 				switch (responseObj.action)
 				{
 					case "LOGIN":
@@ -82,10 +85,17 @@
 					case "GETServerList":
 								if(responseObj.responseCode==0)
 								{
-									var serverList=responseObj.returnMessage;
-									for (i=0;i<serverList.length;i++)
+									var serverList=responseObj.returnObjects;
+									mainStage.innerHTML="<span style=\"font-size:20px;\">Server listing</span>";
+									if (serverList.length==0)
 									{
-										console.log(serverList[i]);									
+										$(mainStage).append("<br><br><span style=\"font:italic 16px times new roman;\">There are no server have been defined.</span>");
+										$(mainStage).append("<br><br><span style=\"font:italic 16px times new roman;\">Click here to define new ftp server.</span>");
+									}
+									else
+									{
+										for (i=0;i<serverList.length;i++)
+											console.log(serverList[i]);									
 									}
 								}
 								else
@@ -102,9 +112,8 @@
 			{	
 				ws.close();
 				isFirstConnect=true;
-				//$(".loginDiv").animate({opacity: 'show', height: 'show'}, 1000);
-				//$('.adminTable').animate({opacity: 'hide', height: 'hide'}, 1000);
 				openNav();
+				$("#mainStage").empty();
 			}
 		}
 		function listServers()
@@ -155,29 +164,23 @@
 
 		</div>		
 		<!--span style="font-size:20px;cursor:pointer" onclick="openNav()">&#9776; open</span-->
-		<table border=0 width="100%">
+		<table style="width:100%;height:100%" border=0>
 			<tr>
-				<td width="30%">
-					<table>
-						<tr>
-							<td>
-								<span style="font-size:20px;cursor:pointer" onclick="listServers()">Server list</span>
-								<ul id="serverList">
-									<li>add new server</li>
-								</ul>
-							</td>
-						</tr>
-						<tr>
-							<td style="text-align:left"><span style="font-size:20px;cursor:pointer" onclick="changeAdminPwd()">Change admin. password</span></td>
-						</tr>
-						<tr>	
-							<td><span style="font-size:20px;cursor:pointer" onclick="disConnect()">Logout</span></td>
-						</tr>	
-					</table>
+				<td style="width:20%">
+					<span style="font-size:20px;cursor:pointer" onclick="listServers()">Server list</span>
+					<ul id="serverList">
+						<li>add new server</li>
+					</ul>
 				</td>
-				<td>
+				<td rowspan=3 id="mainStage" style="vertical-align: text-top;">
 				</td>
 			</tr>
+			<tr>
+				<td style="text-align:left"><span style="font-size:20px;cursor:pointer" onclick="changeAdminPwd()">Change admin. password</span></td>
+			</tr>
+			<tr>	
+				<td><span style="font-size:20px;cursor:pointer" onclick="disConnect()">Logout</span></td>
+			</tr>	
 		</table>
    </body>
  </html>  

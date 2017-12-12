@@ -109,20 +109,15 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
         					actionResponse.setResponseCode(-1);
         					actionResponse.setReturnMessage("Login failure");
     					}
-    					//logger.debug((new JSONObject(actionResponse)).toString());
-    					responseString=(new JSONObject(actionResponse)).toString();
     					break;
 	        	case "GETServerList":
 	        			ArrayList<FtpServer<T>> ftpServerList=ftpServerManager.getAllServerList();
 	        			actionResponse.setResponseCode(0);
-	        			ftpServerList.add(new FtpServer<T>("abc"));
-	        			JSONObject obj=new JSONObject();
-	        			obj.put("ftpServerList", ftpServerList);
-	        			JSONArray jArray=obj.getJSONArray("ftpServerList");
-	        			responseString=(new JSONObject(actionResponse)).toString();
-	        			responseString=responseString.replace("\"returnMessage\":\"\"", "\"returnMessage\":"+jArray.toString());
+	        			//ftpServerList.add(new FtpServer<T>("abc"));
+	        			actionResponse.setReturnObjects(ftpServerList);
 	        			break;
         	}
+        	responseString=(new JSONObject(actionResponse)).toString();
         	logger.debug("responseString={}",responseString);
         	responseString=messageCoder.encode(responseString);        	
         	ctx.channel().writeAndFlush(new TextWebSocketFrame(responseString));
