@@ -2,6 +2,7 @@
 <html>
    <head>
 	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" type="text/css" href="css/style.css" />
 	<script src="http://code.jquery.com/jquery-3.2.1.js"></script>
 	<script language="JavaScript" type="text/javascript" src="js/JsEncrypt.js"></script>
@@ -90,7 +91,7 @@
 									if (serverList.length==0)
 									{
 										$(mainStage).append("<br><br><span style=\"font:italic 16px times new roman;\">There are no server have been defined.</span>");
-										$(mainStage).append("<br><br><span style=\"font:italic 16px times new roman;\">Click here to define new ftp server.</span>");
+										$(mainStage).append("<br><br><span onclick=\"addServer()\" style=\"font:italic 16px times new roman;cursor:pointer\">Click here to define new ftp server.</span>");
 									}
 									else
 									{
@@ -164,12 +165,12 @@
 
 		</div>		
 		<!--span style="font-size:20px;cursor:pointer" onclick="openNav()">&#9776; open</span-->
-		<table style="width:100%;height:100%" border=0>
+		<table style="width:100%;height:50%" border=0>
 			<tr>
 				<td style="width:20%">
 					<span style="font-size:20px;cursor:pointer" onclick="listServers()">Server list</span>
 					<ul id="serverList">
-						<li>add new server</li>
+						<!-- li>add new server</li-->
 					</ul>
 				</td>
 				<td rowspan=3 id="mainStage" style="vertical-align: text-top;">
