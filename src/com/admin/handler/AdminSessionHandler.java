@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.apache.logging.log4j.Logger;
+import org.bouncycastle.util.encoders.Base64;
 
 
 @Sharable
@@ -24,9 +25,9 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	private JSONObject requestObj=null;
 	private Logger logger=null;
 	private MessageCoder messageCoder;
-	private RSA keyCoder;
+	
 	private String returnCoder=new String();
-	private String responseString,request;
+	private String responseString,requestString;
 	private Server adminServer=null;
 	private FtpServerManager ftpServerManager=null;  
 	private AdminUserManager adminUserManager=null;
@@ -43,13 +44,9 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
     {
 		try 
 		{
-			keyCoder = new RSA(1024);
 			messageCoder=new MessageCoder();
-			String messageKey=Utility.byteArrayToHexString(keyCoder.encode(messageCoder.key.getBytes()));
-			String ivText=Utility.byteArrayToHexString(keyCoder.encode(messageCoder.ivText.getBytes()));
 			logger.debug("messageKey={}",messageCoder.key);
 			logger.debug("ivText={}",messageCoder.ivText);
-			returnCoder="coder=new Coder(\""+messageKey+"\",\""+ivText+"\",\""+keyCoder.getPrivateExponent()+"\",\""+keyCoder.getPublicModulus()+"\");";
 		} 
 		catch (Exception e) 
 		{
@@ -77,29 +74,25 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	}
 	private void handleRequest(ChannelHandlerContext ctx, WebSocketFrame frame) throws Exception
 	{
-        request = ((TextWebSocketFrame) frame).text();
-        logger.debug("{} received {}", ctx.channel(),request);
-        
-        if (request.equals("Hello"))
+        requestString = ((TextWebSocketFrame) frame).text();
+        logger.debug("{} received {}", ctx.channel(),requestString);
+        if (isFirstConnect)
         {
-			if (isFirstConnect)
-			{	
-				ctx.channel().writeAndFlush(new TextWebSocketFrame(returnCoder));
-				isFirstConnect=false;
-			}
-			else
-			{
-				throw new UnsupportedOperationException("Invalid action specified!");
-			}
+        	requestString=requestString.replaceAll("-----BEGIN PUBLIC KEY-----\n", "");
+    		requestString=requestString.replaceAll("\n-----END PUBLIC KEY-----", "");
+        	KeyCoder keyCoder=new KeyCoder(requestString);
+        	responseString ="{\"messageKey\":\""+messageCoder.key+"\",";
+    		responseString+="\"ivText\":\""+messageCoder.ivText+"\"}";
+    		responseString =keyCoder.encode(responseString);
+    		ctx.channel().writeAndFlush(new TextWebSocketFrame(responseString));
+    		isFirstConnect=false;
         }
         else
-        {                
-        	request=messageCoder.decode(request);
-        	logger.debug("Request String:{}",request);
-      	    requestObj=new JSONObject(request);
+        {
+        	requestObj=new JSONObject(messageCoder.decode(requestString));
         	logger.debug("Request action:{}",requestObj.get("action"));
         	Response actionResponse=new Response();
-			actionResponse.setAction((String)requestObj.get("action"));	
+			actionResponse.setAction((String)requestObj.get("action"));
         	switch ((String)requestObj.get("action"))
         	{
 	        	case "LOGIN":
@@ -130,7 +123,6 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	        			responseString=responseString.replace("\"returnMessage\":\"\"", "\"returnMessage\":"+jArray.toString());
 	        			break;
         	}
-        	
         	logger.debug("responseString={}",responseString);
         	responseString=messageCoder.encode(responseString);        	
         	ctx.channel().writeAndFlush(new TextWebSocketFrame(responseString));

@@ -1,18 +1,3 @@
-function Coder(messageKey,ivText,privateKey,modulus)
-{
-	keyCoder=new KeyCoder("",privateKey,modulus);
-	messageKey=keyCoder.decode(messageKey);
-	ivText=keyCoder.decode(ivText);
-	var messageCoder=new MessageCoder(messageKey,ivText);
-	this.encode=function(plainText)
-				{
-					return messageCoder.encode(plainText);
-				}
-	this.decode=function (encodedText)
-				{
-					return messageCoder.decode(encodedText);
-				}
-}
 function MessageCoder(key,iv)
 {
 	var ivArray=CryptoJS.enc.Base64.parse(iv);

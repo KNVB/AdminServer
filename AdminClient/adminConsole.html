@@ -4,20 +4,15 @@
 	<meta charset="UTF-8" />
 	<link rel="stylesheet" type="text/css" href="css/style.css" />
 	<script src="http://code.jquery.com/jquery-3.2.1.js"></script>
-	
-	<script language="JavaScript" src="js/BigInt.js"></script>
-	<script language="JavaScript" src="js/Barrett.js"></script>
-	<script language="JavaScript" src="js/RSA.js"></script>
-	<script language="JavaScript" src="js/KeyCoder.js"></script>
-	<script language="JavaScript" src="js/Coder.js"></script>
-	<!-- script language="JavaScript" src="js/Utility.js"></script-->
+	<script language="JavaScript" type="text/javascript" src="js/JsEncrypt.js"></script>
 	<script language="JavaScript" src="js/Login.js"></script>
 	<script src="js/cryptojs/rollups/aes.js"></script>
 	<script src="js/cryptojs/components/mode-ctr-min.js"></script>
 	<script src="js/cryptojs/components/pad-nopadding.js"></script>
+	<script language="JavaScript" src="js/MessageCoder.js"></script>
 	<script language="javascript">
 		var ws = null;
-		var coder=null;
+		var messageCoder=null;
 		var isFirstConnect=true;
 		function login()
 		{
@@ -33,7 +28,15 @@
 		}
 		function sendGreetingMessage()
 		{
-			 ws.send("Hello");
+			keyCoder = new JSEncrypt({
+			    default_key_size: 2048
+			});
+			var dt = new Date();
+			var time = -(dt.getTime());
+			keyCoder.getKey();
+			console.log("Public key="+keyCoder.getPublicKey());
+			ws.send(keyCoder.getPublicKey());
+			keyCoder.setPrivateKey(keyCoder.getPrivateKey());
 		}
 		function errorHandler(evt)
 		{
@@ -41,21 +44,24 @@
 		}
 		function serverResponseHandler(evt)
 		{
-			var received_msg = evt.data;
-			console.log("server response message="+received_msg);
+			var serverResponseMessage = evt.data;
 			if (isFirstConnect)
 			{	
-				eval(received_msg);
+				var decodedServerResponseMessage = keyCoder.decrypt(serverResponseMessage);
+				console.log("decoded AES key="+decodedServerResponseMessage);
+				var aesKey=JSON.parse(decodedServerResponseMessage);
+				//console.log(aesKey.messageKey,aesKey.ivText);
+				messageCoder=new MessageCoder(aesKey.messageKey,aesKey.ivText);
 				var login=new Login(document.getElementById("userName").value,document.getElementById("password").value);
 				//login=Utility.stringReverse(encodeURIComponent(JSON.stringify(login)));
 				login=JSON.stringify(login);
-				ws.send(coder.encode(login));
+				ws.send(messageCoder.encode(login));
 				isFirstConnect=false;
 			}
 			else
-			{	
-				responseString=coder.decode(received_msg);
-				console.log("decoded server response="+responseString);
+			{
+				responseString=messageCoder.decode(serverResponseMessage);
+				console.log("decoded server response message="+responseString)
 				responseObj=JSON.parse(responseString);
 				switch (responseObj.action)
 				{
@@ -64,7 +70,7 @@
 								{
 									//$(".adminTable").show();
 									//$('.loginDiv').animate({opacity: 'hide', height: 'hide'}, 500);
-									//listServers();
+									listServers();
 									closeNav();
 								}
 								else
@@ -103,7 +109,7 @@
 		}
 		function listServers()
 		{
-			ws.send(coder.encode("{\"action\":\"GETServerList\"}"));
+			ws.send(messageCoder.encode("{\"action\":\"GETServerList\"}"));
 		}		
 		function openNav() 
 		{
