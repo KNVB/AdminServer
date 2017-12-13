@@ -91,7 +91,7 @@
 								if(responseObj.responseCode==0)
 								{
 									var serverList=responseObj.returnObjects;
-									mainStage.innerHTML="<span style=\"font-size:20px;\">Server listing</span>";
+									mainStage.html("<span style=\"font-size:20px;\">Server listing</span>");
 									if (serverList.length==0)
 									{
 										$(mainStage).append("<br><br><span style=\"font:italic 16px times new roman;\">There are no server have been defined.</span>");
