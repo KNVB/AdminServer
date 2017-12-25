@@ -11,121 +11,80 @@
 	<script src="js/security/cryptojs/components/mode-ctr-min.js"></script>
 	<script src="js/security/cryptojs/components/pad-nopadding.js"></script>
 	<script language="JavaScript" src="js/security/MessageCoder.js"></script>
-	<script language="JavaScript" src="js/ui/Server.js"></script>
+	<script language="JavaScript" src="js/AdminServer.js"></script>
+	<script language="JavaScript" src="js/ui/ServerDetail.js"></script>
 	<script language="javascript">
-		var ws = null;
 		var mainStage=null;
 		var messageCoder=null;
 		var isFirstConnect=true;
-		function login()
+		var serverDetail=new ServerDetail();
+		var adminServer=null;
+		$(document).ready(function() 
 		{
-			var hostName=document.getElementById("hostName").value;
-			var portNo=document.getElementById("portNo").value;
-
-			// Let us open a web socket
-			ws = new WebSocket("ws://"+hostName+":"+portNo+"/websocket");
-			ws.onerror=errorHandler;
-			ws.onopen=sendGreetingMessage;	
-			ws.onmessage=serverResponseHandler;
-			mainStage=$("#mainStage");
-		}
-		function sendGreetingMessage()
+			$("#loginButton").click(function ()
+									{
+										var hostName=document.getElementById("hostName").value;
+										var portNo=document.getElementById("portNo").value;
+										var login=new Login(document.getElementById("userName").value,document.getElementById("password").value);
+										adminServer=new AdminServer();
+										adminServer.setServerResponseHandler(myResponseHandler);
+										adminServer.login(hostName,portNo,login);
+										mainStage=$("#mainStage");
+									});
+			$("#disconnectButton").click(function()
+										{
+											adminServer.disConnect();
+											adminServer=null;
+											openNav();
+											mainStage.empty();
+										});
+			
+		});
+		function myResponseHandler(serverResponseObj)
 		{
-			keyCoder = new JSEncrypt({
-			    default_key_size: 1234
-			});
-			var dt = new Date();
-			var time = -(dt.getTime());
-			keyCoder.getKey();
-			//console.log("Public key="+keyCoder.getPublicKey());
-			var publicKey=keyCoder.getPublicKey();
-			publicKey=publicKey.replace("-----BEGIN PUBLIC KEY-----\n","");
-			publicKey=publicKey.replace("\n-----END PUBLIC KEY-----","");
-			console.log("Public key="+publicKey);
-			ws.send(publicKey);
-			keyCoder.setPrivateKey(keyCoder.getPrivateKey());
-		}
-		function errorHandler(evt)
-		{
-			alert(evt.type);
-		}
-		function serverResponseHandler(evt)
-		{
-			var serverResponseMessage = evt.data;
-			if (isFirstConnect)
-			{	
-				var decodedServerResponseMessage = keyCoder.decrypt(serverResponseMessage);
-				console.log("decoded AES key="+decodedServerResponseMessage);
-				var aesKey=JSON.parse(decodedServerResponseMessage);
-				//console.log(aesKey.messageKey,aesKey.ivText);
-				messageCoder=new MessageCoder(aesKey.messageKey,aesKey.ivText);
-				var login=new Login(document.getElementById("userName").value,document.getElementById("password").value);
-				//login=Utility.stringReverse(encodeURIComponent(JSON.stringify(login)));
-				login=JSON.stringify(login);
-				ws.send(messageCoder.encode(login));
-				isFirstConnect=false;
-			}
-			else
+			mainStage.empty();
+			switch (serverResponseObj.action)
 			{
-				responseString=messageCoder.decode(serverResponseMessage);
-				console.log("decoded server response message="+responseString)
-				responseObj=JSON.parse(responseString);
-				mainStage.empty();
-				
-				switch (responseObj.action)
-				{
-					case "LOGIN":
-								if(responseObj.responseCode==0)
-								{
-									//$(".adminTable").show();
-									//$('.loginDiv').animate({opacity: 'hide', height: 'hide'}, 500);
-									listServers();
-									closeNav();
-								}
-								else
-								{
-									disConnect();
-									alert("Invalid user name or password");	
-								}
-								break;
-					case "GETServerList":
-								if(responseObj.responseCode==0)
-								{
-									var serverList=responseObj.returnObjects;
-									mainStage.html("<span style=\"font-size:20px;\">Server listing</span>");
-									if (serverList.length==0)
-									{
-										$(mainStage).append("<br><br><span style=\"font:italic 16px times new roman;\">There are no server have been defined.</span>");
-										$(mainStage).append("<br><br><span onclick=\"addServer()\" style=\"font:italic 16px times new roman;cursor:pointer\">Click here to define new ftp server.</span>");
-									}
-									else
-									{
-										for (i=0;i<serverList.length;i++)
-											console.log(serverList[i]);									
-									}
-								}
-								else
-								{
-									alert("Getting server list failure.");	
-								}
-								break;
-				}
+				case "LOGIN":
+					if(serverResponseObj.responseCode==0)
+					{
+						//$(".adminTable").show();
+						//$('.loginDiv').animate({opacity: 'hide', height: 'hide'}, 500);
+						//server.listServers();
+						closeNav();
+					}
+					else
+					{
+						adminServer.disConnect();
+						openNav();
+						mainStage.empty();
+						alert("Invalid user name or password");	
+					}
+					break;
+				case "GETServerList":
+					if(serverResponseObj.responseCode==0)
+					{
+						var serverList=serverResponseObj.returnObjects;
+						mainStage.html("<span style=\"font-size:20px;\">Server listing</span>");
+						if (serverList.length==0)
+						{
+							$(mainStage).append("<br><br><span style=\"font:italic 16px times new roman;\">There are no server have been defined.</span>");
+							$(mainStage).append("<br><br><span onclick=\"addServer()\" style=\"font:italic 16px times new roman;cursor:pointer\">Click here to define new ftp server.</span>");
+						}
+						else
+						{
+							for (i=0;i<serverList.length;i++)
+								console.log(serverList[i]);									
+						}
+					}
+					else
+					{
+						alert("Getting server list failure.");	
+					}
+					break;
+
 			}
 		}
-		function disConnect()
-		{
-			if (ws != null)
-			{	
-				ws.close();
-				isFirstConnect=true;
-				openNav();
-				mainStage.empty();
-			}
-		}
-		function listServers()
-		{
-			ws.send(messageCoder.encode("{\"action\":\"GETServerList\"}"));
-		}		
 		function openNav() 
 		{
 			document.getElementById("mySidenav").style.width = "250px";
@@ -134,7 +93,7 @@
 		{
 			document.getElementById("mySidenav").style.width = "0";
 		}		
-	</script>
+	</script>	
    </head>
    <body>
 		<div class="sidenav" id="mySidenav">
@@ -161,19 +120,18 @@
 						<td><input type="password" value ="password" id="password" size="10" required></td>
 					</tr>
 					<tr>
-						<td colspan=2 style="text-align:center;"><button onclick="login()">Login</button></td>
+						<td colspan=2 style="text-align:center;"><button id="loginButton">Login</button></td>
 						<!--<td><button onclick="login()" style="float:right">Login</button></td>
 						<td><button onclick="disConnect()">Disconnect</button></td>-->
 					</tr>	
 				</table>
 			</div>			
-
 		</div>		
 		<!--span style="font-size:20px;cursor:pointer" onclick="openNav()">&#9776; open</span-->
 		<table style="width:100%;height:50%" border=0>
 			<tr>
 				<td style="width:20%">
-					<span style="font-size:20px;cursor:pointer" onclick="listServers()">Server list</span>
+					<span style="font-size:20px;cursor:pointer" id="listServers">Server list</span>
 					<ul id="serverList">
 						<!-- li>add new server</li-->
 					</ul>
@@ -185,7 +143,7 @@
 				<td style="text-align:left"><span style="font-size:20px;cursor:pointer" onclick="changeAdminPwd()">Change admin. password</span></td>
 			</tr>
 			<tr>	
-				<td><span style="font-size:20px;cursor:pointer" onclick="disConnect()">Logout</span></td>
+				<td><span style="font-size:20px;cursor:pointer" id="disconnectButton">Logout</span></td>
 			</tr>	
 		</table>
    </body>
