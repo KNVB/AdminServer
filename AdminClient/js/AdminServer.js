@@ -73,11 +73,12 @@ class AdminServer
 			this.customHandler(responseObj);
 		}	
 	}
-	sendMessage(message) 
+	sendRequest(requestObj) 
 	{
 		if (this.wsState === WsStateConnected) 
 		{
-			this.ws.send(message);
+			//this.ws.send(message);
+			this.ws.send(this.messageCoder.encode(requestObj));
 		} 
 		else 
 		{

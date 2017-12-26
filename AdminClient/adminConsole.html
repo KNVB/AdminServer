@@ -12,12 +12,12 @@
 	<script src="js/security/cryptojs/components/pad-nopadding.js"></script>
 	<script language="JavaScript" src="js/security/MessageCoder.js"></script>
 	<script language="JavaScript" src="js/AdminServer.js"></script>
-	<script language="JavaScript" src="js/ui/ServerDetail.js"></script>
+	<script language="JavaScript" src="js/ui/ServerPage.js"></script>
 	<script language="javascript">
 		var mainStage=null;
 		var messageCoder=null;
 		var isFirstConnect=true;
-		var serverDetail=new ServerDetail();
+		var serverPage=null;
 		var adminServer=null;
 		$(document).ready(function() 
 		{
@@ -30,6 +30,7 @@
 										adminServer.setServerResponseHandler(myResponseHandler);
 										adminServer.login(hostName,portNo,login);
 										mainStage=$("#mainStage");
+										serverPage=new ServerPage(adminServer);
 									});
 			$("#disconnectButton").click(function()
 										{
@@ -50,7 +51,8 @@
 					{
 						//$(".adminTable").show();
 						//$('.loginDiv').animate({opacity: 'hide', height: 'hide'}, 500);
-						//server.listServers();
+						//console.log(serverPage==null);
+						serverPage.listServers();
 						closeNav();
 					}
 					else
@@ -69,7 +71,7 @@
 						if (serverList.length==0)
 						{
 							$(mainStage).append("<br><br><span style=\"font:italic 16px times new roman;\">There are no server have been defined.</span>");
-							$(mainStage).append("<br><br><span onclick=\"addServer()\" style=\"font:italic 16px times new roman;cursor:pointer\">Click here to define new ftp server.</span>");
+							$(mainStage).append("<br><br><span onclick=\"serverPage.addServer()\" style=\"font:italic 16px times new roman;cursor:pointer\">Click here to define new ftp server.</span>");
 						}
 						else
 						{
