@@ -11,6 +11,7 @@
 	<script src="js/security/cryptojs/components/mode-ctr-min.js"></script>
 	<script src="js/security/cryptojs/components/pad-nopadding.js"></script>
 	<script language="JavaScript" src="js/security/MessageCoder.js"></script>
+	<script language="JavaScript" src="js/Request.js"></script>
 	<script language="JavaScript" src="js/AdminServer.js"></script>
 	<script language="JavaScript" src="js/ui/ServerPage.js"></script>
 	<script language="javascript">
@@ -19,6 +20,7 @@
 		var isFirstConnect=true;
 		var serverPage=null;
 		var adminServer=null;
+		
 		$(document).ready(function() 
 		{
 			$("#loginButton").click(function ()
@@ -26,11 +28,11 @@
 										var hostName=document.getElementById("hostName").value;
 										var portNo=document.getElementById("portNo").value;
 										var login=new Login(document.getElementById("userName").value,document.getElementById("password").value);
-										adminServer=new AdminServer();
+										adminServer=new AdminServer(hostName,portNo);
 										adminServer.setServerResponseHandler(myResponseHandler);
-										adminServer.login(hostName,portNo,login);
+										adminServer.login(login);
 										mainStage=$("#mainStage");
-										serverPage=new ServerPage(adminServer);
+										serverPage=new ServerPage(adminServer,mainStage);
 									});
 			$("#disconnectButton").click(function()
 										{
@@ -63,7 +65,7 @@
 						alert("Invalid user name or password");	
 					}
 					break;
-				case "GETServerList":
+				case "GetServerList":
 					if(serverResponseObj.responseCode==0)
 					{
 						var serverList=serverResponseObj.returnObjects;
@@ -71,7 +73,14 @@
 						if (serverList.length==0)
 						{
 							$(mainStage).append("<br><br><span style=\"font:italic 16px times new roman;\">There are no server have been defined.</span>");
-							$(mainStage).append("<br><br><span onclick=\"serverPage.addServer()\" style=\"font:italic 16px times new roman;cursor:pointer\">Click here to define new ftp server.</span>");
+							$(mainStage).append("<br><br><span id=\"addServer\" style=\"font:italic 16px times new roman;cursor:pointer\">Click here to define new ftp server.</span>");
+							$("#addServer").click(
+													function ()
+													{
+														mainStage.empty();
+														serverPage.getAddServerPageData();
+													}
+												 );
 						}
 						else
 						{

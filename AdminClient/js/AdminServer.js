@@ -5,7 +5,7 @@ const WsStateConnecting = 3;
 
 class AdminServer
 {
-	constructor()
+	constructor(hostName,portNo)
 	{
 		this.ws = null;
 		this.loginObj=null;
@@ -15,13 +15,15 @@ class AdminServer
 		});
 		this.messageCoder=null;
 		this.isFirstConnect=true;
+		this.hostName=hostName;
+		this.portNo=portNo;
 		this.wsState = WsStateDisconnected;
-	}
-	login(hostName,portNo,loginObj)
+	}	
+	login(loginObj)
 	{
 		this.loginObj=loginObj;
 		this.wsState = WsStateConnecting;
-		this.ws = new WebSocket("ws://"+hostName+":"+portNo+"/websocket");
+		this.ws = new WebSocket("ws://"+this.hostName+":"+this.portNo+"/websocket");
 		this.ws.onopen = function (e) {
 	        this.wsState = WsStateConnected;
 	        if (this.wsState === WsStateConnected) {
@@ -78,7 +80,7 @@ class AdminServer
 		if (this.wsState === WsStateConnected) 
 		{
 			//this.ws.send(message);
-			this.ws.send(this.messageCoder.encode(requestObj));
+			this.ws.send(this.messageCoder.encode(JSON.stringify(requestObj)));
 		} 
 		else 
 		{

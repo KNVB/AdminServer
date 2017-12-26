@@ -108,7 +108,7 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
         					actionResponse.setReturnMessage("Login failure");
     					}
     					break;
-	        	case "GETServerList":
+	        	case "GetServerList":
 	        			ArrayList<FtpServer<T>> ftpServerList=ftpServerManager.getAllServerList();
 	        			actionResponse.setResponseCode(0);
 	        			//ftpServerList.add(new FtpServer<T>("abc"));
