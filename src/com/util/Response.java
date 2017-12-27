@@ -1,5 +1,5 @@
 package com.util;
-import java.util.ArrayList;
+import java.util.HashMap;
 /*
  * Copyright 2004-2005 the original author or authors.
  *
@@ -25,8 +25,7 @@ public class Response
 	private String action;
 	private int responseCode=0;
 	private String returnMessage="";
-	@SuppressWarnings("rawtypes")
-	private ArrayList returnObjects=new ArrayList();
+	private HashMap<String,Object> returnObjects=new HashMap<String,Object>();
 	public String getAction() {
 		return action;
 	}
@@ -46,11 +45,11 @@ public class Response
 		this.returnMessage = returnMessage;
 	}
 	@SuppressWarnings("rawtypes")
-	public ArrayList getReturnObjects() {
+	public HashMap getReturnObjects() {
 		return returnObjects;
 	}
-	public void setReturnObjects(@SuppressWarnings("rawtypes") ArrayList returnObjects) {
-		this.returnObjects = returnObjects;
+	public void setReturnObjects(String key, Object returnObjects) {
+		this.returnObjects.put(key, returnObjects);
 	}
 	
 	/*public String toJSONString()

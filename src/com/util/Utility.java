@@ -1,4 +1,11 @@
 package com.util;
+
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+
 /*
  * Copyright 2004-2005 the original author or authors.
  *
@@ -24,6 +31,33 @@ public class Utility
 	public Utility()
 	{
 		
+	}
+	/**
+	 * Get all local IP
+	 * @return list of local IP address
+	 * @throws SocketException
+	 */
+	public static ArrayList<String> getAllLocalIp()throws SocketException 
+	{	
+		int index;
+		String temp;
+		ArrayList<String> addrList = new ArrayList<String>();
+	    Enumeration<NetworkInterface> enumNI = NetworkInterface.getNetworkInterfaces();
+	    while ( enumNI.hasMoreElements() ){
+	        NetworkInterface ifc = enumNI.nextElement();
+	        if( ifc.isUp() && !ifc.isLoopback() ){
+	            Enumeration<InetAddress>enumAdds = ifc.getInetAddresses();
+	            while ( enumAdds.hasMoreElements() ){
+	                InetAddress addr = enumAdds.nextElement();
+	                temp=addr.getHostAddress();
+	                index=temp.indexOf("%");
+	                if (index>-1)
+	                	temp=temp.substring(0,index);
+	                addrList.add(temp);
+	            }
+	        }
+	    }
+		return addrList;
 	}
 	/**
      * Convert hex decimal string to byte array

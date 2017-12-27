@@ -112,7 +112,12 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	        			ArrayList<FtpServer<T>> ftpServerList=ftpServerManager.getAllServerList();
 	        			actionResponse.setResponseCode(0);
 	        			//ftpServerList.add(new FtpServer<T>("abc"));
-	        			actionResponse.setReturnObjects(ftpServerList);
+	        			actionResponse.setReturnObjects("ftpServerList",ftpServerList);
+	        			break;
+	        	case "GetAddServerPageData":
+	        			ArrayList<String> localIpList=Utility.getAllLocalIp();
+	        			actionResponse.setResponseCode(0);
+	        			actionResponse.setReturnObjects("localIpList",localIpList);
 	        			break;
         	}
         	responseString=(new JSONObject(actionResponse)).toString();

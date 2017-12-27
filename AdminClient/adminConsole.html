@@ -68,11 +68,12 @@
 				case "GetServerList":
 					if(serverResponseObj.responseCode==0)
 					{
-						var serverList=serverResponseObj.returnObjects;
+						var serverList=serverResponseObj.returnObjects["ftpServerList"];
 						mainStage.html("<span style=\"font-size:20px;\">Server listing</span>");
 						if (serverList.length==0)
 						{
-							$(mainStage).append("<br><br><span style=\"font:italic 16px times new roman;\">There are no server have been defined.</span>");
+							serverPage.showNoServerPage();
+							/*$(mainStage)
 							$(mainStage).append("<br><br><span id=\"addServer\" style=\"font:italic 16px times new roman;cursor:pointer\">Click here to define new ftp server.</span>");
 							$("#addServer").click(
 													function ()
@@ -80,7 +81,7 @@
 														mainStage.empty();
 														serverPage.getAddServerPageData();
 													}
-												 );
+												 );*/
 						}
 						else
 						{
@@ -93,6 +94,15 @@
 						alert("Getting server list failure.");	
 					}
 					break;
+				case "GetAddServerPageData":
+					if(serverResponseObj.responseCode==0)
+					{
+						serverPage.buildAddServerPage(serverResponseObj);
+					}
+					else
+					{
+						alert("Getting Add Server Page Data failure.");
+					}
 
 			}
 		}
