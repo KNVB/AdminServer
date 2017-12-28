@@ -1,0 +1,140 @@
+fieldset
+{
+	border-radius: 5px;
+	border:1px solid black
+}
+html,body
+{ 
+	min-height: 100% !important;
+	height:100%; 
+}
+body {
+	font-size: 16px;
+    font-family: "Lato", sans-serif;
+	padding-top: 0px;
+	margin-top:0px;
+}
+ul{
+    color: #818181;
+	font:italic 16px times new roman;
+}
+ul li:hover
+{
+	color: #f1f1f1;
+}
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+	width : 320px;
+}
+
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 16px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+	display:none;
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+
+.loginTable
+{
+	color:#818181;
+}
+.loginTable:hover
+{
+	color: #f1f1f1;
+}
+.loginCaption
+{
+	text-align:right;
+	font-size: 16px;
+}
+.adminTable
+{
+	color:white;
+	display:none;
+}
+.navLink 
+{
+	height:100%;
+	width:240px;
+	background-color:#fff;
+	position:fixed!important;
+	z-index:1;
+	overflow:auto;
+	display:block;
+	padding-top: 15px;
+	box-shadow:5px 0px 5px rgba(0,0,0,0.12);
+	/*height: 100%;
+	width : 240px;
+	display:block;
+	background-color: #ffffff;
+	padding-top: 15px;
+	*/
+}
+.navLink a
+{
+	padding:16px;
+	cursor:pointer;	
+}
+.navLink a:hover
+{
+	background-color: #f1f1f1;	
+}
+/*
+.fa
+{
+	display:inline-block;
+	font:normal normal normal 14px/1 FontAwesome;
+	font-size:inherit;
+	text-rendering:auto;
+	-webkit-font-smoothing:antialiased;
+	-moz-osx-font-smoothing:grayscale
+}
+.fa-inbox:before 
+{
+    content: "\f01c";
+}
+.fa-caret-down:before {
+    content: "\f0d7";
+}
+.fa-remove:before, .fa-close:before, .fa-times:before 
+{
+    content: "\f00d";
+}
+.fa-bars:before
+{
+	content:"\f0c9"
+}
+.fa-pencil:before
+{
+	content:"\f040"
+}
+@font-face{font-family:'FontAwesome';src:url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/fonts/fontawesome-webfont.eot?v=4.7.0');src:url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/fonts/fontawesome-webfont.eot?#iefix&v=4.7.0') format('embedded-opentype'),url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/fonts/fontawesome-webfont.woff2?v=4.7.0') format('woff2'),url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/fonts/fontawesome-webfont.woff?v=4.7.0') format('woff'),url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/fonts/fontawesome-webfont.ttf?v=4.7.0') format('truetype'),url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/fonts/fontawesome-webfont.svg?v=4.7.0#fontawesomeregular') format('svg');font-weight:normal;font-style:normal}*/
