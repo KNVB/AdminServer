@@ -11,10 +11,12 @@
 				padding: 16px
 			}
 		</style>
+		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
 		<script src="http://code.jquery.com/jquery-3.2.1.js"></script>
+		<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 	</head>
 	<body>
-		<div class="sidenav" id="mySidenav" style="z-index:10">
+		<div class="sidenav" id="mySidenav" style="display:none">
 			<div class="loginDiv">
 				<table class="loginTable">
 					<tr>
@@ -50,47 +52,82 @@
 	  <a href="javascript:void(0)" onclick="w3_close()" title="Close Sidemenu" 
 	  class="w3-bar-item w3-button w3-hide-large w3-large">Close &#x2718;</a>
 	 
-	  <a href="javascript:myFunc('Demo1')" class="w3-bar-item w3-button">FTP Server Administration&#x25bc;</a>
-	  <div id="Demo1" class="w3-hide w3-animate-left">
+	  <a href="javascript:myFunc('ftpAdminFunction')" class="w3-bar-item w3-button">FTP Server Administration &#x25bc;</a>
+	  <div id="ftpAdminFunction" class="w3-hide w3-animate-left">
 		<a class="w3-bar-item w3-button w3-border-bottom test w3-hover-light-grey" id="listServer">
 		  <div class="w3-container">
 				<span class="w3-opacity w3-large">List Server</span>
 		  </div>
 		</a>
-		<a href="javascript:void(0)" class="w3-bar-item w3-button w3-border-bottom test w3-hover-light-grey" onclick="openMail('Borge');w3_close();">
+		<a href="javascript:void(0)" class="w3-bar-item w3-button w3-border-bottom test w3-hover-light-grey" id="addServer">
 		  <div class="w3-container">
-			<span class="w3-opacity w3-large">Add Server</span>
+			<span class="w3-opacity w3-large">Add Server &#x270E;</span>
 		  </div>
 		</a>
 		<a href="javascript:void(0)" class="w3-bar-item w3-button w3-border-bottom test w3-hover-light-grey" onclick="openMail('Borge');w3_close();" id="firstTab">
 		  <div class="w3-container">
-			<span class="w3-opacity w3-large">Remove Server</span>
+			<span class="w3-opacity w3-large">Remove Server &#x270E;</span>
 		  </div>
 		</a>		
 	  </div>
-	  <a  class="w3-bar-item w3-button">Administration Server Setting&#x25bc;</a>	  
+	  <a href="javascript:myFunc('adminServerFunction')" class="w3-bar-item w3-button">Administration Server Setting &#x25bc;</a>
+	  <div id="adminServerFunction" class="w3-hide w3-animate-left">	  
+	  </div>
 	  <a href="#" class="w3-bar-item w3-button">Logout</a>
 	</nav>
 	 
 	<!-- Modal that pops up when you click on "New Message" -->
-	<div id="id01" class="w3-modal" style="z-index:4">
+	<div id="userDetailPage" class="w3-modal" style="z-index:4">
 	  <div class="w3-modal-content w3-animate-zoom">
 		<div class="w3-container w3-padding w3-red">
-		   <span onclick="document.getElementById('id01').style.display='none'"
-		   class="w3-button w3-red w3-right w3-xxlarge"><i class="fa fa-remove"></i></span>
-		  <h2>Send Mail</h2>
+		   <span onclick="document.getElementById('userDetailPage').style.display='none'"
+		   class="w3-button w3-red w3-right w3-xxlarge">&#x2718;</span>
+		  <h2>Add User</h2>
 		</div>
 		<div class="w3-panel">
-		  <label>To</label>
-		  <input class="w3-input w3-border w3-margin-bottom" type="text">
-		  <label>From</label>
-		  <input class="w3-input w3-border w3-margin-bottom" type="text">
-		  <label>Subject</label>
-		  <input class="w3-input w3-border w3-margin-bottom" type="text">
-		  <input class="w3-input w3-border w3-margin-bottom" style="height:150px" placeholder="What's on your mind?">
+		  <table>
+			<tr>
+				<td>Virtual Directory:</td>
+				<td>Physical Directory:</td>
+			</tr>
+			<tr>
+				<td><input type=text id="virtualDir0"></td>
+				<td>
+					<div class="remoteDir">
+						<ul style="padding:0;margin:0">
+							<li style="display:list-item;margin:0;list-style:none;padding:0;">
+								<a href="#" style="text-decoration:none">&#x1F5C0;</a>
+							</li>
+							<li style="display:list-item;margin:0;list-style:none;padding:0;">
+								<a href="#" style="text-decoration:none">&#x1F517;</a>
+							</li>
+							<li style="display:list-item;margin:0;list-style:none;padding:0;">
+								<a href="#" style="text-decoration:none">&#x1F5C5;</a>
+							</li>
+							<li style="display:list-item;margin:0;list-style:none;padding:0;">
+								<a href="#" style="text-decoration:none">&#x1F5C8;</a>
+							</li>
+							<li style="display:list-item;margin:0;list-style:none;padding:0;">
+								<a href="#" style="text-decoration:none">&#x1F5C9;</a>
+							</li>
+							<li style="display:list-item;margin:0;list-style:none;padding:0;">
+								<a href="#" style="text-decoration:none">&#x1F5CB;</a>
+							</li>
+							<li style="display:list-item;margin:0;list-style:none;padding:0;">
+								<a href="#" style="text-decoration:none">&#x1F5CE;</a>
+							</li>
+							<li style="display:list-item;margin:0;list-style:none;padding:0;">
+								<a href="#" style="text-decoration:none">&#x1F5D1;</a>
+							</li>
+						</ul>
+					</div>
+					<input type=text id="homeDir">
+				</td>
+			</tr>			
+		  </table>
 		  <div class="w3-section">
-			<a class="w3-button w3-red" onclick="document.getElementById('id01').style.display='none'">Cancel  <i class="fa fa-remove"></i></a>
-			<a class="w3-button w3-light-grey w3-right" onclick="document.getElementById('id01').style.display='none'">Send  <i class="fa fa-paper-plane"></i></a> 
+			<a class="w3-button w3-red" onclick="document.getElementById('userDetailPage').style.display='none'">Cancel  &#x2718;</a>
+			<a class="w3-button w3-light-grey w3-right" onclick="document.getElementById('userDetailPage').style.display='none'">Add 	&#x2714;</a> 
 		  </div>    
 		</div>
 	  </div>
@@ -102,76 +139,108 @@
 	<!-- Page content -->
 	<div class="w3-main" style="margin-left:320px;">
 		<a class="w3-button w3-white w3-hide-large w3-xlarge w3-margin-left w3-margin-top" onclick="w3_open()">&#x2630;</a>
-		<a href="javascript:void(0)" class="w3-hide-large w3-red w3-button w3-right w3-margin-top w3-margin-right" onclick="document.getElementById('id01').style.display='block'">&#x270E;</a>
+		<!--a href="javascript:void(0)" class="w3-hide-large w3-red w3-button w3-right w3-margin-top w3-margin-right" onclick="document.getElementById('userDetailPage').style.display='block'">&#x270E;</a-->
 		<div id="mainStage">
-			<div id="addServerPage" class="w3-hide w3-container">
-				<p>
-				Description:<input type=text required id="desc">
-				<fieldset>
-					<legend>Binding</legend>
-					<table>
-						<tr>
-							<td>IP address:</td>
-							<td>Port:</td>
-						</tr>
-						<tr>
-							<td>
-								<select id="bindAddress">
-								</select>
-							</td>
-							<td>
-								<input type=number required id="port" min="1" max="65535" value="21">
-							</td>								
-						</tr>	
-					</table>
-				</fieldset>
-				<fieldset id="passiveModeSetting" style="border:none">
-					<legend><input type="checkbox" onclick="togglePassiveMode()">Passive Mode</legend>
-					<div id="passiveModeDetail" style="display:none">
-						Port Range:<input type=text id="portRange" required>
-					</div>
-				</fieldset>
-				<fieldset>
-					<legend>User Administration</legend>
-					<table width="100%" style="border-collapse: collapse;border:1px solid black">
-						<tr><td>User Name:</td></tr>
-						<tr>
-							<td>
-								<a class="w3-button w3-light-grey" style="float:right" href="javascript:addServer()">add user</a>
-							</td>
-						</tr>	
-					</table>
-				</fieldset>
-				</p>
-				<a class="w3-button w3-light-grey" style="float:right" href="javascript:addServer()">add</a>
-			</div>
 		</div>
-		 
+	</div>
+	<div id="addServerPage" class="w3-hide w3-container">
+		<p>
+		Description:<input type=text required id="desc">
+		<fieldset>
+			<legend>Binding</legend>
+			<table>
+				<tr>
+					<td>IP address:</td>
+					<td>Port:</td>
+				</tr>
+				<tr>
+					<td>
+						<select id="bindAddress">
+						</select>
+					</td>
+					<td>
+						<input type=number required id="port" min="1" max="65535" value="21">
+					</td>								
+				</tr>	
+			</table>
+		</fieldset>
+		<fieldset id="passiveModeSetting" class="passiveModeSetting">
+			<legend><input type="checkbox" onclick="togglePassiveMode()">Passive Mode</legend>
+			<div id="passiveModeDetail" style="display:none">
+				Port Range:<input type=text id="portRange" required>
+			</div>
+		</fieldset>
+		<fieldset>
+			<legend>User Management</legend>
+			<table width="100%" height="100%" id="userTable" class="display">
+				<thead>
+					<tr>
+						<td>User Name:</td>
+						<td>Password:</td>
+						<td>Directory Access:</td>
+						<td>Enabled</td>
+					</tr>
+				</thead>
+				<tr>
+					<td><input type=hidden id="userName0" readonly style="border:none" value="anonymous">anonymous</td>
+					<td></td>
+					<td align=center>&#x271A;</td>
+					<td><input value="1" type=checkbox id="isEnable0"></td>
+				</tr>
+				<tbody>
+					<tr>
+						<td><input type=text id="userName1" required value="tmchan"></td>
+						<td><input type=password id="password1"></td>
+						<td align=center>&#x271A;</td>
+						<td><input value="1" type=checkbox id="isEnable1"></td>
+					</tr>
+				</tbody>
+			</table>
+			<!--
+			<table width="100%" style="border-collapse: collapse;border:1px solid black">
+				<tr><td>User Name:</td></tr>
+				<tr>
+					<td>
+						<a href="javascript:void(0)" class="w3-red w3-button w3-right w3-margin-top w3-margin-right" onclick="document.getElementById('userDetailPage').style.display='block'">&#x270E;</a>
+					</td>
+				</tr>	
+			</table>-->
+		</fieldset>
+		</p>
+		<a href="javascript:void(0)" class="w3-red w3-button w3-right w3-margin-top w3-margin-right">Add &#x2714;</a>
 	</div>
 
 	<script>
 	$(document).ready(function() 
 			{
+				var mainStage=$("#mainStage");
 				$("#loginButton").click(function ()
 										{
 											document.getElementById("mySidenav").style.display="none";
 										});
-										
 				$("#listServer").click(function()
+									  {
+										mainStage.empty();
+										w3_close();
+									  });
+				$("#addServer").click(function()
 									   { 
 										 	 var obj=document.getElementById("addServerPage");
-										 	 if(obj.className.indexOf("w3-hide")>-1)
-										 	 {	
-										 	 	obj.className=obj.className.replace("w3-hide","");
-										 	 	this.className += " w3-light-grey";
-										 	 }
-										 	 else
-										 	 {	
-										 	 	obj.className+=" w3-hide";
-										 	 	this.className=this.className.replace("w3-light-grey","");
-										 	 }
-										 		w3_close();
-									   });									   
+											 mainStage.append(obj);
+											 obj.className=obj.className.replace("w3-hide","");
+										 	 this.className += " w3-light-grey";
+										 	 w3_close();
+									   });
+				$('#userTable').DataTable(
+				{ 
+					"CaseSensitive":true, 
+					"order": [[ 1, "asc" ]],
+					paging: false,
+					"info": true,
+					"orderCellsTop": true, 
+					"fixedHeader":true
+				});					   
+									   
 			});
 	function w3_open() {
 		document.getElementById("mySidebar").style.display = "block";
@@ -189,10 +258,10 @@
 	{
 	 		var passiveModeDetail=$("#passiveModeDetail");
 	 		var passiveModeSetting=document.getElementById("passiveModeSetting");
-			if (passiveModeSetting.style.border.indexOf("1px solid black")==-1)
-				passiveModeSetting.style.border="1px solid black";
+			if (passiveModeSetting.className=="passiveModeSetting")
+				passiveModeSetting.className="";
 			else
-				passiveModeSetting.style.border="none";	
+				passiveModeSetting.className="passiveModeSetting";	
 	 		passiveModeDetail.toggle();
 	}
 	function myFunc(id) {
