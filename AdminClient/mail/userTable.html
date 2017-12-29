@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>FTP Server Administration Page</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="css/w3.css">
+		<link rel="stylesheet" href="css/style.css"><style>
+			.w3-bar-block .w3-bar-item 
+			{
+				padding: 16px
+			}
+			.toolbar 
+			{
+    		float: left;
+			}
+		</style>
+		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+		<script src="http://code.jquery.com/jquery-3.2.1.js"></script>
+		<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+	</head>
+	<body>
+						<table id="userTable" class="display">
+							<thead>
+								<tr>
+									<th>User Name:</th>
+									<th>Password:</th>
+									<th align=center>Directory Access:</th>
+									<th>Enabled</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td><input type=hidden id="userName0" readonly style="border:none" value="anonymous">anonymous</td>
+									<td></td>
+									<td align=center><a href="javascript:void(0)" onclick="addDirAccess(0)">&#x271A;</a></td>
+									<td><input value="1" type=checkbox id="isUserEnable0"></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td><input type=text id="userName1" required value="tmchan"></td>
+									<td><input type=password id="password1"></td>
+									<td align=center><a href="javascript:void(0)" onclick="addDirAccess(1)">&#x271A;</a></td>
+									<td><input value="1" type=checkbox id="isUserEnable1"></td>
+									<td>&#x2796;</td>
+								</tr>
+							</tbody>
+						</table>
+		<script>
+			var userTable;
+		$(document).ready(function() 
+											{
+												userTable=$('#userTable').DataTable(
+												{ 
+													"dom": '<"toolbar">frtip',
+													"CaseSensitive":true, 
+													"order": [[ 1, "asc" ]],
+													paging: false,
+													"info": true,
+													"orderCellsTop": true, 
+													"fixedHeader":true,
+													"columnDefs": [{"className": "dt-center", "targets": 2}]													
+												});
+												$("div.toolbar").html("<a onclick='addRow()'>&#x271A;</a>");												
+												/*var a=document.createElement("a");
+												a.innerHTML="&#x271A;";
+												$(a).insertBefore($("#userTable").prev());*/
+											});
+											function addRow()
+											{
+												userTable.row.add(["<input type=text>","<input type=text>","&#x271A;","<input type=checkbox>","&#x2796;"]).draw(false);
+												userTable.order([1, 'asc']).draw();
+                				userTable.page('last').draw(false);
+											}
+		</script>														
+	</body>
+</html>	
