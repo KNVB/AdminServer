@@ -1,0 +1,122 @@
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+		<link rel="stylesheet" href="css/w3.css">
+		<link rel="stylesheet" href="css/style.css">
+		<style>
+			.w3-bar-block .w3-bar-item 
+			{
+				padding: 16px
+			}
+			.toolbar 
+			{
+    		float: left;
+			}
+		</style>		
+		<script src="http://code.jquery.com/jquery-3.2.1.js"></script>
+		<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+		<script>
+			$(document).ready(function() {
+			   var t = $('#example').DataTable({
+					"dom": '<"toolbar">frtip',
+				  "CaseSensitive":true, 
+					"order": [[ 1, "asc" ]],
+					paging: true,
+					"pageLength": 5,
+					"info": true,
+					"orderCellsTop": true, 
+					"fixedHeader":true,
+					"columnDefs":[{"className": "dt-center", "targets": [2,3,4]},
+								  			{"targets":[1,2,4],"orderable": false}],
+				 	columns: [{data: "User Name"}, 
+				 						{data: "Password"}, 
+				 						{data: "Directory Access"}, 
+				 						{data: "Enabled"}, 
+				 						{data: "Action"}]
+			   });
+				 $("div.toolbar").html("&nbsp;&#x271A;");												
+
+			   $('div.toolbar').on('click', function() {
+						 //add obj instead of array
+						 console.log("adding data...");
+						 var row=t.row.add({
+						   "User Name": "<input type=\"text\">",
+						   "Password": "<input type=\"password\">",
+						   "Directory Access": "<a onclick=\"addDirAccess(0)\">&#x271A;</a>",
+						   "Enabled": "<input value=\"1\" type=checkbox id=\"isUserEnable0\">",
+						   "Action": "<span style=\"font-size:30px\">&#x1F5D1;</span>"
+						 }).draw();
+			   });
+
+			   // Automatically add a first row of data
+			   //$('#addRow').click();
+
+			 });
+
+		</script>
+	</head>
+	<body>
+		<table id="example" class="display">
+		  <thead>
+			<tr>
+			  <th>User Name</th>
+			  <th>Password</th>
+			  <th>Directory Access</th>
+			  <th>Enabled</th>
+			  <th>Action</th>
+			</tr>
+		  </thead>
+		  <tbody>
+			<tr>
+			  <td>anonymous</td>
+			  <td></td>
+			  <td align=center><a href="javascript:void(0)" onclick="addDirAccess(0)">&#x271A;</a></td>
+			  <td align=center>
+					<input value="1" type=checkbox id="isUserEnable0">
+			  </td>
+			  <td></td>
+			</tr>
+<tr>
+		<td><input type=hidden id="userName0" readonly style="border:none" value="anonymous">abc</td>
+		<td></td>
+		<td align=center><a href="javascript:void(0)" onclick="addDirAccess(0)">&#x271A;</a></td>
+		<td><input value="1" type=checkbox id="isUserEnable0"></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td><input type=hidden id="userName0" readonly style="border:none" value="anonymous">ab</td>
+		<td></td>
+		<td align=center><a onclick="addDirAccess(0)">&#x271A;</a></td>
+		<td><input value="1" type=checkbox id="isUserEnable0"></td>
+		<td></td>
+	</tr>			
+
+<tr>
+		<td data-order="11">stamn</td>
+		<td><input type=password id="password1"></td>
+		<td align=center><a href="javascript:void(0)" onclick="addDirAccess(0)">&#x271A;</a></td>
+		<td><input value="1" type=checkbox id="isUserEnable0"></td>
+		<td></td>
+	</tr>
+
+	<tr>
+		<td data-order="10">tmchan</td>
+		<td><input type=password id="password1"></td>
+		<td align=center><a href="javascript:void(0)" onclick="addDirAccess(1)">&#x271A;</a></td>
+		<td><input value="1" type=checkbox id="isUserEnable1"></td>
+		<td style="font-size:30px">&#x1F5D1;</td>
+	</tr>	
+	
+		  </tbody>
+		  <tfoot>
+			<tr>
+			  <th>User Name</th>
+			  <th>Password</th>
+			  <th>Directory Access</th>
+			  <th>Enabled</th>
+			  <th>Action</th>
+			</tr>
+		  </tfoot>
+		</table>
+	</body>
+</html>

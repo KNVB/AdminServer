@@ -32,40 +32,18 @@
 							</thead>
 							<tbody>
 								<tr>
-									<td data-order="0,1000"><input type=hidden id="userName0" readonly style="border:none" value="anonymous">anonymous</td>
+									<td><input type=hidden id="userName0" readonly style="border:none" value="anonymous">anonymous</td>
 									<td></td>
 									<td align=center><a href="javascript:void(0)" onclick="addDirAccess(0)">&#x271A;</a></td>
 									<td><input value="1" type=checkbox id="isUserEnable0"></td>
 									<td></td>
 								</tr>
 								<tr>
-									<td data-order="1"><input type=hidden id="userName0" readonly style="border:none" value="anonymous">abc</td>
-									<td></td>
-									<td align=center><a href="javascript:void(0)" onclick="addDirAccess(0)">&#x271A;</a></td>
-									<td><input value="1" type=checkbox id="isUserEnable0"></td>
-									<td></td>
-								</tr>
-								<tr>
-									<td><input type=hidden id="userName0" readonly style="border:none" value="anonymous">ab</td>
-									<td></td>
-									<td align=center><a href="javascript:void(0)" onclick="addDirAccess(0)">&#x271A;</a></td>
-									<td><input value="1" type=checkbox id="isUserEnable0"></td>
-									<td></td>
-								</tr>								
-								<tr>
-									<td>stamn</td>
-									<td></td>
-									<td align=center><a href="javascript:void(0)" onclick="addDirAccess(0)">&#x271A;</a></td>
-									<td><input value="1" type=checkbox id="isUserEnable0"></td>
-									<td></td>
-								</tr>
-
-								<tr>
-									<td>tmchan</td>
+									<td><input type=text id="userName1" required value="tmchan"></td>
 									<td><input type=password id="password1"></td>
 									<td align=center><a href="javascript:void(0)" onclick="addDirAccess(1)">&#x271A;</a></td>
 									<td><input value="1" type=checkbox id="isUserEnable1"></td>
-									<td style="font-size:30px">&#x1F5D1;</td>
+									<td>&#x2796;</td>
 								</tr>
 							</tbody>
 						</table>
@@ -84,14 +62,14 @@
 													"fixedHeader":true,
 													"columnDefs": [{"className": "dt-center", "targets": 2}]													
 												});
-												$("div.toolbar").html("<a onclick='addRow()'>&nbsp;&#x271A;</a>");												
+												$("div.toolbar").html("<a onclick='addRow()'>&#x271A;</a>");												
 												/*var a=document.createElement("a");
 												a.innerHTML="&#x271A;";
 												$(a).insertBefore($("#userTable").prev());*/
 											});
 											function addRow()
 											{
-												userTable.row.add(["<input type=\"text\">","<input type=text>","&#x271A;","<input type=checkbox>","&#x2796;"]).draw(false);
+												userTable.row.add(["<input type=text>","<input type=text>","&#x271A;","<input type=checkbox>","&#x2796;"]).draw(false);
 												userTable.order([1, 'asc']).draw();
                 				userTable.page('last').draw(false);
 											}
