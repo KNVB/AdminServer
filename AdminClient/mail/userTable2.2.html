@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>FTP Server Administration Page</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="css/w3.css">
+		<link rel="stylesheet" href="css/style.css"><style>
+			.w3-bar-block .w3-bar-item 
+			{
+				padding: 16px
+			}
+			.toolbar 
+			{
+				float: left;
+				font-size:20px;
+				cursor:pointer;
+			}
+			.removeUserEntry 
+			{
+				cursor:pointer;
+				font-size:30px
+			}
+			.popupDirAccessPage
+			{
+				cursor:pointer;
+				font-size:20px
+			}			
+		</style>
+		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+		<script src="http://code.jquery.com/jquery-3.2.1.js"></script>
+		<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+	</head>
+	<body>
+						<table id="userTable" class="display">
+							<thead>
+								<tr>
+									<th>User Name</th>
+									<th>Password</th>
+									<th align=center>Directory Access</th>
+									<th>Enabled</th>
+									<th>Remove</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td data-order="0">anonymous<input type="hidden" id="userName0" value="anonymous"></td>
+									<td></td>
+									<td align=center><span class="popupDirAccessPage" onclick="popupDirAccessPage(0)">&#x271A;</span></td>
+									<td align=center><input value="1" type=checkbox id="isUserEnable0"></td>
+									<td></td>
+								</tr>
+							</tbody>
+						</table>
+		<div id="userDirAccess" class="w3-modal" style="z-index:4">
+		  <div class="w3-modal-content w3-animate-zoom">
+				<div class="w3-container w3-padding w3-red">
+				   <span onclick="document.getElementById('userDirAccess').style.display='none'"
+				   class="w3-button w3-red w3-right w3-xxlarge">&#x2718;</span>
+				  <h2>User:<span id="userName"></span></h2>
+				</div>
+			  <div class="w3-panel">
+
+				  <table width="100%" border=1 id="remoteDirAccessTable">
+						<tr>
+							<td>Virtual Directory</td>
+							<td>Physical Directory</td>
+							<td style="font-size:20px; text-align: center;">
+								<span style="cursor:pointer" onclick="addDirAccessRow('remoteDirAccessTable')">&#x271A;</span>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<input type=text id="virtualDir0">
+							</td>
+							<td style="font-size:20px; text-align: center;">
+								<span style="cursor:pointer" onclick="showRemoteDir(this)">&#x271A;</span>
+							</td>
+							<td>
+							</td>
+						</tr>			
+				  </table>
+			  
+				  <div class="w3-section">
+						<a class="w3-button w3-red" onclick="document.getElementById('userDirAccess').style.display='none'">Cancel &#x2718;</a>
+						<a class="w3-button w3-light-grey w3-right" onclick="document.getElementById('userDirAccess').style.display='none'">Add	&#x2714;</a> 
+				  </div>
+				</div>    
+			</div>
+		</div>							
+		<script>
+			var userTable,dataTable;
+			$(document).ready(function() 
+							{
+								userTable=$('#userTable');
+								dataTable=userTable.DataTable(
+								{ 
+									"dom": '<"toolbar">frtip',
+									"CaseSensitive":true, 
+									"order": [[ 0, "desc" ]],
+									paging: true,
+									"pageLength": 10,
+									responsive: true,
+									"info": true,
+									"orderCellsTop": true, 
+									"fixedHeader":true,
+									"columnDefs": [{"className": "dt-center", "targets": [2,3,4]},
+													{"orderable": false,"targets":[1,2,3,4]}
+												  ],
+								});
+								$("div.toolbar").html("&nbsp;&#x271A;");												
+								$("div.toolbar").on("click",function()
+															{
+																var count=dataTable.data().count();
+																var tbody=userTable.children("tbody");
+																var span=document.createElement("span");
+																var tbody=userTable.children("tbody");
+																var row=document.createElement("tr");
+																var cell=row.insertCell(row.cells.length);
+																cell.innerHTML="<input type=\"text\" id=\"userName"+count+"\">";
+																cell=row.insertCell(row.cells.length);
+																cell.className="sorting_1";
+																cell.innerHTML="<input type=\"password\" id=\"password"+count+"\">";
+																cell=row.insertCell(row.cells.length);
+																cell.style.textAlign="center";
+																cell.innerHTML="<span class=\"popupDirAccessPage\" onclick=\"popupDirAccessPage("+count+")\">&#x271A;</span>";
+																cell=row.insertCell(row.cells.length);
+																cell.style.textAlign="center";
+																cell.innerHTML="<input type=\"checkbox\" id=\"isUserEnable"+count+"\">";
+																cell=row.insertCell(row.cells.length);
+																span.innerHTML="&#x1F5D1";
+																span.id=count;
+																span.className="removeUserEntry";
+																$(span).click(function()
+																			{
+																				//dataTable.row($(row)).remove().draw();
+																				//$(row).hide();
+																				var field=document.getElementById("isRemoveThisUser"+this.id);
+																				field.value="1";
+																				$(row).hide();
+																			});
+																cell.appendChild(span);
+																$(cell).append("<input type=hidden id=isRemoveThisUser"+count+" value=\"0\">");
+																var dt = $('#userTable').dataTable().api();
+																dt.row.add($(row));
+																dt.draw();
+															});																		
+								
+							});
+			function popupDirAccessPage(id)
+			{
+				$("#userDirAccess").toggle();
+			}								
+			function addDirAccessRow(id)
+			{
+				var table=document.getElementById(id);
+				var rowCount=table.rows.length;
+				var row=table.insertRow(rowCount);
+				var cell=row.insertCell(row.cells.length);
+				cell.innerHTML="<input type=text id=\"virtualDir"+rowCount+"\">";
+				cell=row.insertCell(row.cells.length);
+				cell.innerHTML="<span style=\"cursor:pointer\" onclick=\"showRemoteDir(this)\">&#x271A;</span>";
+			}
+		</script>														
+	</body>
+</html>	

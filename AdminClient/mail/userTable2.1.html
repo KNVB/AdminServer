@@ -16,11 +16,16 @@
 				font-size:20px;
 				cursor:pointer;
 			}
-			.removeUserEntry
+			.removeUserEntry 
 			{
 				cursor:pointer;
 				font-size:30px
 			}
+			.popupDirAccessPage
+			{
+				cursor:pointer;
+				font-size:20px
+			}			
 		</style>
 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
 		<script src="http://code.jquery.com/jquery-3.2.1.js"></script>
@@ -41,11 +46,11 @@
 								<tr>
 									<td data-order="0">anonymous</td>
 									<td></td>
-									<td align=center><a href="javascript:void(0)" onclick="addDirAccess(0)">&#x271A;</a></td>
+									<td align=center><span class="popupDirAccessPage" onclick="popupDirAccessPage(0)">&#x271A;</span></td>
 									<td align=center><input value="1" type=checkbox id="isUserEnable0"></td>
 									<td></td>
 								</tr>
-								<tr>
+<!--								<tr>
 									<td><input type=hidden id="userName0" readonly style="border:none" value="anonymous">abc</td>
 									<td></td>
 									<td align=center><a href="javascript:void(0)" onclick="addDirAccess(0)">&#x271A;</a></td>
@@ -73,9 +78,11 @@
 									<td align=center><a href="javascript:void(0)" onclick="addDirAccess(1)">&#x271A;</a></td>
 									<td><input value="1" type=checkbox id="isUserEnable1"></td>
 									<td style="font-size:30px">&#x1F5D1;</td>
-								</tr>
+								</tr> -->
 							</tbody>
 						</table>
+		<div id="userDirAccess" class="w3-modal" style="z-index:4">
+		</div>							
 		<script>
 			var userTable,dataTable;
 			$(document).ready(function() 
@@ -111,7 +118,7 @@
 																cell.innerHTML="<input type=\"password\" id=\"password"+count+"\">";
 																cell=row.insertCell(row.cells.length);
 																cell.style.textAlign="center";
-																cell.innerHTML="&#x271A;";
+																cell.innerHTML="<span class=\"popupDirAccessPage\" onclick=\"popupDirAccessPage("+count+")\">&#x271A;</span>";
 																cell=row.insertCell(row.cells.length);
 																cell.style.textAlign="center";
 																cell.innerHTML="<input type=\"checkbox\" id=\"isUserEnable"+count+"\">";
@@ -135,6 +142,7 @@
 															});																		
 								
 							});
+							
 		</script>														
 	</body>
 </html>	
