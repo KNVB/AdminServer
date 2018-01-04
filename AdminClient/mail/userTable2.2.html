@@ -21,7 +21,7 @@
 				cursor:pointer;
 				font-size:30px
 			}
-			.popupDirAccessPage
+			.popupAccessRightPage
 			{
 				cursor:pointer;
 				font-size:20px
@@ -37,7 +37,7 @@
 								<tr>
 									<th>User Name</th>
 									<th>Password</th>
-									<th align=center>Directory Access</th>
+									<th align=center>Access Right</th>
 									<th>Enabled</th>
 									<th>Remove</th>
 								</tr>
@@ -46,46 +46,36 @@
 								<tr>
 									<td data-order="0">anonymous<input type="hidden" id="userName0" value="anonymous"></td>
 									<td></td>
-									<td align=center><span class="popupDirAccessPage" onclick="popupDirAccessPage(0)">&#x271A;</span></td>
+									<td align=center><span class="popupAccessRightPage" onclick="popupAccessRightPage(0)">&#x1F589;</span></td>
 									<td align=center><input value="1" type=checkbox id="isUserEnable0"></td>
 									<td></td>
 								</tr>
 							</tbody>
 						</table>
-		<div id="userDirAccess" class="w3-modal" style="z-index:4">
-		  <div class="w3-modal-content w3-animate-zoom">
-				<div class="w3-container w3-padding w3-red">
-				   <span onclick="document.getElementById('userDirAccess').style.display='none'"
-				   class="w3-button w3-red w3-right w3-xxlarge">&#x2718;</span>
-				  <h2>User:<span id="userName"></span></h2>
-				</div>
-			  <div class="w3-panel">
-
-				  <table width="100%" border=1 id="remoteDirAccessTable">
-						<tr>
-							<td>Virtual Directory</td>
-							<td>Physical Directory</td>
-							<td style="font-size:20px; text-align: center;">
-								<span style="cursor:pointer" onclick="addDirAccessRow('remoteDirAccessTable')">&#x271A;</span>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<input type=text id="virtualDir0">
-							</td>
-							<td style="font-size:20px; text-align: center;">
-								<span style="cursor:pointer" onclick="showRemoteDir(this)">&#x271A;</span>
-							</td>
-							<td>
-							</td>
-						</tr>			
-				  </table>
-			  
-				  <div class="w3-section">
-						<a class="w3-button w3-red" onclick="document.getElementById('userDirAccess').style.display='none'">Cancel &#x2718;</a>
-						<a class="w3-button w3-light-grey w3-right" onclick="document.getElementById('userDirAccess').style.display='none'">Add	&#x2714;</a> 
-				  </div>
-				</div>    
+		<div id="userAccessRight" class="w3-modal" style="z-index:4">
+			<div class="w3-modal-content w3-animate-zoom">
+				<table width="100%">
+					<tr class="w3-red">
+						<td>Directory Access</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td> 
+							<span onclick="document.getElementById('userAccessRight').style.display='none'" class="w3-button w3-red w3-left">
+								Cancel &#x2718;
+							</span>
+						</td>
+						<td>
+							<span onclick="document.getElementById('userAccessRight').style.display='none'" class="w3-button w3-red w3-right">
+								Save &#x2718;
+							</span>
+						</td>
+					</tr>					
+				</table>
 			</div>
 		</div>							
 		<script>
@@ -123,7 +113,7 @@
 																cell.innerHTML="<input type=\"password\" id=\"password"+count+"\">";
 																cell=row.insertCell(row.cells.length);
 																cell.style.textAlign="center";
-																cell.innerHTML="<span class=\"popupDirAccessPage\" onclick=\"popupDirAccessPage("+count+")\">&#x271A;</span>";
+																cell.innerHTML="<span class=\"popupAccessRightPage\" onclick=\"popupAccessRightPage("+count+")\">&#x271A;</span>";
 																cell=row.insertCell(row.cells.length);
 																cell.style.textAlign="center";
 																cell.innerHTML="<input type=\"checkbox\" id=\"isUserEnable"+count+"\">";
@@ -147,9 +137,9 @@
 															});																		
 								
 							});
-			function popupDirAccessPage(id)
+			function popupAccessRightPage(id)
 			{
-				$("#userDirAccess").toggle();
+				$("#userAccessRight").toggle();
 			}								
 			function addDirAccessRow(id)
 			{
