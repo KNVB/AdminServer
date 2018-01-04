@@ -110,12 +110,21 @@ ul li:hover
 {
 	background-color: #f1f1f1;	
 }
+.remoteDirContainer
+{
+	display:none;
+	width:fit-content;
+}
 .remoteDir
 {
-	overflow:scroll;
-	border:1px solid black;
-	background-color:#ffffff;
-	padding:5px;
+	background: #FFF;
+	border-top: solid 1px #BBB;
+	border-left: solid 1px #BBB;
+	border-bottom: solid 1px #FFF;  
+	border-right: solid 1px #FFF;
+	overflow: scroll;
+	padding: 0px;
+	margin-left:0px
 }
 .passiveModeSetting
 {
