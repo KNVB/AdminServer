@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>FTP Server Administration Page</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+		<style>
+			.sidenav 
+			{
+				height: 100%;
+				width: 0;
+				position: fixed;
+				z-index: 1;
+				top: 0;
+				left: 0;
+				background-color: red;
+				overflow-x: hidden;
+				transition: 0.5s;
+				padding-top: 60px;
+				width : 320px;
+				z-index:4;
+			}
+			.w3-bar-block .w3-bar-item 
+			{
+				padding: 16px
+			}
+			.loginTable
+			{
+				color:#f1f1f1;
+			}
+			.loginCaption
+			{
+				text-align:right;
+				font-size: 16px;
+			}
+			@media screen and (max-height: 450px) 
+			{
+				.sidenav {padding-top: 15px;}
+				.sidenav a {font-size: 18px;}
+			}
+		</style>
+		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<script src="http://code.jquery.com/jquery-3.2.1.js"></script>
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+	</head>
+	<body>
+		<div class="sidenav" id="loginSideBar">
+			<div class="loginDiv">
+				<table class="loginTable">
+					<tr>
+						<td colspan=2 align=center>Admin. Server login</td>
+					</tr>
+					<tr>
+						<td class="loginCaption">server name:</td>
+						<td><input type=text value="localhost" id="hostName" size="10" required ></td>
+					</tr>
+					<tr>
+						<td class="loginCaption">server port no:</td>
+						<td><input type=number value="4466" id="portNo" min="1" max="999999" required ></td>
+					</tr>
+					<tr>
+						<td class="loginCaption">user name:</td>
+						<td><input type="text" value ="admin" id="userName" size="10" required></td>
+					</tr>
+					<tr>
+						<td class="loginCaption">password:</td>
+						<td><input type="password" value ="password" id="password" size="10" required></td>
+					</tr>
+					<tr>
+						<td colspan=2 style="text-align:center;"><button id="loginButton">Login</button></td>
+						<!--<td><button onclick="login()" style="float:right">Login</button></td>
+						<td><button onclick="disConnect()">Disconnect</button></td>-->
+					</tr>	
+				</table>
+			</div>			
+		</div>
+		<!-- Side Navigation -->
+		<nav class="w3-sidebar w3-bar-block w3-collapse w3-white w3-animate-left w3-card" style="z-index:3;width:320px;" id="mySidebar">
+			<a href="javascript:void(0)" onclick="adminPage.w3_close()" title="Close Sidemenu" class="w3-bar-item w3-button w3-hide-large w3-large">
+				Close &#x2718;
+			</a>
+			<div id="qq">
+				<a href="#" onclick="adminPage.updateSideNavigation(this)" class="w3-bar-item w3-button">
+					FTP Server Administration &#x25bc;
+				</a>
+				<div id="ftpAdminFunction" class="w3-hide w3-animate-left">
+					<a class="w3-bar-item w3-button w3-border-bottom test w3-hover-light-grey" id="listFtpServer">
+					  <div class="w3-container">
+							<span class="w3-opacity w3-large">List Server</span>
+					  </div>
+					</a>
+					<a href="javascript:void(0)" class="w3-bar-item w3-button w3-border-bottom test w3-hover-light-grey" id="addFtpServer">
+					  <div class="w3-container">
+						<span class="w3-opacity w3-large">Add Server &#x270E;</span>
+					  </div>
+					</a>
+					<a href="javascript:void(0)" class="w3-bar-item w3-button w3-border-bottom test w3-hover-light-grey" id="removeFtpServer">
+					  <div class="w3-container">
+						<span class="w3-opacity w3-large">Remove Server &#x270E;</span>
+					  </div>
+					</a>					
+				</div>
+				<a href="#" onclick="adminPage.updateSideNavigation(this)" class="w3-bar-item w3-button">
+					Administration Server Setting &#x25bc;
+				</a>	
+				<div id="adminServerFunction" class="w3-hide w3-animate-left">
+					<a class="w3-bar-item w3-button w3-border-bottom test w3-hover-light-grey" id="changeAdminUserNameAndPassword">
+					  <div class="w3-container">
+							<span class="w3-opacity w3-large">Change Admin. UserName And Password</span>
+					  </div>
+					</a>
+				</div>
+				<a href="#" class="w3-bar-item w3-button" id="logoutButton">Logout</a>
+			</div>
+		</nav>
+		
+		<!-- Overlay effect when opening the side navigation on small screens -->
+		<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="adminPage.w3_close()" style="cursor:pointer" title="Close Sidemenu" 
+			id="myOverlay">
+		</div>
+		<!-- Page content -->
+		<div class="w3-main" style="margin-left:320px;">
+			<a class="w3-button w3-white w3-hide-large w3-xlarge w3-margin-left w3-margin-top" onclick="adminPage.w3_open()">&#x2630;</a>
+			<!--a href="javascript:void(0)" class="w3-hide-large w3-red w3-button w3-right w3-margin-top w3-margin-right" onclick="document.getElementById('userDetailPage').style.display='block'">&#x270E;</a-->
+			<div id="mainStage">
+			
+						
+			
+			</div>
+		</div>
+		
+		
+		<script>
+		var adminPage;		
+		$(document).ready(function() 
+						{
+							adminPage=new AdminPage();
+						});
+		function addDirAccess(id)
+		{
+			$("#directoryAccess").show();
+			$("#directoryAccess_userName").text("User:"+$("#userName"+id).val());
+			/*var userName=$(obj).parents("tr:first").children().find("input").val();
+			$("#directoryAccess_userName").text("User:"+userName);
+			$("#directoryAccess").show();*/
+			
+		}		
+		class AdminPage
+		{
+			constructor()
+			{
+				this.mainStage=$("#mainStage");
+				this.showHideOption={};
+				$("#loginButton").click(function ()
+										{	
+											adminPage.emptyMainStage();
+											$("#loginSideBar").hide("slide",this.showHideOption,1000);
+										});
+				$("#logoutButton").click(function()
+										{
+											adminPage.emptyMainStage();
+											$("#loginSideBar").show("slide",this.showHideOption,1000);
+										});
+			}
+			emptyMainStage()
+			{
+				this.mainStage.empty();
+			}
+			updateSideNavigation(obj)
+			{
+				$(obj).parent().children("a").each(function()
+													{
+														$(this).removeClass("w3-red");
+														$(this).next("div:first").addClass("w3-hide");
+													});
+				$(obj).addClass("w3-red");
+				$(obj).next("div:first").removeClass("w3-hide");
+			}
+			
+			w3_open() 
+			{
+				document.getElementById("mySidebar").style.display = "block";
+				document.getElementById("myOverlay").style.display = "block";
+			}
+			w3_close() 
+			{
+				document.getElementById("mySidebar").style.display = "none";
+				document.getElementById("myOverlay").style.display = "none";
+			}			
+		}		
+		</script>					
+	</body>
+</html> 
