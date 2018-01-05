@@ -16,13 +16,14 @@ class AdminPage
 		document.body.appendChild(this.getLoginSideBar(this.serverResponseHandler.bind(this)));
 		
 		//Side Navigation
+		this.adminSidebar.id="mySidebar";
 		this.adminSidebar.className="w3-hide w3-sidebar w3-bar-block w3-collapse w3-white w3-animate-left w3-card";
 		this.adminSidebar.setAttribute("style","z-index:3;width:320px;");
 		var a=document.createElement("a");
 		a.className="w3-bar-item w3-button w3-hide-large w3-large";
 		a.setAttribute("title","Close Sidemenu");
 		a.onclick=this.w3_close;
-		a.text="Close &#x2718;";
+		a.innerHTML="Close &#x2718;";
 		
 		this.adminSidebar.appendChild(a);
 		this.adminSidebar.appendChild(this.modalList.getModalList());
@@ -38,12 +39,14 @@ class AdminPage
 		document.body.appendChild(this.overLay);	
 		
 		this.mainContainer=document.createElement("div");
+		this.mainContainer.className="w3-main";
 		this.mainContainer.style.marginLeft="320px";
 		
 		this.mainStage=document.createElement("div");
 		this.mainStage.id="mainStage";
 		var a2=document.createElement("a");
-		a2.className="w3-button w3-white w3-hide-large w3-xlarge w3-margin-left w3-margin-top"; 
+		a2.className="w3-button w3-white w3-hide-large w3-xlarge w3-margin-left w3-margin-top";
+		               
 		a2.innerHTML="&#x2630;";
 		a2.onclick=this.w3_open;
 		this.mainContainer.appendChild(a2);
