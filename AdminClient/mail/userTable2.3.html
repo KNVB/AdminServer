@@ -71,7 +71,7 @@
     </div>
     <div class="w3-panel">
       <table class="display" id="dirAccess" width="100%">
-		<thead>
+			<thead>
 			<tr>
 				<th>Virtual Path</th>
 				<th>Physical Path</th>
@@ -88,20 +88,35 @@
 					<button onclick="getRemoteDir(0)">...</button>
 					
 					<div id="remoteDir0" class="remoteDirContainer">
-						<p>
-							<ul class="remoteDir" style="padding-left:5px;margin-left:5px">
-							  <li style="margin-left:5px;list-style:none;">abc</li>
-							  <ul style="padding-left: 5px;margin-left:5px">
-								<li style="margin-left:5px;list-style:none;">def</li>
-								 <ul style="padding-left: 5px;margin-left:5px">
-								  <li style="margin-left:5px;list-style:none;">ghi</li>
-								 </ul>
-							  </ul>
-							</ul>			
-							<input type=hidden id="oldPhysicalDirValue0" value="xyz">
-							<button onclick="resumeOldSetting(0)">Cancel</button>
-							<button onclick="hideRemoteDir(0)">Ok</button>
-						</p>
+						<!--<div class="remoteDir" style="width:200px;padding-top:0px;margin-top:0px">
+							<ul style="padding:0px;margin:0px">
+									<li style="margin-left:10px;list-style:none;">
+										<span style="color:red">&#x1F5BF;</span>
+										<a>abc</a>
+										<ul style="padding:0px;margin:0px">
+												<li style="margin-left:10px;list-style:none;">
+													<span style="color:red">&#x1F5BF;</span>
+													<a>def</a>
+													<ul style="padding:0px;margin:0px">
+															<li style="margin-left:10px;list-style:none;">
+																<span style="color:red">&#x1F5BF;</span>
+																<a>ghi</a>
+																<ul style="padding:0px;margin:0px">
+																		<li style="margin-left:10px;list-style:none;">
+																			<span style="color:red">&#x1F5BF;</span>
+																			<a>klm</a>
+																		</li>
+																</ul>
+															</li>
+													</ul>
+												</li>
+										</ul>
+									</li>
+							</ul>
+						</div>-->				
+						<input type=hidden id="oldPhysicalDirValue0" value="xyz">
+						<button onclick="resumeOldSetting(0)">Cancel</button>
+						<button onclick="hideRemoteDir(0)">Ok</button>
 					</div>
 					
 				</td>
@@ -219,30 +234,35 @@
 									"fixedHeader":true
 								});
 								var oldPhysicalDirValue=$("#oldPhysicalDirValue0");
-								/*var list=document.createElement("ul");
+								var div=document.createElement("div");
+								var list=document.createElement("ul");
 								var listItem=document.createElement("li");
+								var span=document.createElement("span");
 								var a=document.createElement("a");
+								span.style.color="red";
+								span.innerHTML="&#x1F5BF;";
 								a.text="abc";
-								list.className="remoteDir";
-								
-								list.style="padding: 0px;padding-left:0px;margin: 0px;list-style:none";
-								$(list).insertBefore(oldPhysicalDirValue);
-								
-								
-								listItem.appendChild(a);
-								a.onmousedown=function(){return false;};
-								$(list).append(listItem);
 								a.setAttribute("rel","/abc");
 								a.onclick=function(event)
-										  {
-											console.log("click:"+this.text);
-											selectPath(this,0); 
-										  };
+										  		{
+														console.log("click:"+this.text);
+														selectPath(this,0); 
+										  		};
 								a.ondblclick=function(event) 
 								             {
-												console.log("dblclick:"+this.text);
-												drillDown(this);
-											};*/
+															 console.log("dblclick:"+this.text);
+															 drillDown(this);
+														 }
+								list.style="padding:0px;margin:0px";
+								listItem.style="margin-left:10px;list-style:none;";
+								div.className="remoteDir";
+								div.style="width:200px;padding-top:0px;margin-top:0px";
+								$(listItem).append(span);
+								$(listItem).append(a);
+								$(list).append(listItem);
+								$(div).append(list);
+								$(div).insertBefore(oldPhysicalDirValue);
+									
 							});
 			function popupAccessRightPage(id)
 			{
@@ -354,11 +374,11 @@
 			{
 				console.log(link.outerHTML);
 				$("#remoteDir"+rowCount).find("a").css("background","white");
-				/*var list=$(listItem).parent().children("li").css("background","white");*/
+				//var list=$(listItem).parent().children("li").css("background","white");
 				var dirName=$.trim(link.getAttribute("rel"));
 
 				link.style.background="#aab7d1";
-				$("#physicalDir"+rowCount).val(dirName);
+				$("#oldPhysicalDirValue"+rowCount).val(dirName);
 			}
 			function getRemoteDir(id)
 			{
