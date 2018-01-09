@@ -241,18 +241,21 @@
 								var a=document.createElement("a");
 								span.style.color="red";
 								span.innerHTML="&#x1F5BF;";
+								span.onmousedown=function(){return false;};
 								a.text="abc";
+								a.style="cursor:pointer";
+								a.onmousedown=function(){return false;};
 								a.setAttribute("rel","/abc");
 								a.onclick=function(event)
-										  		{
-														console.log("click:"+this.text);
-														selectPath(this,0); 
-										  		};
+										{
+											console.log("click:"+this.text);
+											selectPath(this,0); 
+										};
 								a.ondblclick=function(event) 
 								             {
-															 console.log("dblclick:"+this.text);
-															 drillDown(this);
-														 }
+												 console.log("dblclick:"+this.text);
+												 drillDown(this,0);
+											 }
 								list.style="padding:0px;margin:0px";
 								listItem.style="margin-left:10px;list-style:none;";
 								div.className="remoteDir";
@@ -349,36 +352,71 @@
 												easing:"swing"
 												});
 			}
-			function drillDown(parent)
+			function drillDown(parent,rowCount)
 			{
-				$("#remoteDir0").find("a").css("background","white");
+				var list;
+				$("#remoteDir"+rowCount).find("a").css("background","white");
+				$("#remoteDir"+rowCount).find("a").prev().css("background","white");
 				parent.style.background="#aab7d1";
-				var list=document.createElement("ul");
-				var listItem=document.createElement("li");
-				var a=document.createElement("a");
-				listItem.style="list-style:none;display: list-item;text-align: -webkit-match-parent;";
-				listItem.onmousedown="return false;";
-				
-				a.onmousedown=function(){return false;};
-				a.onclick=function(event){selectPath(this,0);event.stopPropagation();};
-				a.ondblclick=function(event){drillDown(this);event.stopPropagation();};
-				listItem.style.background="white";
-				a.text="一二三";
-				a.setAttribute("rel",parent.getAttribute("rel")+"/"+a.text);
-				listItem.appendChild(a);
-				list.appendChild(listItem);
-				list.style.background="white";
-				$(list).insertAfter(parent);
+				$(parent).prev().css("background","#aab7d1");
+				if ($(parent).next().length==0)
+				{
+					list=document.createElement("ul");
+					var listItem=document.createElement("li");
+					var span=document.createElement("span");
+					var a=document.createElement("a");
+					span.style.color="red";
+					span.innerHTML="&#x1F5BF;";
+					span.onmousedown=function(){return false;};
+					a.text="一二三";
+					a.style="cursor:pointer";
+					a.onmousedown=function(){return false;};
+					a.setAttribute("rel",parent.getAttribute("rel")+"/"+a.text);
+					a.onclick=function(event)
+							{
+								console.log("click:"+this.text);
+								selectPath(this,0);
+								event.stopPropagation();							
+							};
+					a.ondblclick=function(event) 
+								 {
+									 console.log("dblclick:"+this.text);
+									 drillDown(this,0);
+									 event.stopPropagation();
+								 }
+					list.style="padding:0px;margin:0px";
+					listItem.style="margin-left:10px;list-style:none;";
+					$(listItem).append(span);
+					$(listItem).append(a);
+					$(list).append(listItem);
+					$(list).insertAfter(parent);
+				}
+				else
+				{
+					list=$(parent).next();
+					if ($(list).css("display")=="none")
+						$(list).slideDown({
+											duration: 1000, 
+											easing:"swing"
+										});
+					else
+						$(list).slideUp({
+											duration: 1000, 
+											easing:"swing"
+										});
+				}
 			}
 			function selectPath(link,rowCount)
 			{
 				console.log(link.outerHTML);
 				$("#remoteDir"+rowCount).find("a").css("background","white");
+				$("#remoteDir"+rowCount).find("a").prev().css("background","white");
 				//var list=$(listItem).parent().children("li").css("background","white");
 				var dirName=$.trim(link.getAttribute("rel"));
 
 				link.style.background="#aab7d1";
-				$("#oldPhysicalDirValue"+rowCount).val(dirName);
+				$(link).prev().css("background","#aab7d1");
+				$("#physicalDir"+rowCount).val(dirName);
 			}
 			function getRemoteDir(id)
 			{
