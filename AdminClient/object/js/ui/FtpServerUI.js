@@ -1,10 +1,11 @@
 class FtpServerUI
 {
-	constructor(adminServer,adminPage)
+	constructor(adminServer,adminPageControl)
 	{
 		this.adminServer=adminServer;
+		this.adminPageControl=adminPageControl;
 	}
-	getModal(callBack)
+	getUI(callBack)
 	{
 		var a=document.createElement("a");
 	
@@ -22,14 +23,14 @@ class FtpServerUI
 		subDiv.id="ftp";
 		subDiv.className="w3-hide w3-animate-left";
 		
-		subDiv.appendChild(this.addFunction("List Server","listFtpServer"));
-		subDiv.appendChild(this.addFunction("Add Server &#x1F589;","addFtpServer"));
-		subDiv.appendChild(this.addFunction("Remove Server &#x1F589;","removeFtpServer"));
+		subDiv.appendChild(this.addFunction("List Server","listFtpServer",this.listFtpServer.bind(this)));
+		subDiv.appendChild(this.addFunction("Add Server &#x1F589;","addFtpServer",this.addFtpServer.bind(this)));
+		subDiv.appendChild(this.addFunction("Remove Server &#x1F589;","removeFtpServer",this.removeFtpServer.bind(this)));
 		div.appendChild(a);
 		div.appendChild(subDiv);
 		return div;
 	}
-	addFunction(label,id)
+	addFunction(label,id, theFunction)
 	{
 		var a2=document.createElement("a");
 		var div2=document.createElement("div");
@@ -42,6 +43,22 @@ class FtpServerUI
 		span.innerHTML=label;
 		div2.appendChild(span);
 		a2.appendChild(div2);
+		a2.addEventListener('click',function()
+								  {
+									  theFunction();
+								  });
 		return a2;
+	}
+	listFtpServer()
+	{
+		this.adminPageControl.setContent("List server");
+	}
+	addFtpServer()
+	{
+		this.adminPageControl.setContent("add server");
+	}
+	removeFtpServer()
+	{
+		this.adminPageControl.setContent("remove server");
 	}
 }

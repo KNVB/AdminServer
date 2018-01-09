@@ -1,4 +1,4 @@
-class AdminPage
+class AdminPageControl
 {
 	constructor()
 	{
@@ -6,13 +6,13 @@ class AdminPage
 		this.modalList=new ModalList(this.logout.bind(this));
 		this.adminServer=new AdminServer();
 		this.adminSidebar=document.createElement("nav");
-		this.ftpServerUI=new FtpServerUI(this.adminServer);
-		this.adminServerUI=new AdminServerUI(this.adminServer);
+		this.ftpServerUI=new FtpServerUI(this.adminServer,this);
+		this.adminServerUI=new AdminServerUI(this.adminServer,this);
 		
 		
 		this.adminServer.setServerResponseHandler(this.serverResponseHandler.bind(this));
-		this.modalList.addModal(this.ftpServerUI.getModal(this.modalList.updateSideNavigation.bind(this.modalList)));
-		this.modalList.addModal(this.adminServerUI.getModal(this.modalList.updateSideNavigation.bind(this.modalList)));
+		this.modalList.addModalUI(this.ftpServerUI.getUI(this.modalList.updateSideNavigation.bind(this.modalList)));
+		this.modalList.addModalUI(this.adminServerUI.getUI(this.modalList.updateSideNavigation.bind(this.modalList)));
 		document.body.appendChild(this.getLoginSideBar(this.serverResponseHandler.bind(this)));
 		
 		//Side Navigation
@@ -56,22 +56,29 @@ class AdminPage
 	}
 	serverResponseHandler(serverResponseObj)
 	{
-		switch (serverResponseObj.action)
+		if(serverResponseObj!=null)
 		{
-			case "LOGIN":
-					if(serverResponseObj.responseCode==0)
-					{
-						//$(".adminTable").show();
-						//$('.loginDiv').animate({opacity: 'hide', height: 'hide'}, 500);
-						//console.log(serverPage==null);
-						this.hideLoginSideBar(this.initTheStage.bind(this));
-					}
-					else
-					{
-						this.adminServer.disConnect();
-						alert("Invalid user name or password");	
-					}
-					break;
+			switch (serverResponseObj.action)
+			{
+				case "LOGIN":
+						if(serverResponseObj.responseCode==0)
+						{
+							//$(".adminTable").show();
+							//$('.loginDiv').animate({opacity: 'hide', height: 'hide'}, 500);
+							//console.log(serverPage==null);
+							this.hideLoginSideBar(this.initTheStage.bind(this));
+						}
+						else
+						{
+							this.adminServer.disConnect();
+							alert("Invalid user name or password");	
+						}
+						break;
+			}
+		}
+		else
+		{
+			this.hideLoginSideBar(this.initTheStage.bind(this));	
 		}
 	}
 	initTheStage()
@@ -128,8 +135,8 @@ class AdminPage
 								                    adminServerPortNoInputBox.value,
 													loginUserNameInputBox.value,
 													loginPasswordInputBox.value);
-								myAdminServer.login(loginObj);
-								//callBack();
+								//myAdminServer.login(loginObj);
+								callBack();
 							})
 		row=loginTable.insertRow(loginTable.rows.length);
 		cell=row.insertCell(row.cells.length);
@@ -191,6 +198,14 @@ class AdminPage
 		{
 			$(this.loginSideBar).hide("slide",this.showHideOption,1000,callBack);
 		}
+	}
+	setContent(content)
+	{
+		$(this.mainStage).html(content);
+	}
+	clearMainStage()
+	{ 
+		$(this.mainStage).empty();
 	}
 	logout()
 	{

@@ -21,9 +21,9 @@ class ModalList
 										$(this).children("div").addClass("w3-hide");
 									});
 	}
-	addModal(modal)
+	addModalUI(modalUI)
 	{
-		this.moduleListDiv.insertBefore(modal,this.logoutLink);
+		this.moduleListDiv.insertBefore(modalUI,this.logoutLink);
 	}
 	updateSideNavigation(obj)
 	{

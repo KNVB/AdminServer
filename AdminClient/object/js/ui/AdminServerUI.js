@@ -1,10 +1,11 @@
 class AdminServerUI
 {
-	constructor(adminServer)
+	constructor(adminServer,adminPageControl)
 	{
 		this.adminServer=adminServer;
+		this.adminPageControl=adminPageControl;
 	}
-	getModal(callBack)
+	getUI(callBack)
 	{
 		var a=document.createElement("a");
 		var div=document.createElement("div");
