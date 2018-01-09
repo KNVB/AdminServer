@@ -8,8 +8,10 @@ class AdminPageControl
 		this.adminSidebar=document.createElement("nav");
 		this.ftpServerUI=new FtpServerUI(this.adminServer,this);
 		this.adminServerUI=new AdminServerUI(this.adminServer,this);
-		
-		
+		this.buildUI();	
+	}
+	buildUI()
+	{
 		this.adminServer.setServerResponseHandler(this.serverResponseHandler.bind(this));
 		this.modalList.addModalUI(this.ftpServerUI.getUI(this.modalList.updateSideNavigation.bind(this.modalList)));
 		this.modalList.addModalUI(this.adminServerUI.getUI(this.modalList.updateSideNavigation.bind(this.modalList)));
@@ -56,7 +58,11 @@ class AdminPageControl
 	}
 	serverResponseHandler(serverResponseObj)
 	{
-		if(serverResponseObj!=null)
+		if(serverResponseObj==null)
+		{
+			this.hideLoginSideBar(this.initTheStage.bind(this));	
+		}
+		else
 		{
 			switch (serverResponseObj.action)
 			{
@@ -75,11 +81,7 @@ class AdminPageControl
 						}
 						break;
 			}
-		}
-		else
-		{
-			this.hideLoginSideBar(this.initTheStage.bind(this));	
-		}
+		}		
 	}
 	initTheStage()
 	{
