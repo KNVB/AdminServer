@@ -209,6 +209,7 @@ class AdminPageControl
 	}
 	logout()
 	{
+		this.clearMainStage();
 		this.adminServer.disConnect();
 		$(this.loginSideBar).show("slide",this.showHideOption,1000);
 		$(this.adminSidebar).toggleClass("w3-hide");
