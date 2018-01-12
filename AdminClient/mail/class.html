@@ -1,0 +1,26 @@
+<html>
+	<head>
+		<script src="http://code.jquery.com/jquery-3.2.1.js"></script>
+	</head>
+	<body>
+		<script>
+			$(document).ready(function() 
+												{
+													 var q=null;
+													 try
+													 {
+													 	q=new QQ();
+													 }
+													 catch(err)
+													 {
+															var script = document.createElement('script');
+															script.src = "QQ.js";
+															script.onload=function(){q=new QQ();};
+															
+															document.head.appendChild(script);
+																												 		
+													 }
+												});	
+		</script>
+	</body>
+</html>

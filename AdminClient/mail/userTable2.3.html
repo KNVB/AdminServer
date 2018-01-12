@@ -108,11 +108,15 @@
 						<legend>File access</legend>
 						<table>
 							<tr>
-								<td>Read</td>
-								<td><input type=checkbox id="readFile"></td>
+								<td>Download</td>
+								<td><input type=checkbox id="uploadFile"></td>
 							</tr>
 							<tr>
-								<td>Write</td>
+								<td>Upload</td>
+								<td><input type=checkbox id="writeFile"></td>
+							</tr>							
+							<tr>
+								<td>Delete</td>
 								<td><input type=checkbox id="writeFile"></td>
 							</tr>							
 						</table>
@@ -123,12 +127,22 @@
 						<legend>Folder access</legend>
 						<table>
 							<tr>
-								<td>List</td>
-								<td><input type=checkbox id="listDir"></td>
+								<td>List File</td>
+								<td><input type=checkbox id="listFile"></td>
+								<td>Create Sub. Dir.</td>
+								<td><input type=checkbox id="createDir"></td>
 							</tr>
 							<tr>
-								<td>Create</td>
+								<td>List Dir.</td>
+								<td><input type=checkbox id="listDir" ></td>
+								<td>Remove Sub. Dir.</td>
 								<td><input type=checkbox id="createDir"></td>
+							</tr>
+							<tr>
+								<td>Deny</td>
+								<td><input type=checkbox id="denyDir"></td>
+								<td>Hide</td>
+								<td><input type=checkbox id="hideDir"></td>
 							</tr>
 						</table>
 					</fieldset>	
