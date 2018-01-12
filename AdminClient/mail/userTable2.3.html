@@ -33,9 +33,11 @@
 			}			
 		</style>
 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.2.4/css/select.dataTables.min.css">
 		<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 		<script src="http://code.jquery.com/jquery-3.2.1.js"></script>
 		<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+		<script src="https://cdn.datatables.net/select/1.2.4/js/dataTables.select.min.js"></script>
 		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 		<script src="jquery.easing.1.3.js"></script>
 	</head>
@@ -88,32 +90,6 @@
 					<button onclick="getRemoteDir(0)">...</button>
 					
 					<div id="remoteDir0" class="remoteDirContainer">
-						<!--<div class="remoteDir" style="width:200px;padding-top:0px;margin-top:0px">
-							<ul style="padding:0px;margin:0px">
-									<li style="margin-left:10px;list-style:none;">
-										<span style="color:red">&#x1F5BF;</span>
-										<a>abc</a>
-										<ul style="padding:0px;margin:0px">
-												<li style="margin-left:10px;list-style:none;">
-													<span style="color:red">&#x1F5BF;</span>
-													<a>def</a>
-													<ul style="padding:0px;margin:0px">
-															<li style="margin-left:10px;list-style:none;">
-																<span style="color:red">&#x1F5BF;</span>
-																<a>ghi</a>
-																<ul style="padding:0px;margin:0px">
-																		<li style="margin-left:10px;list-style:none;">
-																			<span style="color:red">&#x1F5BF;</span>
-																			<a>klm</a>
-																		</li>
-																</ul>
-															</li>
-													</ul>
-												</li>
-										</ul>
-									</li>
-							</ul>
-						</div>-->				
 						<input type=hidden id="oldPhysicalDirValue0" value="xyz">
 						<button onclick="resumeOldSetting(0)">Cancel</button>
 						<button onclick="hideRemoteDir(0)">Ok</button>
@@ -125,6 +101,40 @@
 		</tbody>
 	  </table>
       <div class="w3-section">
+		<table width="100%">
+			<tr>
+				<td>
+					<Fieldset>
+						<legend>File access</legend>
+						<table>
+							<tr>
+								<td>Read</td>
+								<td><input type=checkbox id="readFile"></td>
+							</tr>
+							<tr>
+								<td>Write</td>
+								<td><input type=checkbox id="writeFile"></td>
+							</tr>							
+						</table>
+					</Fieldset>	
+				</td>
+				<td>
+					<fieldset>
+						<legend>Folder access</legend>
+						<table>
+							<tr>
+								<td>List</td>
+								<td><input type=checkbox id="listDir"></td>
+							</tr>
+							<tr>
+								<td>Create</td>
+								<td><input type=checkbox id="createDir"></td>
+							</tr>
+						</table>
+					</fieldset>	
+				</td>
+			</tr>
+		</table>
         <a class="w3-button w3-red" onclick="document.getElementById('userAccessRight').style.display='none'">
 			Cancel <i>&#x2718;</i>
 		</a>
@@ -157,7 +167,7 @@
 													{"orderable": false,"targets":[1,2,3,4]}
 												  ],
 								});
-								
+									
 
 								$("div.toolbar").html("&nbsp;&#x271A;");												
 								$("div.toolbar").on("click",function()
@@ -230,9 +240,21 @@
 												   {"className": "dt-center", "targets":[2]},
 												   {"orderable": false,"targets":[2]}
 													],
-									"select":true,				
+									select: {
+												style: 'single'
+											},				
 									"fixedHeader":true
 								});
+								dirAccessTable.on("select",function ( e, dt, type, indexes ) 
+													  {
+														rowData=JSON.stringify(dirAccessTable.rows(indexes).data().toArray());
+														console.log("selected row data:"+rowData);
+													  });
+								dirAccessTable.on("deselect",function ( e, dt, type, indexes ) 
+													  {
+														rowData=JSON.stringify(dirAccessTable.rows(indexes).data().toArray());
+														console.log("deselected row data:"+rowData);
+													  });
 								var oldPhysicalDirValue=$("#oldPhysicalDirValue0");
 								var div=document.createElement("div");
 								var list=document.createElement("ul");
@@ -305,7 +327,7 @@
 				
 				showRemoteDirBtn.value="...";
 				showRemoteDirBtn.setAttribute("type", "button");
-				showRemoteDirBtn.onclick=getRemoteDir(rowCount);
+				showRemoteDirBtn.onclick=function(){getRemoteDir(rowCount);};
 				
 				resumeOldSettingBtn.value="Cancel";
 				resumeOldSettingBtn.setAttribute("type", "button");
