@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>FTP Server Administration Page</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="css/w3.css">
+		<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="jQueryFileTree.css">
+		<style>
+			.w3-bar-block .w3-bar-item 
+			{
+				padding: 16px
+			}
+			.toolbar 
+			{
+				float: left;
+				font-size:20px;
+				cursor:pointer;
+			}
+			.addEntry 
+			{
+				cursor:pointer;
+				font-size:25px
+			}
+			.removeEntry 
+			{
+				cursor:pointer;
+				font-size:25px
+			}
+			.popupAccessRightPage
+			{
+				cursor:pointer;
+				font-size:25px
+			}			
+		</style>
+		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<script src="http://code.jquery.com/jquery-3.2.1.js"></script>
+		<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		<script src="jquery.easing.1.3.js"></script>
+		<script src="jQueryFileTree.js"></script>
+		<script>
+			$(document).ready(function() 
+												{
+													var userData={"userList":[]};
+													var userManagement=new UserManagement(userData);
+												});
+			class UserManagement
+			{
+				constructor(userData)
+				{
+					var cell,span,self=this;
+					var th=document.createElement("th");
+					var thead=document.createElement("thead"); 
+					var tbody=document.createElement("tbody");
+					var row=thead.insertRow(thead.rows.length);
+					this.table=document.createElement("table");
+					
+					$(th).text("User Name");
+					row.append(th);
+					
+					th=document.createElement("th");
+					$(th).text("Password");
+					row.append(th);
+					
+					th=document.createElement("th");
+					$(th).text("Access Right");
+					row.append(th);
+
+					th=document.createElement("th");
+					$(th).text("Enabled");
+					row.append(th);
+
+					th=document.createElement("th");
+					$(th).text("Remove");
+					row.append(th);
+					this.table.append(thead);
+					
+					row=tbody.insertRow(tbody.rows.length);
+					if (userData.userList.length==0)
+					{
+						cell=row.insertCell(row.cells.length);
+						cell.setAttribute("data-order","0");
+						cell.innerHTML="anonymous<input type=\"hidden\" id=\"userName0\" value=\"anonymous\">";
+						cell=row.insertCell(row.cells.length);
+						cell=row.insertCell(row.cells.length);
+						span=document.createElement("span");
+						span.className="popupAccessRightPage";
+						$(span).html("&#x1F589;");
+						$(span).on("click",function()
+															{
+																	self.popupAccessRight(0);
+															});
+						cell.append(span);
+						cell=row.insertCell(row.cells.length);
+						cell.innerHTML="<input value=\"1\" type=checkbox id=\"isUserEnable0\">";
+						cell=row.insertCell(row.cells.length);
+					}
+					
+					this.table.append(tbody);
+					this.table.className="display";
+					document.body.append(this.table);
+					this.userTable=$(this.table).DataTable(
+								{ 
+									"dom": '<"toolbar">frtip',
+									"CaseSensitive":true, 
+									"order": [[ 0, "desc" ]],
+									paging: true,
+									"pageLength": 10,
+									responsive: true,
+									"info": true,
+									"orderCellsTop": true, 
+									"fixedHeader":true,
+									"columnDefs": [{"className": "dt-center", "targets": [2,3,4]},
+													{"orderable": false,"targets":[1,2,3,4]}
+												  ],
+								})
+								$("div.toolbar").html("&nbsp;&#x271A;");
+								$("div.toolbar").on("click",function()
+																						{
+																							var userData={}
+																							self.addUserRow(userData);
+																						});
+				}
+				addUserRow(userData)
+				{
+					var self=this;
+					var count=this.userTable.rows().count();
+					var tbody=this.userTable.table().body();
+					var span=document.createElement("span");
+					var popupAccessRightSpan=document.createElement("span");
+					
+					var userNameInputBox=document.createElement("input");
+					var passwordInputBox=document.createElement("input");
+					var userEnableCheckBox=document.createElement("input");
+					var isRemoveThisUserInputBox=document.createElement("input");
+																					
+					var row=document.createElement("tr");
+					var cell=row.insertCell(row.cells.length);
+					
+					popupAccessRightSpan.className="popupAccessRightPage";
+					popupAccessRightSpan.innerHTML="&#x1F589;";
+					popupAccessRightSpan.onclick=function()
+																				{
+																					self.popupAccessRight(count)
+																				};
+					
+					span.innerHTML="&#x1F5D1;";
+					span.className="removeEntry";
+					$(span).on("click",function()
+														{
+																self.removeRow(row,count);
+														});
+					userNameInputBox.id="userName"+count;
+					userNameInputBox.setAttribute("type","text");
+					userNameInputBox.required = true;									
+					if (userData.userName!=null)
+					{
+						userNameInputBox.value=userData.userName;
+					}
+					
+					passwordInputBox.id="password"+count;
+					passwordInputBox.required = true;
+					passwordInputBox.setAttribute("type","password");
+					if (userData.password!=null)
+					{
+						passwordInputBox.value=userData.password;
+					}
+
+					userEnableCheckBox.id="isUserEnable"+count;
+					userEnableCheckBox.value=1;
+					userEnableCheckBox.setAttribute("type","checkbox");					
+					if (userData.enable!=null)
+					{
+						if (userData.enable)
+						{
+							userEnableCheckBox.checked=true;
+						}
+					}
+					isRemoveThisUserInputBox.id="isRemoveThisUser"+count;
+					isRemoveThisUserInputBox.setAttribute("type","hidden");
+					isRemoveThisUserInputBox.value=0;
+					
+					cell.appendChild(userNameInputBox);
+					cell=row.insertCell(row.cells.length);
+					
+					cell.appendChild(passwordInputBox);
+					cell=row.insertCell(row.cells.length);
+					
+					cell.appendChild(popupAccessRightSpan);
+					cell=row.insertCell(row.cells.length);
+					
+					cell.appendChild(userEnableCheckBox);
+					cell=row.insertCell(row.cells.length);
+					
+					cell.appendChild(span);
+					cell.appendChild(isRemoveThisUserInputBox);
+					var dt = $(this.table).dataTable().api();
+					dt.row.add($(row));
+					dt.draw();
+				}
+				popupAccessRight(userRowCount)
+				{
+					var accessRightData={"accessRightList":[]};
+					var accessRight=new AccessRight(accessRightData,userRowCount);
+				}
+				removeRow(row,userCount)
+				{
+					var field=document.getElementById("isRemoveThisUser"+userCount);
+					field.value="1";
+					$(row).hide();
+				}
+			}
+			class AccessRight
+			{
+				constructor(accessRightData,userRowCount)
+				{
+					console.log(accessRightData,userRowCount);
+				}
+			}									
+		</script>			
+	</head>
+	<body>
+	</body>
+</html>	
