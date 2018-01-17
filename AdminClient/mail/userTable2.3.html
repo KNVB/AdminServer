@@ -40,26 +40,29 @@
 		<script src="jquery.easing.1.3.js"></script>
 	</head>
 	<body>
-						<table id="userTable" class="display">
-							<thead>
-								<tr>
-									<th>User Name</th>
-									<th>Password</th>
-									<th align=center>Access Right</th>
-									<th>Enabled</th>
-									<th>Remove</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td data-order="0">anonymous<input type="hidden" id="userName0" value="anonymous"></td>
-									<td></td>
-									<td align=center><span class="popupAccessRightPage" onclick="popupAccessRightPage(0)">&#x1F589;</span></td>
-									<td align=center><input value="1" type=checkbox id="isUserEnable0"></td>
-									<td></td>
-								</tr>
-							</tbody>
-						</table>
+		<fieldset>
+			<legend>User Management</legend>
+			<table id="userTable" class="display">
+				<thead>
+					<tr>
+						<th>User Name</th>
+						<th>Password</th>
+						<th align=center>Access Right</th>
+						<th>Enabled</th>
+						<th>Remove</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td data-order="0">anonymous<input type="hidden" id="userName0" value="anonymous"></td>
+						<td></td>
+						<td align=center><span class="popupAccessRightPage" onclick="popupAccessRightPage(0)">&#x1F589;</span></td>
+						<td align=center><input value="1" type=checkbox id="isUserEnable0"></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>				
 <div id="userAccessRight" class="w3-modal" style="z-index:4">
   <div class="w3-modal-content w3-animate-zoom">
     <div class="w3-container w3-padding w3-red">
