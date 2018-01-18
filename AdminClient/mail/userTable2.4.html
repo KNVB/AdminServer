@@ -298,7 +298,7 @@
 					th.className="addEntry";
 					th.onclick=function ()
 								{
-									self.addAccessRightRow(null,userEntryId);
+									self.addAccessRightRow({virtualDir:"",physicalDir:"/"},userEntryId);
 								};
 					
 					row.appendChild(th);
@@ -340,21 +340,62 @@
 					
 					listFileCheckBox.setAttribute("type","checkbox");
 					listFileCheckBox.id="listFile"+userEntryId;
+					listFileCheckBox.onchange=function()
+												{
+													if (listFileCheckBox.checked)
+														self.addPermissionSummaryValue("listFile");
+													else
+														self.removePermissionSummaryValue("listFile");			
+												}
 					
 					createDirCheckBox.setAttribute("type","checkbox");
 					createDirCheckBox.id="createDir"+userEntryId;
+					createDirCheckBox.onchange=function()
+												{
+													if (createDirCheckBox.checked)
+														self.addPermissionSummaryValue("createDir");
+													else
+														self.removePermissionSummaryValue("createDir");			
+												}
 					
 					listDirCheckBox.setAttribute("type","checkbox");
 					listDirCheckBox.id="listDir"+userEntryId;
+					listDirCheckBox.onchange=function()
+												{
+													if (listDirCheckBox.checked)
+														self.addPermissionSummaryValue("listDir");
+													else
+														self.removePermissionSummaryValue("listDir");			
+												}
 					
 					removeSubDirCheckBox.setAttribute("type","checkbox");
 					removeSubDirCheckBox.id="removeSubDir"+userEntryId;
-					
+					removeSubDirCheckBox.onchange=function()
+												{
+													if (removeSubDirCheckBox.checked)
+														self.addPermissionSummaryValue("removeSubDir");
+													else
+														self.removePermissionSummaryValue("removeSubDir");			
+												}
 					denyDirCheckBox.setAttribute("type","checkbox");
 					denyDirCheckBox.id="denyDir"+userEntryId;
-					
+					denyDirCheckBox.onchange=function()
+												{
+													if (denyDirCheckBox.checked)
+														self.addPermissionSummaryValue("denyDir");
+													else
+														self.removePermissionSummaryValue("denyDir");			
+												}
+												
 					hideDirCheckBox.setAttribute("type","checkbox");
 					hideDirCheckBox.id="hideDir"+userEntryId;
+					hideDirCheckBox.onchange=function()
+												{
+													if (hideDirCheckBox.checked)
+														self.addPermissionSummaryValue("hideDir");
+													else
+														self.removePermissionSummaryValue("hideDir");			
+												}
 					
 					settingDetailTable.setAttribute("width","100%");
 					settingDetailTable.style.display="none";
@@ -439,7 +480,7 @@
 					savelLink.onclick=function()
 									 {
 										self.accessRightTable.rows().deselect();
-										/*var selectedRow=-1;
+										var selectedRow=-1;
 										var finalResult=new Array();
 										var isPermissionEmpty=false,isAllVirtualDirEmpty=true,containHomePath=false;
 										
@@ -449,6 +490,7 @@
 											self.accessRightTable.rows().deselect();
 										}
 										var accessRightRows=$(self.table).find("tbody>tr");
+										
 										for (var i=0;i<accessRightRows.length;i++)
 										{
 											var virtualDir=$(accessRightRows[i]).find("input[id^='virtualDir"+userEntryId+"_']")[0];
@@ -471,17 +513,18 @@
 												break;
 											}
 											else
-											{	var rowResult={"virtualDir":$(virtualDir).val(),
+											{	
+												var rowResult={"virtualDir":$(virtualDir).val(),
 															   "physicalDir":$(physicalDir).val(),
 															   "permissionSummary":$(permissionSummary).val().split(",")};
 												finalResult.push(rowResult);
-											}												
+											}
 										}
 										if (!isPermissionEmpty)
 										{
 											if ((!isAllVirtualDirEmpty)&&(containHomePath))
 											{
-												document.getElementById("accessRight"+userEntryId).value=finalResult;
+												document.getElementById("accessRight"+userEntryId).value=JSON.stringify(finalResult);
 												self.close();
 											}
 											else
@@ -497,7 +540,8 @@
 													self.accessRightTable.row(selectedRow).select();
 												}
 											}
-										}*/
+										}
+
 									 };
 					
 					sectionDiv.className="w3-section";
@@ -538,8 +582,7 @@
 												//console.log("selected row data:"+rowData);
 											
 												self.permissionSummary=$(self.table).find("tr.selected>td:first-child").children("input[id^='permissionSummary"+userEntryId+"_']");
-												console.log(self.permissionSummary);
-												/*
+												
 												downloadFileCheckBox.checked=false;
 												uploadFileCheckBox.checked=false;
 												deleteFileCheckBox.checked=false;
@@ -549,11 +592,11 @@
 												removeSubDirCheckBox.checked=false;
 												denyDirCheckBox.checked=false;
 												hideDirCheckBox.checked=false;
-
+												
 												
 												if (self.permissionSummary.val()!="")
 												{
-													var permissionSummaryData=JSON.parse(permissionSummary.val());
+													var permissionSummaryData=self.permissionSummary.val().split(",");
 													for (var i=0;i<permissionSummaryData.length;i++)
 													{
 														switch (permissionSummaryData[i])
@@ -587,42 +630,15 @@
 																break;
 														}
 													}
-												}*/
+												}
 												settingDetailTable.style.display="table";
 										  });
 					this.accessRightTable.on("deselect",function ( e, dt, type, indexes ) 
 										  {
-												/*console.log("Deselect table");
-												console.log(e.delegateTarget);*/
-												
+												console.log("deselect event");
 												//var rowData=JSON.stringify(self.accessRightTable.rows(indexes).data().toArray());
-												//console.log("deselected row data:"+rowData[0][0]);
+												//console.log("deselected row data:"+rowData);
 												
-												/*var row=$(self.table).find("tbody>tr")[indexes];
-												var permissionSummary=$(row).find("td:first-child").children("input[id='permissionSummary']");
-												console.log("userEntryId="+userEntryId);
-												console.log(permissionSummary.length);
-												var permissionSummaryData=new Array();
-												
-												if (downloadFileCheckBox.checked)
-													permissionSummaryData.push("downloadFile");
-												if (uploadFileCheckBox.checked)
-													permissionSummaryData.push("uploadFile");
-												if (deleteFileCheckBox.checked)
-													permissionSummaryData.push("deleteFile");
-												if (listFileCheckBox.checked)
-													permissionSummaryData.push("listFile");
-												if (createDirCheckBox.checked)
-													permissionSummaryData.push("createDir");
-												if (listDirCheckBox.checked)
-													permissionSummaryData.push("listDir");
-												if (removeSubDirCheckBox.checked)
-													permissionSummaryData.push("removeSubDir");
-												if (denyDirCheckBox.checked)
-													permissionSummaryData.push("denyDir");
-												if (hideDirCheckBox.checked)
-													permissionSummaryData.push("hideDir");
-												permissionSummary.val(JSON.stringify(permissionSummaryData));*/
 												settingDetailTable.style.display="none";
 										  });								
 					
@@ -642,7 +658,6 @@
 							permissionSummaryData.push(value);
 						}
 					}
-					console.log(permissionSummaryData);
 					this.permissionSummary.val(permissionSummaryData);
 				}
 				removePermissionSummaryValue(value)
