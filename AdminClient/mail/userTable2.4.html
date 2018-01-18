@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 	<head>
 		<title>FTP Server Administration Page</title>
@@ -44,12 +44,16 @@
 								{
 									var userData={"userList":[{userName:"anonymous",
 									                           password:"",
-															   accessRightList:[{virtualDir:"",physicalDir:"/"}]
+															   accessRightList:[{virtualDir:"/",physicalDir:"/"}]
 															  }]};
 									var userManagement=new UserManagement();
 									document.body.appendChild(userManagement.getHTML());
 									userManagement.addUserRow(userData.userList[0]);
 								});
+			const guid=()=> {
+			  const s4=()=> Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);     
+			  return `${s4() + s4()}-${s4()}-${s4()}-${s4()}-${s4() + s4() + s4()}`;
+			}
 			class UserManagement
 			{
 				constructor()
@@ -60,7 +64,7 @@
 					var tbody=document.createElement("tbody");
 					var row=thead.insertRow(thead.rows.length);
 					var legend=document.createElement("legend");
-					
+
 					this.fieldset=document.createElement("fieldset");
 					this.table=document.createElement("table");
 					$(this.fieldset).append(legend);
@@ -107,7 +111,7 @@
 					$(toolbar).html("&nbsp;&#x271A;");					
 					$(toolbar).on("click",function()
 											{
-												var userData={}
+												var userData={accessRightList:[]}
 												self.addUserRow(userData);
 											});
 				}
@@ -119,9 +123,10 @@
 				{
 					var self=this;
 					var tbody=this.userTable.table().body();
-					var count=this.userTable.rows().count();
-					var span=document.createElement("span");
+					var entryId=guid();
+					var deleteEntrySpan=document.createElement("span");
 					var popupAccessRightSpan=document.createElement("span");
+					var accessRight=document.createElement("input");
 					var userNameInputBox=document.createElement("input");
 					var passwordInputBox=document.createElement("input");
 					var userEnableCheckBox=document.createElement("input");
@@ -129,18 +134,21 @@
 																					
 					var row=document.createElement("tr");
 					
-					userNameInputBox.id="userName"+count;
+					userNameInputBox.id="userName"+entryId;
 					userNameInputBox.setAttribute("type","text");
 					userNameInputBox.required = true;
 					
-					passwordInputBox.id="password"+count;
+					accessRight.id="accessRight"+entryId;
+					accessRight.setAttribute("type","hidden");
+					
+					passwordInputBox.id="password"+entryId;
 					passwordInputBox.required = true;
 					passwordInputBox.setAttribute("type","password");					
 					
-					userEnableCheckBox.id="isUserEnable"+count;
+					userEnableCheckBox.id="isUserEnable"+entryId;
 					userEnableCheckBox.setAttribute("type","checkbox");
 					
-					isRemoveThisUserInputBox.id="isRemoveThisUser"+count;
+					isRemoveThisUserInputBox.id="isRemoveThisUser"+entryId;
 					isRemoveThisUserInputBox.setAttribute("type","hidden");
 					isRemoveThisUserInputBox.value=0;
 					
@@ -148,18 +156,19 @@
 					popupAccessRightSpan.innerHTML="&#x1F589;";
 					popupAccessRightSpan.onclick=function()
 												 {
-													self.popupAccessRightModal(count,thisUserData);
+													self.popupAccessRightModal(entryId,thisUserData);
 												 };
-					span.innerHTML="&#x1F5D1;";
-					span.className="removeEntry";
-					$(span).click(function()
+					deleteEntrySpan.innerHTML="&#x1F5D1;";
+					deleteEntrySpan.className="removeEntry";
+					$(deleteEntrySpan).click(function()
 								{
-									self.removeRow(row,count);
+									self.removeRow(row,entryId);
 								});
 					
 					
 					var cell=row.insertCell(row.cells.length);
 					cell.appendChild(userNameInputBox);
+					cell.appendChild(accessRight);
 					
 					cell=row.insertCell(row.cells.length);
 					cell.appendChild(passwordInputBox);
@@ -171,7 +180,7 @@
 					cell.appendChild(userEnableCheckBox);
 
 					cell=row.insertCell(row.cells.length);
-					cell.appendChild(span);
+					cell.appendChild(deleteEntrySpan);
 					cell.appendChild(isRemoveThisUserInputBox);
 					
 					if ((thisUserData.userName!=null))
@@ -180,12 +189,15 @@
 						{
 							userNameInputBox.setAttribute("type","hidden");
 							cell=$(userNameInputBox).parent();
-							cell.empty();
-							cell.text("anonymous");
-							cell.append(userNameInputBox);
 							cell.attr("data-order","0");
+							var textNode=document.createTextNode("anonymous");
+							$(textNode).insertBefore(userNameInputBox);
 							$(passwordInputBox).remove();
-							$(span).remove();
+							$(deleteEntrySpan).remove();
+						}
+						else
+						{
+							passwordInputBox.setAttribute("value",thisUserData.password);
 						}
 						userNameInputBox.setAttribute("value",thisUserData.userName);
 					}
@@ -193,14 +205,14 @@
 					dt.row.add($(row));
 					dt.draw();
 				}
-				popupAccessRightModal(userRowCount,thisUserData)
+				popupAccessRightModal(userEntryId,thisUserData)
 				{
 					var accessRightData=thisUserData.accessRightList;
-					var userAccessRightDiv=document.getElementById("userAccessRight"+userRowCount);
+					var userAccessRightDiv=document.getElementById("userAccessRight"+userEntryId);
 					if (userAccessRightDiv==null)
 					{	
-						var accessRight=new AccessRight(userRowCount);
-						accessRight.loadData(accessRightData,userRowCount);
+						var accessRight=new AccessRight(userEntryId);
+						accessRight.loadData(accessRightData,userEntryId);
 					}
 					else
 					{
@@ -226,7 +238,7 @@
 			}
 			class AccessRight
 			{
-				constructor(userRowCount)
+				constructor(userEntryId)
 				{
 					//console.log(accessRightData,userRowCount);
 					var self=this;
@@ -249,10 +261,10 @@
 					var listFileCheckBox=document.createElement("input");
 					var createDirCheckBox=document.createElement("input");
 					var listDirCheckBox=document.createElement("input");
-					var removeDirCheckBox=document.createElement("input");
+					var removeSubDirCheckBox=document.createElement("input");
 					var denyDirCheckBox=document.createElement("input");
 					var hideDirCheckBox=document.createElement("input");
-					
+					this.permissionSummary=null;
 					this.table=document.createElement("table");
 					this.userAccessRightDiv=document.createElement("div");
 					
@@ -286,7 +298,7 @@
 					th.className="addEntry";
 					th.onclick=function ()
 								{
-									self.addAccessRightRow(null,userRowCount);
+									self.addAccessRightRow(null,userEntryId);
 								};
 					
 					row.appendChild(th);
@@ -296,38 +308,53 @@
 					this.table.appendChild(thead);
 					
 					downloadFileCheckBox.setAttribute("type","checkbox");
-					downloadFileCheckBox.id="downloadFile"+userRowCount;
-					downloadFileCheckBox.onclick=function()
+					downloadFileCheckBox.id="downloadFile"+userEntryId;
+					downloadFileCheckBox.onchange=function()
 												{
-													var selectedRow=self.accessRightTable.rows({selected:true});
-													console.log(selectedRow[0]);
-													//console.log(this.checked);
-													
-												}												
+													if (downloadFileCheckBox.checked)
+														self.addPermissionSummaryValue("downloadFile");
+													else
+														self.removePermissionSummaryValue("downloadFile");			
+												}
 					
 					uploadFileCheckBox.setAttribute("type","checkbox");
-					uploadFileCheckBox.id="uploadFile"+userRowCount;
+					uploadFileCheckBox.id="uploadFile"+userEntryId;
+					uploadFileCheckBox.onchange=function()
+												{
+													if (uploadFileCheckBox.checked)
+														self.addPermissionSummaryValue("uploadFile");
+													else
+														self.removePermissionSummaryValue("uploadFile");			
+												}
 					
 					deleteFileCheckBox.setAttribute("type","checkbox");
-					deleteFileCheckBox.id="deleteFile"+userRowCount;
+					deleteFileCheckBox.id="deleteFile"+userEntryId;
+					deleteFileCheckBox.onchange=function()
+												{
+													if (deleteFileCheckBox.checked)
+														self.addPermissionSummaryValue("deleteFile");
+													else
+														self.removePermissionSummaryValue("deleteFile");			
+												}
+					
 					
 					listFileCheckBox.setAttribute("type","checkbox");
-					listFileCheckBox.id="listFile"+userRowCount;
+					listFileCheckBox.id="listFile"+userEntryId;
 					
 					createDirCheckBox.setAttribute("type","checkbox");
-					createDirCheckBox.id="createDir"+userRowCount;
+					createDirCheckBox.id="createDir"+userEntryId;
 					
 					listDirCheckBox.setAttribute("type","checkbox");
-					listDirCheckBox.id="listDir"+userRowCount;
+					listDirCheckBox.id="listDir"+userEntryId;
 					
-					removeDirCheckBox.setAttribute("type","checkbox");
-					removeDirCheckBox.id="removeDir"+userRowCount;
+					removeSubDirCheckBox.setAttribute("type","checkbox");
+					removeSubDirCheckBox.id="removeSubDir"+userEntryId;
 					
 					denyDirCheckBox.setAttribute("type","checkbox");
-					denyDirCheckBox.id="denyDir"+userRowCount;
+					denyDirCheckBox.id="denyDir"+userEntryId;
 					
 					hideDirCheckBox.setAttribute("type","checkbox");
-					hideDirCheckBox.id="hideDir"+userRowCount;
+					hideDirCheckBox.id="hideDir"+userEntryId;
 					
 					settingDetailTable.setAttribute("width","100%");
 					settingDetailTable.style.display="none";
@@ -337,6 +364,7 @@
 					var fieldset=document.createElement("fieldset");
 					var legend=document.createElement("legend");
 					legend.textContent="File access"
+
 					var row2=filePermissionTable.insertRow(filePermissionTable.rows.length);
 					var cell2=row2.insertCell(row2.cells.length);
 					cell2.textContent="Download";
@@ -383,7 +411,7 @@
 					cell2=row2.insertCell(row2.cells.length);
 					cell2.textContent="Remove Sub. Dir.";
 					cell2=row2.insertCell(row2.cells.length);
-					cell2.appendChild(removeDirCheckBox);
+					cell2.appendChild(removeSubDirCheckBox);
 					
 					row2=folderPermissionTable.insertRow(folderPermissionTable.rows.length);
 					cell2=row2.insertCell(row2.cells.length);
@@ -410,21 +438,82 @@
 					savelLink.innerHTML="Save <i>&#x2714;</i>";
 					savelLink.onclick=function()
 									 {
-										self.close();
+										self.accessRightTable.rows().deselect();
+										/*var selectedRow=-1;
+										var finalResult=new Array();
+										var isPermissionEmpty=false,isAllVirtualDirEmpty=true,containHomePath=false;
+										
+										if (self.accessRightTable.row({selected:true}).index()!=null)
+										{
+											selectedRow=self.accessRightTable.row({selected:true}).index();
+											self.accessRightTable.rows().deselect();
+										}
+										var accessRightRows=$(self.table).find("tbody>tr");
+										for (var i=0;i<accessRightRows.length;i++)
+										{
+											var virtualDir=$(accessRightRows[i]).find("input[id^='virtualDir"+userEntryId+"_']")[0];
+											var physicalDir=$(accessRightRows[i]).find("input[id^='physicalDir"+userEntryId+"_']")[0];
+											var permissionSummary=$(accessRightRows[i]).find("input[id^='permissionSummary"+userEntryId+"_']")[0];
+											if ($(virtualDir).val()!="")
+											{	
+												isAllVirtualDirEmpty=false;
+												if ($(virtualDir).val()=="/")
+													containHomePath=true;
+											}
+											if ($(permissionSummary).val()=="")
+											{
+												isPermissionEmpty=true;
+												alert("Permission setting is missing in row:"+i);
+												if (selectedRow!=-1)
+												{
+													self.accessRightTable.row(selectedRow).select();
+												}
+												break;
+											}
+											else
+											{	var rowResult={"virtualDir":$(virtualDir).val(),
+															   "physicalDir":$(physicalDir).val(),
+															   "permissionSummary":$(permissionSummary).val().split(",")};
+												finalResult.push(rowResult);
+											}												
+										}
+										if (!isPermissionEmpty)
+										{
+											if ((!isAllVirtualDirEmpty)&&(containHomePath))
+											{
+												document.getElementById("accessRight"+userEntryId).value=finalResult;
+												self.close();
+											}
+											else
+											{
+												if (isAllVirtualDirEmpty)
+													alert("Please set at least 1 virtual directory for this user");
+												else
+												{	if (!containHomePath)
+														alert("Please set home path(/) for this user.");
+												}
+												if (selectedRow!=-1)
+												{
+													self.accessRightTable.row(selectedRow).select();
+												}
+											}
+										}*/
 									 };
-					panelDiv.className="w3-panel";
-					panelDiv.appendChild(this.table);
 					
 					sectionDiv.className="w3-section";
 					sectionDiv.appendChild(settingDetailTable);
 					sectionDiv.appendChild(cancelLink);
 					sectionDiv.appendChild(savelLink);
 					
+					panelDiv.className="w3-panel";
+					panelDiv.appendChild(this.table);
+					panelDiv.appendChild(sectionDiv);
+					
 					modalContentDiv.className="w3-modal-content w3-animate-zoom";
 					modalContentDiv.appendChild(containerDiv);
 					modalContentDiv.appendChild(panelDiv);
-					modalContentDiv.appendChild(sectionDiv);
-					this.userAccessRightDiv.id="userAccessRight"+userRowCount;
+					
+					this.userAccessRightDiv.id="userAccessRight"+userEntryId;
 					this.userAccessRightDiv.className="w3-modal";
 					this.userAccessRightDiv.style.zIndex="4";
 					this.userAccessRightDiv.appendChild(modalContentDiv);
@@ -445,33 +534,149 @@
 															
 					this.accessRightTable.on("select",function ( e, dt, type, indexes ) 
 										  {
-											var rowData=JSON.stringify(self.accessRightTable.rows(indexes).data().toArray());
-											settingDetailTable.style.display="table";
-											//console.log("selected row data:"+rowData);
+												//var rowData=JSON.stringify(self.accessRightTable.rows(indexes).data().toArray());
+												//console.log("selected row data:"+rowData);
+											
+												self.permissionSummary=$(self.table).find("tr.selected>td:first-child").children("input[id^='permissionSummary"+userEntryId+"_']");
+												console.log(self.permissionSummary);
+												/*
+												downloadFileCheckBox.checked=false;
+												uploadFileCheckBox.checked=false;
+												deleteFileCheckBox.checked=false;
+												listFileCheckBox.checked=false;
+												createDirCheckBox.checked=false;
+												listDirCheckBox.checked=false;
+												removeSubDirCheckBox.checked=false;
+												denyDirCheckBox.checked=false;
+												hideDirCheckBox.checked=false;
+
+												
+												if (self.permissionSummary.val()!="")
+												{
+													var permissionSummaryData=JSON.parse(permissionSummary.val());
+													for (var i=0;i<permissionSummaryData.length;i++)
+													{
+														switch (permissionSummaryData[i])
+														{
+															case "downloadFile":
+																downloadFileCheckBox.checked=true;
+																break;
+															case "uploadFile":
+																uploadFileCheckBox.checked=true;
+																break;
+															case "deleteFile":
+																deleteFileCheckBox.checked=true;
+																break;
+															case "listFile":
+																listFileCheckBox.checked=true;
+																break;
+															case "createDir":
+																createDirCheckBox.checked=true;
+																break;
+															case "listDir":
+																listDirCheckBox.checked=true;
+																break;
+															case "removeSubDir":
+																removeSubDirCheckBox.checked=true;
+																break;
+															case "denyDir":
+																denyDirCheckBox.checked=true;
+																break;
+															case "hideDir":
+																hideDirCheckBox.checked=true;
+																break;
+														}
+													}
+												}*/
+												settingDetailTable.style.display="table";
 										  });
 					this.accessRightTable.on("deselect",function ( e, dt, type, indexes ) 
 										  {
-											var rowData=JSON.stringify(self.accessRightTable.rows(indexes).data().toArray());
-											settingDetailTable.style.display="none";
-											//console.log("deselected row data:"+rowData);
+												/*console.log("Deselect table");
+												console.log(e.delegateTarget);*/
+												
+												//var rowData=JSON.stringify(self.accessRightTable.rows(indexes).data().toArray());
+												//console.log("deselected row data:"+rowData[0][0]);
+												
+												/*var row=$(self.table).find("tbody>tr")[indexes];
+												var permissionSummary=$(row).find("td:first-child").children("input[id='permissionSummary']");
+												console.log("userEntryId="+userEntryId);
+												console.log(permissionSummary.length);
+												var permissionSummaryData=new Array();
+												
+												if (downloadFileCheckBox.checked)
+													permissionSummaryData.push("downloadFile");
+												if (uploadFileCheckBox.checked)
+													permissionSummaryData.push("uploadFile");
+												if (deleteFileCheckBox.checked)
+													permissionSummaryData.push("deleteFile");
+												if (listFileCheckBox.checked)
+													permissionSummaryData.push("listFile");
+												if (createDirCheckBox.checked)
+													permissionSummaryData.push("createDir");
+												if (listDirCheckBox.checked)
+													permissionSummaryData.push("listDir");
+												if (removeSubDirCheckBox.checked)
+													permissionSummaryData.push("removeSubDir");
+												if (denyDirCheckBox.checked)
+													permissionSummaryData.push("denyDir");
+												if (hideDirCheckBox.checked)
+													permissionSummaryData.push("hideDir");
+												permissionSummary.val(JSON.stringify(permissionSummaryData));*/
+												settingDetailTable.style.display="none";
 										  });								
 					
 				}
-				loadData(accessRightData,userRowCount)
+				addPermissionSummaryValue(value)
 				{
-					for (var i=0;i<accessRightData.length;i++)
-					{	
-						this.addAccessRightRow(accessRightData[i],userRowCount);
+					var permissionSummaryData;
+					if (this.permissionSummary.val()=="")
+					{
+						permissionSummaryData=new Array(value);
 					}
-					
+					else
+					{
+						permissionSummaryData=this.permissionSummary.val().split(",");
+						if (permissionSummaryData.indexOf(value)==-1)
+						{
+							permissionSummaryData.push(value);
+						}
+					}
+					console.log(permissionSummaryData);
+					this.permissionSummary.val(permissionSummaryData);
 				}
-				addAccessRightRow(accessRightDataEntry,userRowCount)
+				removePermissionSummaryValue(value)
+				{
+					var permissionSummaryData=this.permissionSummary.val();
+					permissionSummaryData=permissionSummaryData.replace(value,"");
+					permissionSummaryData=permissionSummaryData.replace(/^,/,"");
+					permissionSummaryData=permissionSummaryData.replace(/,$/,"");
+					permissionSummaryData=permissionSummaryData.replace(",,",",");
+					
+					this.permissionSummary.val(permissionSummaryData);
+				}
+				loadData(accessRightData,userEntryId)
+				{
+					if (accessRightData.length==0)
+					{
+						this.addAccessRightRow(null,userEntryId);
+					}
+					else
+					{
+						for (var i=0;i<accessRightData.length;i++)
+						{	
+							this.addAccessRightRow(accessRightData[i],userEntryId);
+						}
+					}					
+				}
+				addAccessRightRow(accessRightDataEntry,userEntryId)
 				{
 					var self=this;
-					var accessRightRowCount=this.accessRightTable.rows().count();
+					var accessRightEntryId=guid();
 					var pObj=document.createElement("p");
 					var remoteDir=document.createElement("div");
 					var remoteDirContainer=document.createElement("div");
+					var permissionSummary=document.createElement("input");
 					var physicalDirInputBox=document.createElement("input");
 					var virtualDirInputBox=document.createElement("input");
 					var oldPhysicalDirValue=document.createElement("input");
@@ -479,12 +684,21 @@
 					var resumeOldSettingBtn=document.createElement("input");
 					var hideRemoteDirBtn=document.createElement("input");
 					
-					remoteDirContainer.id="remoteDir"+userRowCount+"_"+accessRightRowCount;
+					remoteDirContainer.id="remoteDir"+userEntryId+"_"+accessRightEntryId;
 					remoteDirContainer.className="remoteDirContainer";
 					remoteDir.className="remoteDir";
 					
+					permissionSummary.setAttribute("type", "hidden");
+					permissionSummary.id="permissionSummary"+userEntryId+"_"+accessRightEntryId;
+					//permissionSummary.value=new Array('a','b');
+					/*permissionSummary.value={"userList":[{userName:"anonymous",
+									                           password:"",
+															   accessRightList:[{virtualDir:"",physicalDir:"/"}]
+															  }]};*/
+					
+					
 					virtualDirInputBox.required = true;
-					virtualDirInputBox.id="virtualDir"+userRowCount+"_"+accessRightRowCount;
+					virtualDirInputBox.id="virtualDir"+userEntryId+"_"+accessRightEntryId;
 					virtualDirInputBox.setAttribute("type", "text");
 					if (accessRightDataEntry!=null)
 					{
@@ -492,14 +706,14 @@
 					}
 					physicalDirInputBox.readOnly=true;
 					physicalDirInputBox.required = true;
-					physicalDirInputBox.id="physicalDir"+userRowCount+"_"+accessRightRowCount;
+					physicalDirInputBox.id="physicalDir"+userEntryId+"_"+accessRightEntryId;
 					physicalDirInputBox.setAttribute("type", "text");
 					if (accessRightDataEntry!= null)
 					{
 						physicalDirInputBox.setAttribute("value",accessRightDataEntry.physicalDir);
 					}
 					
-					oldPhysicalDirValue.id="oldPhysicalDirValue"+userRowCount+"_"+accessRightRowCount;
+					oldPhysicalDirValue.id="oldPhysicalDirValue"+userEntryId+"_"+accessRightEntryId;
 					oldPhysicalDirValue.setAttribute("type", "hidden");
 					if (accessRightDataEntry!= null)
 					{
@@ -510,27 +724,29 @@
 					showRemoteDirBtn.setAttribute("type", "button");
 					showRemoteDirBtn.onclick=function()
 											 {
-												self.getRemoteDir(userRowCount,accessRightRowCount);
+												self.getRemoteDir(userEntryId,accessRightEntryId);
 											 };
 					
 					resumeOldSettingBtn.value="Cancel";
 					resumeOldSettingBtn.setAttribute("type", "button");
 					resumeOldSettingBtn.onclick=function()
 												{
-													self.resumeOldSetting(userRowCount,accessRightRowCount);
+													self.resumeOldSetting(userEntryId,accessRightEntryId);
 												};
 					
 					hideRemoteDirBtn.value="Ok";
 					hideRemoteDirBtn.setAttribute("type", "button");
 					hideRemoteDirBtn.onclick=function()
 											{
-												self.hideRemoteDir(userRowCount,accessRightRowCount);
+												self.hideRemoteDir(userEntryId,accessRightEntryId);
 											};
 					
 					var row=this.table.insertRow(this.table.rows.length);
 					var cell=row.insertCell(row.cells.length);
 					
 					cell.appendChild(virtualDirInputBox);
+					cell.appendChild(permissionSummary);
+					
 					cell=row.insertCell(row.cells.length);
 					cell.appendChild(physicalDirInputBox);
 					cell.innerHTML+="\n";
@@ -551,37 +767,38 @@
 									$(row).addClass("selected");
 									self.accessRightTable.row(".selected").remove().draw(true);
 								}
+					row.id=accessRightEntryId;
 					var dt = $(this.table).dataTable().api();
 					dt.row.add($(row));
 					dt.draw();
 					
 				}
-				getRemoteDir(userRowCount,accessRightRowCount)
+				getRemoteDir(userEntryId,accessRightEntryId)
 				{
-					var remoteDirContainer=document.getElementById("remoteDir"+userRowCount+"_"+accessRightRowCount);
+					var remoteDirContainer=document.getElementById("remoteDir"+userEntryId+"_"+accessRightEntryId);
 					if (remoteDirContainer.style.display=="block")
-						this.hideRemoteDir(userRowCount,accessRightRowCount);
+						this.hideRemoteDir(userEntryId,accessRightEntryId);
 					else
-						this.showRemoteDir(userRowCount,accessRightRowCount);
+						this.showRemoteDir(userEntryId,accessRightEntryId);
 				}
-				showRemoteDir(userRowCount,accessRightRowCount)
+				showRemoteDir(userEntryId,accessRightEntryId)
 				{	
-					$("#remoteDir"+userRowCount+"_"+accessRightRowCount).slideDown({
+					$("#remoteDir"+userEntryId+"_"+accessRightEntryId).slideDown({
 													duration: 1000, 
 													easing:"swing"
 													});
 				}
-				hideRemoteDir(userRowCount,accessRightRowCount)
+				hideRemoteDir(userEntryId,accessRightEntryId)
 				{	
-					$("#remoteDir"+userRowCount+"_"+accessRightRowCount).slideUp({
+					$("#remoteDir"+userEntryId+"_"+accessRightEntryId).slideUp({
 													duration: 1000, 
 													easing:"swing"
 													});
 				}
-				resumeOldSetting(userRowCount,accessRightRowCount)
+				resumeOldSetting(userEntryId,accessRightEntryId)
 				{
-					$("#physicalDir"+userRowCount+"_"+accessRightRowCount).val($("#oldPhysicalDirValue"+userRowCount+"_"+accessRightRowCount).val());
-					this.hideRemoteDir(userRowCount,accessRightRowCount);
+					$("#physicalDir"+userEntryId+"_"+accessRightEntryId).val($("#oldPhysicalDirValue"+userEntryId+"_"+accessRightEntryId).val());
+					this.hideRemoteDir(userEntryId,accessRightEntryId);
 				}
 				close()
 				{
