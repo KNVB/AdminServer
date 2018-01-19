@@ -65,9 +65,11 @@
 					var tbody=document.createElement("tbody");
 					var row=thead.insertRow(thead.rows.length);
 					var legend=document.createElement("legend");
-
-					this.fieldset=document.createElement("fieldset");
+					
+					this.accessRightArray=new Array();
 					this.table=document.createElement("table");
+					this.fieldset=document.createElement("fieldset");
+					
 					$(this.fieldset).append(legend);
 					$(legend).text("User Management");
 					
@@ -112,7 +114,7 @@
 					$(toolbar).html("&nbsp;&#x271A;");					
 					$(toolbar).on("click",function()
 											{
-												var userData={accessRightList:[]}
+												var userData={accessRightList:[{virtualDir:"",physicalDir:"/"}]}
 												self.addUserRow(userData);
 											});
 				}
@@ -209,16 +211,16 @@
 				popupAccessRightModal(userEntryId,thisUserData)
 				{
 					var accessRightData=thisUserData.accessRightList;
-					var userAccessRightDiv=document.getElementById("userAccessRight"+userEntryId);
-					if (userAccessRightDiv==null)
-					{	
-						var accessRight=new AccessRight(userEntryId);
-						accessRight.loadData(accessRightData,userEntryId);
+					if (userEntryId in this.accessRightArray)
+					{
+						this.accessRightArray[userEntryId].show();
 					}
 					else
 					{
-						$(userAccessRightDiv).show()
-					}
+						var accessRight=new AccessRight(userEntryId);
+						accessRight.loadData(accessRightData,userEntryId);
+						this.accessRightArray[userEntryId]=accessRight;
+					}					
 				}
 				removeRow(row,userCount)
 				{
@@ -299,7 +301,7 @@
 					th.className="addEntry";
 					th.onclick=function ()
 								{
-									self.addAccessRightRow({virtualDir:"",physicalDir:"/"},userEntryId);
+									self.addAccessRightRow(null,userEntryId);
 								};
 					
 					row.appendChild(th);
@@ -819,7 +821,11 @@
 				close()
 				{
 					this.userAccessRightDiv.style.display='none';
-				}				
+				}
+				show()
+				{
+					this.userAccessRightDiv.style.display='block';
+				}
 			}									
 		</script>			
 	</head>

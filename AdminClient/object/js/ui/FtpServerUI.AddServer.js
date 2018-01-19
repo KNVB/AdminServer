@@ -1,6 +1,6 @@
 class FtpServerUI_AddServer extends MainPageTemplate
 {
-	constructor()
+	constructor(adminPageControl)
 	{
 		super();
 		var self=this;
@@ -22,13 +22,16 @@ class FtpServerUI_AddServer extends MainPageTemplate
 		var bindingLegend=document.createElement("Legend");
 		var bindingFieldSet=document.createElement("fieldset");
 		this.bindingAddressDropDown=document.createElement("select");
+		
 		var controlPortInputBox=document.createElement("input");
 		var passiveModeFieldSet=document.createElement("fieldset");
 		var passiveModeLegend=document.createElement("Legend");
 		var passiveModeCheckBox=document.createElement("input");
 		var passiveModeDetailDiv=document.createElement("div");
 		var passiveModePortRangeInputBox=document.createElement("input");
-		this.userManagement=new UserManagement();
+		this.adminPageControl=adminPageControl;
+		this.userManagement=new UserManagement(this.adminPageControl);
+		
 		
 		$(bindingLegend).text("Binding");
 		bindingFieldSet.appendChild(bindingLegend);

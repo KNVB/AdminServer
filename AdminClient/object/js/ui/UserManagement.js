@@ -1,6 +1,6 @@
 class UserManagement
 {
-	constructor()
+	constructor(adminPageControl)
 	{
 		var cell,span,self=this;
 		var th=document.createElement("th");
@@ -8,9 +8,12 @@ class UserManagement
 		var tbody=document.createElement("tbody");
 		var row=thead.insertRow(thead.rows.length);
 		var legend=document.createElement("legend");
-
-		this.fieldset=document.createElement("fieldset");
+		
+		this.adminPageControl=adminPageControl;
+		this.accessRightArray=new Array();
 		this.table=document.createElement("table");
+		this.fieldset=document.createElement("fieldset");
+		
 		$(this.fieldset).append(legend);
 		$(legend).text("User Management");
 		
@@ -55,7 +58,7 @@ class UserManagement
 		$(toolbar).html("&nbsp;&#x271A;");					
 		$(toolbar).on("click",function()
 								{
-									var userData={accessRightList:[]}
+									var userData={accessRightList:[{virtualDir:"/",physicalDir:"/"}]}
 									self.addUserRow(userData);
 								});
 	}
@@ -100,7 +103,7 @@ class UserManagement
 		popupAccessRightSpan.innerHTML="&#x1F589;";
 		popupAccessRightSpan.onclick=function()
 									 {
-										self.popupAccessRightModal(entryId,thisUserData);
+										self.popupAccessRightModal(self,entryId,thisUserData);
 									 };
 		deleteEntrySpan.innerHTML="&#x1F5D1;";
 		deleteEntrySpan.className="removeEntry";
@@ -149,19 +152,19 @@ class UserManagement
 		dt.row.add($(row));
 		dt.draw();
 	}
-	popupAccessRightModal(userEntryId,thisUserData)
+	popupAccessRightModal(self,userEntryId,thisUserData)
 	{
 		var accessRightData=thisUserData.accessRightList;
-		var userAccessRightDiv=document.getElementById("userAccessRight"+userEntryId);
-		if (userAccessRightDiv==null)
-		{	
-			var accessRight=new AccessRight(userEntryId);
-			accessRight.loadData(accessRightData,userEntryId);
+		if (userEntryId in this.accessRightArray)
+		{
+			this.accessRightArray[userEntryId].show();
 		}
 		else
 		{
-			$(userAccessRightDiv).show()
-		}
+			var accessRight=new AccessRight(userEntryId,self.adminPageControl);
+			accessRight.loadData(accessRightData,userEntryId);
+			this.accessRightArray[userEntryId]=accessRight;
+		}				
 	}
 	removeRow(row,userCount)
 	{

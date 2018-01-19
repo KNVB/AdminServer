@@ -1,10 +1,13 @@
 package com.util;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+
+import javax.swing.filechooser.FileSystemView;
 
 /*
  * Copyright 2004-2005 the original author or authors.
@@ -123,4 +126,22 @@ public class Utility
           }   
           return tmp.toString();   
       }
+	public static ArrayList<String> getSubFolderOnly(String inPath)
+	{
+		ArrayList<String> dirList = new ArrayList<String>();
+		if (inPath.equals("/"))
+		{
+			File[] paths;
+			// returns pathnames for files and directory
+			paths = File.listRoots();
+			
+			// for each pathname in pathname array
+			for(File path:paths)
+			{
+				// prints file and directory paths
+				dirList.add(path.toString());
+			}
+		}
+		return dirList;
+	}
 }

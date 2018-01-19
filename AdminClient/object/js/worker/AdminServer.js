@@ -56,6 +56,13 @@ class AdminServer
 	{
 		this.sendRequest({action:"GetBindingAccess"});
 	}
+	getRemoteDir(physicalDir,userEntryId,accessRightEntryId)
+	{
+		this.sendRequest({"action":"GetRemoteDir",
+			              "physicalDir":physicalDir,
+			              "userEntryId":userEntryId,
+			              "accessRightEntryId":accessRightEntryId});
+	}
 	serverResponseHandler(evt)
 	{
 		var serverResponseMessage = evt.data;

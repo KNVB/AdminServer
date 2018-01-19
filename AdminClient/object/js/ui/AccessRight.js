@@ -1,6 +1,6 @@
 class AccessRight
 {
-	constructor(userEntryId)
+	constructor(userEntryId,adminPageControl)
 	{
 		//console.log(accessRightData,userRowCount);
 		var self=this;
@@ -26,7 +26,9 @@ class AccessRight
 		var removeSubDirCheckBox=document.createElement("input");
 		var denyDirCheckBox=document.createElement("input");
 		var hideDirCheckBox=document.createElement("input");
+		
 		this.permissionSummary=null;
+		this.adminPageControl=adminPageControl;
 		this.table=document.createElement("table");
 		this.userAccessRightDiv=document.createElement("div");
 		
@@ -451,7 +453,7 @@ class AccessRight
 		var self=this;
 		var accessRightEntryId=Utility.getUniqueId();
 		var pObj=document.createElement("p");
-		var remoteDir=document.createElement("div");
+		var remoteDirDiv=document.createElement("div");
 		var remoteDirContainer=document.createElement("div");
 		var permissionSummary=document.createElement("input");
 		var physicalDirInputBox=document.createElement("input");
@@ -461,9 +463,10 @@ class AccessRight
 		var resumeOldSettingBtn=document.createElement("input");
 		var hideRemoteDirBtn=document.createElement("input");
 		
-		remoteDirContainer.id="remoteDir"+userEntryId+"_"+accessRightEntryId;
+		remoteDirDiv.id="remoteDirDiv"+userEntryId+"_"+accessRightEntryId;
+		remoteDirDiv.className="remoteDirDiv";
 		remoteDirContainer.className="remoteDirContainer";
-		remoteDir.className="remoteDir";
+		remoteDirContainer.id="remoteDirContainer"+userEntryId+"_"+accessRightEntryId;
 		
 		permissionSummary.setAttribute("type", "hidden");
 		permissionSummary.id="permissionSummary"+userEntryId+"_"+accessRightEntryId;
@@ -501,7 +504,7 @@ class AccessRight
 		showRemoteDirBtn.setAttribute("type", "button");
 		showRemoteDirBtn.onclick=function()
 								 {
-									self.getRemoteDir(userEntryId,accessRightEntryId);
+									self.getRemoteDir(self,userEntryId,accessRightEntryId);
 								 };
 		
 		resumeOldSettingBtn.value="Cancel";
@@ -529,13 +532,13 @@ class AccessRight
 		cell.innerHTML+="\n";
 		cell.appendChild(showRemoteDirBtn);
 		
-		remoteDirContainer.appendChild(pObj);
-		pObj.appendChild(remoteDir);
+		remoteDirDiv.appendChild(pObj);
+		pObj.appendChild(remoteDirContainer);
 		pObj.appendChild(oldPhysicalDirValue);
 		pObj.appendChild(resumeOldSettingBtn);
 		pObj.appendChild(hideRemoteDirBtn);
 		
-		cell.appendChild(remoteDirContainer);
+		cell.appendChild(remoteDirDiv);
 		cell=row.insertCell(row.cells.length);
 		cell.className="removeEntry";
 		cell.innerHTML="&#x1F5D1;";
@@ -550,24 +553,37 @@ class AccessRight
 		dt.draw();
 		
 	}
-	getRemoteDir(userEntryId,accessRightEntryId)
+	getRemoteDir(self,userEntryId,accessRightEntryId)
 	{
-		var remoteDirContainer=document.getElementById("remoteDir"+userEntryId+"_"+accessRightEntryId);
-		if (remoteDirContainer.style.display=="block")
+		var remoteDirContainer=document.getElementById("remoteDirContainer"+userEntryId+"_"+accessRightEntryId);
+		if (remoteDirContainer.innerHTML=="")
+		{
+			var phyDir=document.getElementById("physicalDir"+userEntryId+"_"+accessRightEntryId).value;
+			self.adminPageControl.getRemoteDir(phyDir,userEntryId,accessRightEntryId);
+		}
+		else	
+		{
+			self.processRemoteDirDiv(userEntryId,accessRightEntryId);
+		}
+	}
+	processRemoteDirDiv(userEntryId,accessRightEntryId)
+	{
+		var remoteDirDiv=document.getElementById("remoteDirDiv"+userEntryId+"_"+accessRightEntryId);
+		if (remoteDirDiv.style.display=="block")
 			this.hideRemoteDir(userEntryId,accessRightEntryId);
 		else
 			this.showRemoteDir(userEntryId,accessRightEntryId);
 	}
 	showRemoteDir(userEntryId,accessRightEntryId)
 	{	
-		$("#remoteDir"+userEntryId+"_"+accessRightEntryId).slideDown({
+		$("#remoteDirDiv"+userEntryId+"_"+accessRightEntryId).slideDown({
 										duration: 1000, 
 										easing:"swing"
 										});
 	}
 	hideRemoteDir(userEntryId,accessRightEntryId)
 	{	
-		$("#remoteDir"+userEntryId+"_"+accessRightEntryId).slideUp({
+		$("#remoteDirDiv"+userEntryId+"_"+accessRightEntryId).slideUp({
 										duration: 1000, 
 										easing:"swing"
 										});
@@ -581,4 +597,8 @@ class AccessRight
 	{
 		this.userAccessRightDiv.style.display='none';
 	}				
+	show()
+	{
+		this.userAccessRightDiv.style.display='block';
+	}
 }									

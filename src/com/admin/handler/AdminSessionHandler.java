@@ -108,6 +108,13 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
         					actionResponse.setReturnMessage("Login failure");
     					}
     					break;
+	        	case "GetRemoteDir":
+	        			ArrayList<String> dirList=Utility.getSubFolderOnly((String)requestObj.get("physicalDir"));
+	        			actionResponse.setResponseCode(0);
+	        			actionResponse.setReturnObjects("dirList",dirList);
+	        			actionResponse.setReturnObjects("userEntryId",(String)requestObj.get("userEntryId"));
+	        			actionResponse.setReturnObjects("accessRightEntryId",(String)requestObj.get("accessRightEntryId"));
+	        			break;
 	        	case "GetServerList":
 	        			ArrayList<FtpServer<T>> ftpServerList=ftpServerManager.getAllServerList();
 	        			actionResponse.setResponseCode(0);

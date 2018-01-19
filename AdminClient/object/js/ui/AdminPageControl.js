@@ -101,6 +101,11 @@ class AdminPageControl
 						//console.log(serverResponseObj.returnObjects.bindingIpList);
 						this.ftpServerUI.updateBindingIpList(serverResponseObj.returnObjects.bindingIpList);
 						break;
+				case "GetRemoteDir":
+						this.ftpServerUI.updateRemoteDir(serverResponseObj.returnObjects.userEntryId,
+								                         serverResponseObj.returnObjects.accessRightEntryId,
+								                         serverResponseObj.returnObjects.dirList);
+						break;
 			}
 		}		
 	}
@@ -222,6 +227,10 @@ class AdminPageControl
 	getBindingAddress()
 	{
 		this.adminServer.getBindingAddress();
+	}
+	getRemoteDir(physicalDir,userEntryId,accessRightEntryId)
+	{
+		this.adminServer.getRemoteDir(physicalDir,userEntryId,accessRightEntryId);
 	}
 	addContent(content)
 	{

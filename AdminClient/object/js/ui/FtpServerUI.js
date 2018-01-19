@@ -54,7 +54,8 @@ class FtpServerUI
 	{
 		this.adminPageControl.getBindingAddress();
 		this.adminPageControl.clearMainStage();
-		this.ftpServerUI_AddServer=new FtpServerUI_AddServer();
+		
+		this.ftpServerUI_AddServer=new FtpServerUI_AddServer(this.adminPageControl);
 		this.adminPageControl.addContent(this.ftpServerUI_AddServer.getHTML());
 	}
 	removeFtpServer()
