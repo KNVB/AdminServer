@@ -1,11 +1,11 @@
 class AdminServerUI
 {
-	constructor(adminServer,adminPageControl)
+	constructor(adminPageControl)
 	{
-		this.adminServer=adminServer;
+		this.adminServer=adminPageControl.adminServer;
 		this.adminPageControl=adminPageControl;
 	}
-	getUI(callBack)
+	getHTML()
 	{
 		var a=document.createElement("a");
 		var div=document.createElement("div");
@@ -13,10 +13,7 @@ class AdminServerUI
 		
 		a.className="w3-bar-item w3-button";
 		a.innerHTML="Administration Server Setting &#x25bc;"
-		a.addEventListener('click',function()
-								  {
-									  callBack(this);
-								  });
+
 		subDiv.id="admin";
 		subDiv.className="w3-hide w3-animate-left";
 		subDiv.appendChild(this.addFunction("QQ",""));

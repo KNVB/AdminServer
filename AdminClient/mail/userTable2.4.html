@@ -47,8 +47,9 @@
 															   accessRightList:[{virtualDir:"/",physicalDir:"/"}]
 															  }]};
 									var userManagement=new UserManagement();
-									document.body.appendChild(userManagement.getHTML());
+									//document.body.appendChild(userManagement.getHTML());
 									userManagement.addUserRow(userData.userList[0]);
+									document.body.appendChild(userManagement.getHTML());
 								});
 			const guid=()=> {
 			  const s4=()=> Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);     

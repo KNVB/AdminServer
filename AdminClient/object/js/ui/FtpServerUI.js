@@ -1,11 +1,11 @@
 class FtpServerUI
 {
-	constructor(adminServer,adminPageControl)
+	constructor(adminPageControl)
 	{
-		this.adminServer=adminServer;
+		this.ftpServerUI_AddServer=null;
 		this.adminPageControl=adminPageControl;
 	}
-	getUI(callBack)
+	getHTML()
 	{
 		var a=document.createElement("a");
 	
@@ -16,10 +16,6 @@ class FtpServerUI
 		a.className="w3-bar-item w3-button";
 		a.innerHTML="FTP Server Administration &#x25bc;"
 		
-		a.addEventListener('click',function()
-								  {
-									  callBack(this);
-								  });
 		subDiv.id="ftp";
 		subDiv.className="w3-hide w3-animate-left";
 		
@@ -51,14 +47,23 @@ class FtpServerUI
 	}
 	listFtpServer()
 	{
-		this.adminPageControl.setContent("List server");
+		this.adminPageControl.clearMainStage();
+		this.adminPageControl.addContent("List server");
 	}
 	addFtpServer()
 	{
-		this.adminPageControl.setContent("add server");
+		this.adminPageControl.getBindingAddress();
+		this.adminPageControl.clearMainStage();
+		this.ftpServerUI_AddServer=new FtpServerUI_AddServer();
+		this.adminPageControl.addContent(this.ftpServerUI_AddServer.getHTML());
 	}
 	removeFtpServer()
 	{
-		this.adminPageControl.setContent("remove server");
+		this.adminPageControl.clearMainStage();
+		this.adminPageControl.addContent("remove server");
+	}
+	updateBindingIpList(bindingIpList)
+	{
+		this.ftpServerUI_AddServer.updateBindingIpList(bindingIpList);
 	}
 }

@@ -93,7 +93,7 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 			actionResponse.setAction((String)requestObj.get("action"));
         	switch ((String)requestObj.get("action"))
         	{
-	        	case "LOGIN":
+	        	case "Login":
     					String userName=(String)requestObj.get("userName");
     					String password=(String)requestObj.get("password");
     					logger.debug("user name={},password={}",userName,password);
@@ -114,10 +114,10 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	        			//ftpServerList.add(new FtpServer<T>("abc"));
 	        			actionResponse.setReturnObjects("ftpServerList",ftpServerList);
 	        			break;
-	        	case "GetAddServerPageData":
+	        	case "GetBindingAccess":
 	        			ArrayList<String> localIpList=Utility.getAllLocalIp();
 	        			actionResponse.setResponseCode(0);
-	        			actionResponse.setReturnObjects("localIpList",localIpList);
+	        			actionResponse.setReturnObjects("bindingIpList",localIpList);
 	        			break;
         	}
         	responseString=(new JSONObject(actionResponse)).toString();

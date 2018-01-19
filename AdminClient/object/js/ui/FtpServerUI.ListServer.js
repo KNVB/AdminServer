@@ -1,4 +1,4 @@
-export class FtpServerUI.ListServer
+class FtpServerUI_ListServer
 {
 	constructor()
 	{

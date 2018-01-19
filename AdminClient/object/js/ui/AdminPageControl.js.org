@@ -3,37 +3,24 @@ class AdminPageControl
 	constructor()
 	{
 		this.isLogined=false;
-		this.modalList=new ModalList();
+		this.modalList=new ModalList(this.logout.bind(this));
 		this.adminServer=new AdminServer();
-		this.ftpServerUI=new FtpServerUI(this);
-		this.adminServerUI=new AdminServerUI(this);
 		this.adminSidebar=document.createElement("nav");
-		this.buildUI();
+		this.ftpServerUI=new FtpServerUI(this.adminServer,this);
+		this.adminServerUI=new AdminServerUI(this.adminServer,this);
+		this.buildUI();	
 	}
 	buildUI()
 	{
-		var self=this;
-		var modalListDom;
-		var logoutLink=document.createElement("a");
-		document.body.appendChild(this.getLoginSideBar());
 		this.adminServer.setServerResponseHandler(this.serverResponseHandler.bind(this));
-		this.modalList.addModalUI(this.ftpServerUI.getHTML());
-		this.modalList.addModalUI(this.adminServerUI.getHTML());
-		modalListDom=this.modalList.getHTML();
-		
-		logoutLink.className="w3-bar-item w3-button"; 
-		logoutLink.addEventListener('click',function()
-								  {
-									  self.logout();
-								  });
-		logoutLink.text="Logout";
-		modalListDom.appendChild(logoutLink);
+		this.modalList.addModalUI(this.ftpServerUI.getUI(this.modalList.updateSideNavigation.bind(this.modalList)));
+		this.modalList.addModalUI(this.adminServerUI.getUI(this.modalList.updateSideNavigation.bind(this.modalList)));
+		document.body.appendChild(this.getLoginSideBar(this.serverResponseHandler.bind(this)));
 		
 		//Side Navigation
 		this.adminSidebar.id="mySidebar";
 		this.adminSidebar.className="w3-hide w3-sidebar w3-bar-block w3-collapse w3-white w3-animate-left w3-card";
 		this.adminSidebar.setAttribute("style","z-index:3;width:320px;");
-		
 		var a=document.createElement("a");
 		a.className="w3-bar-item w3-button w3-hide-large w3-large";
 		a.setAttribute("title","Close Sidemenu");
@@ -41,7 +28,7 @@ class AdminPageControl
 		a.innerHTML="Close &#x2718;";
 		
 		this.adminSidebar.appendChild(a);
-		this.adminSidebar.appendChild(modalListDom);
+		this.adminSidebar.appendChild(this.modalList.getModalList());
 		document.body.appendChild(this.adminSidebar);
 		
 		// Overlay effect when opening the side navigation on small screens
@@ -67,10 +54,7 @@ class AdminPageControl
 		this.mainContainer.appendChild(a2);
 		this.mainContainer.appendChild(this.mainStage);
 		document.body.appendChild(this.mainContainer);
-	}
-	initTheStage()
-	{
-		$(this.adminSidebar).toggleClass("w3-hide");
+		
 	}
 	serverResponseHandler(serverResponseObj)
 	{
@@ -82,14 +66,13 @@ class AdminPageControl
 		{
 			switch (serverResponseObj.action)
 			{
-				case "Login":
+				case "LOGIN":
 						if(serverResponseObj.responseCode==0)
 						{
-							
-							//$('.loginDiv').animate({opacity: 'hide', height: 'hide'}, 500);
 							//$(".adminTable").show();
+							//$('.loginDiv').animate({opacity: 'hide', height: 'hide'}, 500);
 							//console.log(serverPage==null);
-							this.hideLoginSideBar();
+							this.hideLoginSideBar(this.initTheStage.bind(this));
 						}
 						else
 						{
@@ -97,16 +80,15 @@ class AdminPageControl
 							alert("Invalid user name or password");	
 						}
 						break;
-				case "GetBindingAccess":
-						//console.log(serverResponseObj.returnObjects.bindingIpList);
-						this.ftpServerUI.updateBindingIpList(serverResponseObj.returnObjects.bindingIpList);
-						break;
 			}
 		}		
 	}
-	getLoginSideBar()
+	initTheStage()
 	{
-		var self=this;
+		$(this.adminSidebar).toggleClass("w3-hide");
+	}
+	getLoginSideBar(callBack)
+	{
 		var row=null,cell=null;
 		var myAdminServer=this.adminServer;
 		var loginDiv=document.createElement("div");
@@ -155,8 +137,8 @@ class AdminPageControl
 								                    adminServerPortNoInputBox.value,
 													loginUserNameInputBox.value,
 													loginPasswordInputBox.value);
-								myAdminServer.login(loginObj);
-								//self.serverResponseHandler();
+								//myAdminServer.login(loginObj);
+								callBack();
 							})
 		row=loginTable.insertRow(loginTable.rows.length);
 		cell=row.insertCell(row.cells.length);
@@ -216,16 +198,12 @@ class AdminPageControl
 	{
 		if (this.loginSideBar!=null)
 		{
-			$(this.loginSideBar).hide("slide",this.showHideOption,1000,this.initTheStage());
+			$(this.loginSideBar).hide("slide",this.showHideOption,1000,callBack);
 		}
 	}
-	getBindingAddress()
+	setContent(content)
 	{
-		this.adminServer.getBindingAddress();
-	}
-	addContent(content)
-	{
-		$(this.mainStage).append(content);
+		$(this.mainStage).html(content);
 	}
 	clearMainStage()
 	{ 
@@ -248,5 +226,5 @@ class AdminPageControl
 	{
 		document.getElementById("mySidebar").style.display = "none";
 		document.getElementById("myOverlay").style.display = "none";
-	}
+	}				
 }

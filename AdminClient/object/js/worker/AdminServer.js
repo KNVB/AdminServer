@@ -52,6 +52,10 @@ class AdminServer
 		this.ws.send(publicKey);
 		this.keyCoder.setPrivateKey(this.keyCoder.getPrivateKey());
     }
+	getBindingAddress()
+	{
+		this.sendRequest({action:"GetBindingAccess"});
+	}
 	serverResponseHandler(evt)
 	{
 		var serverResponseMessage = evt.data;
