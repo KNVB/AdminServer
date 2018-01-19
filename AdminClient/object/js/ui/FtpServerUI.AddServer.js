@@ -116,4 +116,8 @@ class FtpServerUI_AddServer extends MainPageTemplate
 			this.bindingAddressDropDown.appendChild(option);
 		}
 	}
+	updateRemoteDir(userEntryId,accessRightEntryId,dirList)
+	{
+		this.userManagement.updateRemoteDir(userEntryId,accessRightEntryId,dirList);
+	}
 }

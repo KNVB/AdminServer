@@ -181,5 +181,11 @@ class UserManagement
 			field.value="1";
 			$(row).hide();
 		}
-	}			
+	}
+	updateRemoteDir(userEntryId,accessRightEntryId,dirList)
+	{
+		//this.userManagement.updateRemoteDir(userEntryId,accessRightEntryId,dirList);
+		var accessRight=this.accessRightArray[userEntryId];
+		accessRight.updateRemoteDir(userEntryId,accessRightEntryId,dirList);
+	}
 }

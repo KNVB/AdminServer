@@ -455,6 +455,7 @@ class AccessRight
 		var pObj=document.createElement("p");
 		var remoteDirDiv=document.createElement("div");
 		var remoteDirContainer=document.createElement("div");
+		var remoteDirList=document.createElement("ul");
 		var permissionSummary=document.createElement("input");
 		var physicalDirInputBox=document.createElement("input");
 		var virtualDirInputBox=document.createElement("input");
@@ -467,6 +468,9 @@ class AccessRight
 		remoteDirDiv.className="remoteDirDiv";
 		remoteDirContainer.className="remoteDirContainer";
 		remoteDirContainer.id="remoteDirContainer"+userEntryId+"_"+accessRightEntryId;
+		remoteDirList.style="padding:0px;margin:0px";
+		remoteDirList.id="remoteDirList"+userEntryId+"_"+accessRightEntryId;
+		remoteDirContainer.appendChild(remoteDirList);
 		
 		permissionSummary.setAttribute("type", "hidden");
 		permissionSummary.id="permissionSummary"+userEntryId+"_"+accessRightEntryId;
@@ -555,8 +559,8 @@ class AccessRight
 	}
 	getRemoteDir(self,userEntryId,accessRightEntryId)
 	{
-		var remoteDirContainer=document.getElementById("remoteDirContainer"+userEntryId+"_"+accessRightEntryId);
-		if (remoteDirContainer.innerHTML=="")
+		var remoteDirList=document.getElementById("remoteDirList"+userEntryId+"_"+accessRightEntryId);
+		if (remoteDirList.innerHTML=="")
 		{
 			var phyDir=document.getElementById("physicalDir"+userEntryId+"_"+accessRightEntryId).value;
 			self.adminPageControl.getRemoteDir(phyDir,userEntryId,accessRightEntryId);
@@ -600,5 +604,33 @@ class AccessRight
 	show()
 	{
 		this.userAccessRightDiv.style.display='block';
+	}
+	updateRemoteDir(userEntryId,accessRightEntryId,dirList)
+	{
+		var listItem,span,a;
+		var remoteDirList=document.getElementById("remoteDirList"+userEntryId+"_"+accessRightEntryId);
+		for (var i=0;i<dirList.length;i++)
+		{
+			listItem=document.createElement("li");
+			span=document.createElement("span");
+			a=document.createElement("a");
+			span.style.color="red";
+			span.style.fontWeight="bold";
+			
+			if (dirList[i].type=="folder")
+				span.innerHTML="&#x1F5BF;";
+			else
+				span.innerHTML="&#x1F5B4;";
+			span.onmousedown=function(){return false;};
+			a.text=dirList[i].pathName;
+			a.style="cursor:pointer";
+			a.onmousedown=function(){return false;};
+			$(listItem).append(span);
+			$(listItem).append(a);
+			$(remoteDirList).append(listItem);
+			//a.setAttribute("rel","/abc");
+			//remoteDirContainer.appendChild(document.createTextNode(dirList[i].pathName));
+		}
+		this.processRemoteDirDiv(userEntryId,accessRightEntryId);
 	}
 }									

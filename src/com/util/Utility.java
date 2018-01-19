@@ -126,12 +126,14 @@ public class Utility
           }   
           return tmp.toString();   
       }
-	public static ArrayList<String> getSubFolderOnly(String inPath)
+	public static ArrayList<FileSystemObject> getSubFolderOnly(String inPath)
 	{
-		ArrayList<String> dirList = new ArrayList<String>();
+		FileSystemObject fso;
+		ArrayList<FileSystemObject> dirList = new ArrayList<FileSystemObject>();
 		if (inPath.equals("/"))
 		{
 			File[] paths;
+			FileSystemView fsv = FileSystemView.getFileSystemView();
 			// returns pathnames for files and directory
 			paths = File.listRoots();
 			
@@ -139,7 +141,11 @@ public class Utility
 			for(File path:paths)
 			{
 				// prints file and directory paths
-				dirList.add(path.toString());
+				if (fsv.isDrive(path))
+					fso=new FileSystemObject("drive",path.getAbsolutePath());
+				else	
+					fso=new FileSystemObject("folder",path.getAbsolutePath());
+				dirList.add(fso);
 			}
 		}
 		return dirList;

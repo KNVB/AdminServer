@@ -66,5 +66,10 @@ class FtpServerUI
 	updateBindingIpList(bindingIpList)
 	{
 		this.ftpServerUI_AddServer.updateBindingIpList(bindingIpList);
-	}
+	}	           
+    updateRemoteDir(userEntryId,accessRightEntryId,dirList)
+	{
+    	this.ftpServerUI_AddServer.updateRemoteDir(userEntryId,accessRightEntryId,dirList);
+	}       
+            
 }
