@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<title>W3.CSS Template</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link href='https://fonts.googleapis.com/css?family=RobotoDraft' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.2.4/css/select.dataTables.min.css">
+<style>
+html,body,h1,h2,h3,h4,h5 {font-family: "RobotoDraft", "Roboto", sans-serif}
+.w3-bar-block .w3-bar-item {padding: 16px}
+.loginTable
+{
+	color: #f1f1f1;
+}
+.loginCaption
+{
+	text-align:right;
+	font-size: 16px;
+}
+.mySideBar
+{
+	z-index:3;
+	width:320px;
+}
+</style>
+<script src="http://code.jquery.com/jquery-3.2.1.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/select/1.2.4/js/dataTables.select.min.js"></script>
+<script src="jquery.easing.1.3.js"></script>
+<script>
+var logined=false;
+$(document).ready(function() 
+				 {
+					//$(genLoginTable()).insertBefore(document.getElementById("myOverlay"));
+				 });
+function w3_open() {    
+	document.getElementById("mySideBar").style.display = "block";
+    document.getElementById("myOverlay").style.display = "block";
+}
+function w3_close() {
+    document.getElementById("mySideBar").style.display = "none";
+	document.getElementById("myOverlay").style.display = "none";
+}
+function showHideChild(functionListItem)
+{
+	var parentDiv=$(functionListItem).parent();
+	$(parentDiv).children("div").each(function ()
+										{
+											if (this.className.indexOf("w3-show")>-1)
+												this.className=this.className.replace("w3-show","w3-hide");
+										});
+	
+	$(parentDiv).children("a:not([title='Close Sidemenu'])").each(function()
+									{
+										if (this===functionListItem)
+										{
+											if (this.className.indexOf("w3-red")==-1)
+											{	
+												this.className+=" w3-red";
+												this.nextElementSibling.className=this.nextElementSibling.className.replace("w3-hide","w3-show");
+											}
+											else
+											{
+												this.className=this.className.replace(" w3-red","");
+												this.nextElementSibling.className=this.nextElementSibling.className.replace("w3-show","w3-hide");
+											}
+										}
+										else
+										{
+											this.className=this.className.replace(" w3-red",""); 
+										}
+									});
+	/*
+	$(parentDiv).children("div").addClass("w3-hide");
+	
+	
+	console.log($(functionListItem).next("div").hasClass("w3-show"));
+	$(functionListItem).next("div").addClass("w3-show");*/
+}
+function login()
+{
+	logined=true;
+	var loginSideBar=document.getElementById("mySideBar");
+	$(".loginTable").hide("slide",1000,function()
+										{
+											$("#functionList").show(); 
+										});
+	$(loginSideBar).removeClass("w3-red");
+	$(loginSideBar).addClass("w3-white");
+	w3_close();
+}
+</script>
+</style>
+<body>
+<!-- Login Side Navigation  -->
+<nav class="w3-sidebar w3-bar-block w3-collapse w3-red w3-animate-left w3-card " style="z-index:3;width:320px;" id="mySideBar">
+		<table class="loginTable">
+			<tr>
+				<td colspan=2 align=center>Admin. Server login</td>
+			</tr>
+			<tr>
+				<td class="loginCaption">server name:</td>
+				<td><input type=text value="localhost" id="hostName" size="10" required ></td>
+			</tr>
+			<tr>
+				<td class="loginCaption">server port no:</td>
+				<td><input type=number value="4466" id="portNo" min="1" max="999999" required ></td>
+			</tr>
+			<tr>
+				<td class="loginCaption">user name:</td>
+				<td><input type="text" value ="admin" id="userName" size="10" required></td>
+			</tr>
+			<tr>
+				<td class="loginCaption">password:</td>
+				<td><input type="password" value ="password" id="password" size="10" required></td>
+			</tr>
+			<tr>
+				<td colspan=2 style="text-align:center;"><button id="loginButton" onclick="login()">Login</button></td>
+			</tr>	
+		</table>
+		<div id="functionList" style="display:none">
+			<a href="javascript:w3_close()" title="Close Sidemenu" class="w3-bar-item w3-button w3-hide-large w3-large">
+				Close <i class="fa fa-remove"></i>
+			</a>
+			<a class="w3-bar-item w3-button" onclick="showHideChild(this)">
+				FTP Server Administration
+				<i class="fa fa-caret-down w3-margin-left"></i>
+			</a>
+			<div class="w3-hide w3-animate-left">	
+				<a class="w3-bar-item w3-button w3-border-bottom test w3-hover-light-grey">
+					List Server <i class="w3-padding fa fa-pencil"></i>
+				</a>
+				<a class="w3-bar-item w3-button w3-border-bottom test w3-hover-light-grey">
+					Add Server  <i class="w3-padding fa fa-pencil"></i>	
+				</a>
+				<a class="w3-bar-item w3-button w3-border-bottom test w3-hover-light-grey">
+					Remove Server  <i class="w3-padding fa fa-pencil"></i>	
+				</a>				
+			</div>
+			<a class="w3-bar-item w3-button" onclick="showHideChild(this)">
+				Administration Server Setting
+				<i class="fa fa-caret-down w3-margin-left"></i>
+			</a>
+			<div class="w3-hide w3-animate-left">	
+				<a class="w3-bar-item w3-button w3-border-bottom test w3-hover-light-grey">
+					Change Admin user and password	
+				</a>				
+			</div>
+		</div>
+</nav>
+<!-- Overlay effect when opening the side navigation on small screens -->
+<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="Close Sidemenu" id="myOverlay"></div>
+<div class="w3-main" style="margin-left:320px;">
+	<i class="fa fa-bars w3-button w3-white w3-hide-large w3-xlarge w3-margin-left w3-margin-top" onclick="w3_open()"></i>
+</div>	
+</body>
+</html> 
