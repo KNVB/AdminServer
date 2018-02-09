@@ -112,8 +112,8 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	        			ArrayList<FileSystemObject> dirList=Utility.getSubFolderOnly((String)requestObj.get("physicalDir"));
 	        			actionResponse.setResponseCode(0);
 	        			actionResponse.setReturnObjects("dirList",dirList);
-	        			actionResponse.setReturnObjects("userEntryId",(String)requestObj.get("userEntryId"));
-	        			actionResponse.setReturnObjects("accessRightEntryId",(String)requestObj.get("accessRightEntryId"));
+	        			actionResponse.setReturnObjects("userId",(String)requestObj.get("userId"));
+	        			actionResponse.setReturnObjects("accessRightId",(String)requestObj.get("accessRightId"));
 	        			break;
 	        	case "GetServerList":
 	        			ArrayList<FtpServer<T>> ftpServerList=ftpServerManager.getAllServerList();
