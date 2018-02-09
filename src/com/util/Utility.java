@@ -148,6 +148,17 @@ public class Utility
 				dirList.add(fso);
 			}
 		}
+		else
+		{
+			for (File f : new File(inPath).listFiles())
+			{
+				if ((f.isDirectory()) &&(!f.isHidden())) 
+				{
+					fso=new FileSystemObject("folder",f.getAbsolutePath());
+					dirList.add(fso);
+				}
+			}
+		}
 		return dirList;
 	}
 }
