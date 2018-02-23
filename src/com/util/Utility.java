@@ -150,14 +150,20 @@ public class Utility
 		}
 		else
 		{
-			for (File f : new File(inPath).listFiles())
+			File f;
+			File[] fileSystemObjectList=new File(inPath).listFiles();
+			if (fileSystemObjectList!=null)
 			{
-				if ((f.isDirectory()) &&(!f.isHidden())) 
+				for (int i=0;i<fileSystemObjectList.length;i++)
 				{
-					fso=new FileSystemObject("folder",f.getAbsolutePath());
-					dirList.add(fso);
+					f=fileSystemObjectList[i];
+					if ((f.isDirectory()) &&(!f.isHidden())) 
+					{
+						fso=new FileSystemObject("folder",f.getAbsolutePath());
+						dirList.add(fso);
+					}
 				}
-			}
+			}			
 		}
 		return dirList;
 	}
