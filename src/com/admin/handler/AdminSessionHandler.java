@@ -1,5 +1,8 @@
 package com.admin.handler;
 
+import com.admin.AccessRightEntry;
+import com.admin.FtpServerInfo;
+import com.admin.FtpUserInfo;
 import com.admin.Server;
 import com.ftp.FtpServer;
 import com.util.*;
@@ -25,10 +28,10 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	private JSONObject requestObj=null;
 	private Logger logger=null;
 	private MessageCoder messageCoder;
-	
+	private Server adminServer=null;
 	private String returnCoder=new String();
 	private String responseString,requestString;
-	private Server adminServer=null;
+	
 	private FtpServerManager ftpServerManager=null;  
 	private AdminUserManager adminUserManager=null;
 	public AdminSessionHandler(Server adminServer)
@@ -121,11 +124,28 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	        			//ftpServerList.add(new FtpServer<T>("abc"));
 	        			actionResponse.setReturnObjects("ftpServerList",ftpServerList);
 	        			break;
+	        	case "GetInitialFtpServerInfo":
+	        			FtpServerInfo ftpServerInfo=new FtpServerInfo();
+	        			AccessRightEntry accessRightEntry=new AccessRightEntry();
+	        			FtpUserInfo ftpUserInfo =new FtpUserInfo();
+	        			ArrayList<String> localIpList=Utility.getAllLocalIp();
+	        			
+	        			localIpList.add(0,"*");
+	        			
+	        			ftpUserInfo.password="";
+	        			ftpUserInfo.userName="anonymous";	        			
+	        			ftpUserInfo.accessRightEntries.add(accessRightEntry);
+	        			ftpServerInfo.bindingAddress=localIpList;
+	        			ftpServerInfo.ftpUserInfoList.add(ftpUserInfo);
+	        			actionResponse.setResponseCode(0);
+	        			actionResponse.setReturnObjects("ftpServerInfo",ftpServerInfo);
+	        			break;
+	        	/*		
 	        	case "GetBindingAccess":
 	        			ArrayList<String> localIpList=Utility.getAllLocalIp();
 	        			actionResponse.setResponseCode(0);
 	        			actionResponse.setReturnObjects("bindingIpList",localIpList);
-	        			break;
+	        			break;*/
         	}
         	responseString=(new JSONObject(actionResponse)).toString();
         	logger.debug("responseString={}",responseString);
