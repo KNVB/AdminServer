@@ -2,6 +2,7 @@ package com.admin.handler;
 
 import com.admin.Server;
 import com.admin.adminObj.AccessRightEntry;
+import com.admin.adminObj.BindingAddress;
 import com.admin.adminObj.FtpServerInfo;
 import com.admin.adminObj.FtpUserInfo;
 import com.ftp.FtpServer;
@@ -125,20 +126,30 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	        			actionResponse.setReturnObjects("ftpServerList",ftpServerList);
 	        			break;
 	        	case "GetInitialFtpServerInfo":
+	        			BindingAddress bindingAddress=new BindingAddress();
 	        			FtpServerInfo ftpServerInfo=new FtpServerInfo();
 	        			AccessRightEntry accessRightEntry=new AccessRightEntry();
 	        			FtpUserInfo ftpUserInfo =new FtpUserInfo();
 	        			ArrayList<String> localIpList=Utility.getAllLocalIp();
+	        			ArrayList<AccessRightEntry> accessRightEntries=new ArrayList<AccessRightEntry>();
+	        			ArrayList<FtpUserInfo> ftpUserInfoList=new ArrayList<FtpUserInfo>();
+	        			ArrayList<BindingAddress> bindingAddressList=new ArrayList<BindingAddress>();
 	        			
-	        			localIpList.add(0,"*");
+	        			accessRightEntries.add(accessRightEntry);
+	        			bindingAddress.setBound(false);
+	        			bindingAddress.setIpAddress("*");
+	        			bindingAddressList.add(bindingAddress);
 	        			
-	        			ftpUserInfo.password="";
-	        			ftpUserInfo.userName="anonymous";	        			
-	        			ftpUserInfo.accessRightEntries.add(accessRightEntry);
-	        			ftpServerInfo.bindingAddress=localIpList;
-	        			ftpServerInfo.ftpUserInfoList.add(ftpUserInfo);
+	        			ftpUserInfo.setPassword("");
+	        			ftpUserInfo.setUserName("anonymous");
+	        			ftpUserInfoList.add(ftpUserInfo);
+	        			
+	        			ftpUserInfo.setAccessRightEntries(accessRightEntries);
+	        			ftpServerInfo.setBindingAddresses(bindingAddressList);
+	        			ftpServerInfo.setFtpUserInfoList(ftpUserInfoList);
 	        			actionResponse.setResponseCode(0);
 	        			actionResponse.setReturnObjects("ftpServerInfo",ftpServerInfo);
+	        			//actionResponse.setReturnObjects("ftpServerInfo",accessRightEntry);
 	        			break;
 	        	/*		
 	        	case "GetBindingAccess":
