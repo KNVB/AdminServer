@@ -1,4 +1,4 @@
-package com.admin;
+package com.admin.adminObj;
 import java.util.ArrayList;
 public class FtpUserInfo 
 {

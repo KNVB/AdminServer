@@ -1,4 +1,4 @@
-package com.admin;
+package com.admin.adminObj;
 
 public class AccessRightEntry 
 {

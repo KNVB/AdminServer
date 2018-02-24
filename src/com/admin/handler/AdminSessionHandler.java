@@ -1,9 +1,9 @@
 package com.admin.handler;
 
-import com.admin.AccessRightEntry;
-import com.admin.FtpServerInfo;
-import com.admin.FtpUserInfo;
 import com.admin.Server;
+import com.admin.adminObj.AccessRightEntry;
+import com.admin.adminObj.FtpServerInfo;
+import com.admin.adminObj.FtpUserInfo;
 import com.ftp.FtpServer;
 import com.util.*;
 
