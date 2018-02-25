@@ -135,16 +135,25 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	        			ArrayList<FtpUserInfo> ftpUserInfoList=new ArrayList<FtpUserInfo>();
 	        			ArrayList<BindingAddress> bindingAddressList=new ArrayList<BindingAddress>();
 	        			
+	        			accessRightEntry.setEntryId(Utility.getUniqueId());
 	        			accessRightEntries.add(accessRightEntry);
-	        			bindingAddress.setBound(false);
+	        			bindingAddress.setBound(true);
 	        			bindingAddress.setIpAddress("*");
 	        			bindingAddressList.add(bindingAddress);
 	        			
+	        			for (String ipAddress : localIpList)
+	        			{
+	        				bindingAddress=new BindingAddress();
+		        			bindingAddress.setBound(false);
+		        			bindingAddress.setIpAddress(ipAddress);
+		        			bindingAddressList.add(bindingAddress);
+	        			}
 	        			ftpUserInfo.setPassword("");
 	        			ftpUserInfo.setUserName("anonymous");
 	        			ftpUserInfoList.add(ftpUserInfo);
 	        			
 	        			ftpUserInfo.setAccessRightEntries(accessRightEntries);
+	        			ftpServerInfo.setServerId(Utility.getUniqueId());
 	        			ftpServerInfo.setBindingAddresses(bindingAddressList);
 	        			ftpServerInfo.setFtpUserInfoList(ftpUserInfoList);
 	        			actionResponse.setResponseCode(0);

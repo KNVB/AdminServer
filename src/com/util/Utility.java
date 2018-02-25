@@ -6,7 +6,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
-
+import java.util.UUID;
 import javax.swing.filechooser.FileSystemView;
 
 /*
@@ -34,6 +34,15 @@ public class Utility
 	public Utility()
 	{
 		
+	}
+	/**
+	 * Generate Universally Unique Identifier
+	 * @return the identifier
+	 */
+	public static String getUniqueId()
+	{
+		 UUID uuid = UUID.randomUUID();
+	     return uuid.toString();
 	}
 	/**
 	 * Get all local IP
