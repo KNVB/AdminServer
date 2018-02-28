@@ -2,6 +2,7 @@ package com.admin.handler;
 
 import com.admin.Server;
 import com.admin.adminObj.AccessRightEntry;
+import com.admin.adminObj.BindingAddress;
 import com.admin.adminObj.FtpServerInfo;
 import com.admin.adminObj.FtpUserInfo;
 import com.ftp.FtpServer;
@@ -129,22 +130,30 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	        			actionResponse.setReturnObjects("uniqueId", uniqueId);
 	        			break;
 	        	case "GetInitialFtpServerInfo":
+	        			BindingAddress bindingAddress=new BindingAddress();
 	        			FtpServerInfo ftpServerInfo=new FtpServerInfo();
 	        			AccessRightEntry accessRightEntry=new AccessRightEntry();
 	        			FtpUserInfo ftpUserInfo =new FtpUserInfo();
 	        			ArrayList<String> localIpList=Utility.getAllLocalIp();
 	        			Hashtable<String,FtpUserInfo> ftpUserInfoList=new Hashtable<String,FtpUserInfo>();
-	        			Hashtable<String,Boolean>bindingAddressList=new Hashtable<String,Boolean>();
+	        			ArrayList<BindingAddress>bindingAddressList=new ArrayList<BindingAddress>();
 	        			Hashtable<String,AccessRightEntry> accessRightEntries=new Hashtable<String,AccessRightEntry>();
 	        			
-	        			bindingAddressList.put("*",false);
+	        			bindingAddress.setBound(true);
+	        			bindingAddress.setIpAddress("*");
+	        			bindingAddressList.add(bindingAddress);
+	        			
 	        			for (String ipAddress : localIpList)
 	        			{
-	        				bindingAddressList.put(ipAddress,false);
+	        				bindingAddress=new BindingAddress();
+		        			bindingAddress.setBound(false);
+		        			bindingAddress.setIpAddress(ipAddress);
+		        			bindingAddressList.add(bindingAddress);
 	        			}
+	        			
 	        			ftpUserInfo.setPassword("");
 	        			ftpUserInfo.setUserName("anonymous");
-	        			accessRightEntry.setEntryId(Utility.getUniqueId());
+	        			//accessRightEntry.setEntryId(Utility.getUniqueId());
 	        			accessRightEntries.put(accessRightEntry.getEntryId(),accessRightEntry);
 	        			ftpUserInfo.setAccessRightEntries(accessRightEntries);
 	        			ftpUserInfoList.put(ftpUserInfo.getUserId(),ftpUserInfo);

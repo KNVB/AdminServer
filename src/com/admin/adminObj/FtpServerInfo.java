@@ -9,7 +9,7 @@ public class FtpServerInfo
 	private String passiveModePortRange="";
 	private String description="New Server";
 	private boolean passiveModeEnabled=false;
-	private Hashtable<String,Boolean> bindingAddresses=new Hashtable<String,Boolean>();
+	private ArrayList<BindingAddress> bindingAddresses=new ArrayList<BindingAddress>();
 	private Hashtable<String,FtpUserInfo> ftpUserInfoList=new Hashtable<String,FtpUserInfo>();
 	public int getStatus() {
 		return status;
@@ -47,10 +47,10 @@ public class FtpServerInfo
 	public void setPassiveModeEnabled(boolean passiveModeEnabled) {
 		this.passiveModeEnabled = passiveModeEnabled;
 	}
-	public Hashtable<String,Boolean> getBindingAddresses() {
+	public ArrayList<BindingAddress> getBindingAddresses() {
 		return bindingAddresses;
 	}
-	public void setBindingAddresses(Hashtable<String,Boolean> bindingAddresses) {
+	public void setBindingAddresses(ArrayList<BindingAddress> bindingAddresses) {
 		this.bindingAddresses = bindingAddresses;
 	}
 	public Hashtable<String,FtpUserInfo> getFtpUserInfoList() {
