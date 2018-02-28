@@ -2,7 +2,6 @@ package com.admin.handler;
 
 import com.admin.Server;
 import com.admin.adminObj.AccessRightEntry;
-import com.admin.adminObj.BindingAddress;
 import com.admin.adminObj.FtpServerInfo;
 import com.admin.adminObj.FtpUserInfo;
 import com.ftp.FtpServer;
@@ -15,11 +14,10 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.apache.logging.log4j.Logger;
-import org.bouncycastle.util.encoders.Base64;
 
 
 @Sharable
@@ -125,40 +123,51 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	        			//ftpServerList.add(new FtpServer<T>("abc"));
 	        			actionResponse.setReturnObjects("ftpServerList",ftpServerList);
 	        			break;
+	        	case "GetUniqueId":
+	        			String uniqueId=Utility.getUniqueId();
+	        			actionResponse.setResponseCode(0);
+	        			actionResponse.setReturnObjects("uniqueId", uniqueId);
+	        			break;
 	        	case "GetInitialFtpServerInfo":
-	        			BindingAddress bindingAddress=new BindingAddress();
 	        			FtpServerInfo ftpServerInfo=new FtpServerInfo();
 	        			AccessRightEntry accessRightEntry=new AccessRightEntry();
 	        			FtpUserInfo ftpUserInfo =new FtpUserInfo();
 	        			ArrayList<String> localIpList=Utility.getAllLocalIp();
-	        			ArrayList<AccessRightEntry> accessRightEntries=new ArrayList<AccessRightEntry>();
-	        			ArrayList<FtpUserInfo> ftpUserInfoList=new ArrayList<FtpUserInfo>();
-	        			ArrayList<BindingAddress> bindingAddressList=new ArrayList<BindingAddress>();
+	        			Hashtable<String,FtpUserInfo> ftpUserInfoList=new Hashtable<String,FtpUserInfo>();
+	        			Hashtable<String,Boolean>bindingAddressList=new Hashtable<String,Boolean>();
+	        			Hashtable<String,AccessRightEntry> accessRightEntries=new Hashtable<String,AccessRightEntry>();
 	        			
-	        			accessRightEntry.setEntryId(Utility.getUniqueId());
-	        			accessRightEntries.add(accessRightEntry);
-	        			bindingAddress.setBound(true);
-	        			bindingAddress.setIpAddress("*");
-	        			bindingAddressList.add(bindingAddress);
-	        			
+	        			bindingAddressList.put("*",false);
 	        			for (String ipAddress : localIpList)
 	        			{
-	        				bindingAddress=new BindingAddress();
-		        			bindingAddress.setBound(false);
-		        			bindingAddress.setIpAddress(ipAddress);
-		        			bindingAddressList.add(bindingAddress);
+	        				bindingAddressList.put(ipAddress,false);
 	        			}
 	        			ftpUserInfo.setPassword("");
 	        			ftpUserInfo.setUserName("anonymous");
-	        			ftpUserInfoList.add(ftpUserInfo);
-	        			
+	        			accessRightEntry.setEntryId(Utility.getUniqueId());
+	        			accessRightEntries.put(accessRightEntry.getEntryId(),accessRightEntry);
 	        			ftpUserInfo.setAccessRightEntries(accessRightEntries);
+	        			ftpUserInfoList.put(ftpUserInfo.getUserId(),ftpUserInfo);
+
+	        			ftpUserInfo =new FtpUserInfo();
+	        			ftpUserInfo.setUserId(Utility.getUniqueId());
+	        			ftpUserInfo.setPassword("密碼");
+	        			ftpUserInfo.setUserName("陳大文");
+	        			accessRightEntries=new Hashtable<String,AccessRightEntry>();
+	        			accessRightEntries.put(accessRightEntry.getEntryId(),accessRightEntry);
+	        			accessRightEntry=new AccessRightEntry();
+	        			accessRightEntry.setPhysicalDir("C:\\");
+	        			accessRightEntry.setEntryId(Utility.getUniqueId());
+	        			accessRightEntries.put(accessRightEntry.getEntryId(),accessRightEntry);
+	        			ftpUserInfo.setAccessRightEntries(accessRightEntries);
+	        			ftpUserInfoList.put(ftpUserInfo.getUserId(),ftpUserInfo);
+	 
 	        			ftpServerInfo.setServerId(Utility.getUniqueId());
 	        			ftpServerInfo.setBindingAddresses(bindingAddressList);
 	        			ftpServerInfo.setFtpUserInfoList(ftpUserInfoList);
 	        			actionResponse.setResponseCode(0);
-	        			actionResponse.setReturnObjects("ftpServerInfo",ftpServerInfo);
-	        			//actionResponse.setReturnObjects("ftpServerInfo",accessRightEntry);
+	        			actionResponse.setReturnObjects("ftpServerInfo",ftpServerInfo);      			
+	        			
 	        			break;
 	        	/*		
 	        	case "GetBindingAccess":

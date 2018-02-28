@@ -1,12 +1,12 @@
 package com.admin.adminObj;
-import java.util.ArrayList;
+import java.util.Hashtable;
 public class FtpUserInfo 
 {
 	private String userId="0";
 	private String userName="";
 	private String password="";
 	private boolean enabled=false;
-	private ArrayList<AccessRightEntry>accessRightEntries=new ArrayList<AccessRightEntry>();
+	private Hashtable<String,AccessRightEntry>accessRightEntries=new Hashtable<String,AccessRightEntry>();
 	public String getUserId() {
 		return userId;
 	}
@@ -31,9 +31,9 @@ public class FtpUserInfo
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-	public ArrayList<AccessRightEntry> getAccessRightEntries() {
+	public Hashtable<String,AccessRightEntry> getAccessRightEntries() {
 		return accessRightEntries;
 	}
-	public void setAccessRightEntries(ArrayList<AccessRightEntry> accessRightEntries) {
+	public void setAccessRightEntries(Hashtable<String,AccessRightEntry> accessRightEntries) {
 		this.accessRightEntries = accessRightEntries;
 	}}
