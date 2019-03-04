@@ -64,16 +64,26 @@ public class Server
 	public AdminUserManager getAdminUserManager() 
 	{
 		return adminUserManager;
-	}	
+	}
+	/**
+	 * It return the message logger
+	 * @return message logger
+	 */
 	public Logger getLogger()
 	{
 		return logger;
 	}
+	/**
+	 * Start the server
+	 */
 	public void start()
 	{
 		if (st!=null)
 			st.start();
 	}
+	/**
+	 * Stop the server
+	 */
 	public void stop() throws Exception
 	{
 		if (st!=null)

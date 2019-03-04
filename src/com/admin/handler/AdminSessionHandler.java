@@ -90,6 +90,7 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
         }
         else
         {
+        	logger.debug(messageCoder.decode(requestString));
         	requestObj=new JSONObject(messageCoder.decode(requestString));
         	logger.debug("Request action:{}",requestObj.get("action"));
         	Response actionResponse=new Response();
