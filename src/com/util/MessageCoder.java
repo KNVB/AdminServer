@@ -34,14 +34,10 @@ public class MessageCoder
          
         SecureRandom secRandom = new SecureRandom() ;
         secRandom.nextBytes(iv);
-       // cipher = Cipher.getInstance("AES/CBC/NoPadding");
-	   // decipher = Cipher.getInstance("AES/CBC/NoPadding");
-        
-		
+      		
 		cipher = Cipher.getInstance("AES/CTR/NoPadding");
 		decipher = Cipher.getInstance("AES/CTR/NoPadding");
-		
-        
+		  
 		cipher.init(Cipher.ENCRYPT_MODE, aesKey,new IvParameterSpec(iv));
 		decipher.init(Cipher.DECRYPT_MODE, aesKey,new IvParameterSpec(iv));
 		ivText=Base64.getEncoder().encodeToString(iv);
