@@ -1,6 +1,9 @@
 package com.util;
+import com.admin.adminObj.FtpServerInfo;
 import com.ftp.FtpServer;
 import java.util.ArrayList;
+import java.util.TreeMap;
+
 import org.apache.logging.log4j.Logger;
 
 
@@ -14,9 +17,9 @@ public class FtpServerManager
 		this.dbo=dbo;
 		this.logger=logger;
 	}
-	public <T> ArrayList<FtpServer<T>> getAllServerList()
+	public TreeMap<String,FtpServerInfo>  getAllServerList()
 	{
-		ArrayList<FtpServer<T>> serverList=dbo.getAllServerList();
+		TreeMap<String,FtpServerInfo> serverList=dbo.getAllServerList();
 		return serverList;
 	}	
 }

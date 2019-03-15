@@ -1,6 +1,6 @@
 package com.admin.adminObj;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.TreeMap;
 public class FtpServerInfo 
 {
 	private int status=0;
@@ -10,7 +10,7 @@ public class FtpServerInfo
 	private String description="New Server";
 	private boolean passiveModeEnabled=false;
 	private ArrayList<BindingAddress> bindingAddresses=new ArrayList<BindingAddress>();
-	private Hashtable<String,FtpUserInfo> ftpUserInfoList=new Hashtable<String,FtpUserInfo>();
+	private TreeMap<String,FtpUserInfo> ftpUserInfoList=new TreeMap<String,FtpUserInfo>();
 	public int getStatus() {
 		return status;
 	}
@@ -53,10 +53,10 @@ public class FtpServerInfo
 	public void setBindingAddresses(ArrayList<BindingAddress> bindingAddresses) {
 		this.bindingAddresses = bindingAddresses;
 	}
-	public Hashtable<String,FtpUserInfo> getFtpUserInfoList() {
+	public TreeMap<String,FtpUserInfo> getFtpUserInfoList() {
 		return ftpUserInfoList;
 	}
-	public void setFtpUserInfoList(Hashtable<String,FtpUserInfo> ftpUserInfoList) {
+	public void setFtpUserInfoList(TreeMap<String,FtpUserInfo> ftpUserInfoList) {
 		this.ftpUserInfoList = ftpUserInfoList;
 	}
 }

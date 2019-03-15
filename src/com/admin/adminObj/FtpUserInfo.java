@@ -1,12 +1,12 @@
 package com.admin.adminObj;
-import java.util.Hashtable;
+import java.util.TreeMap;
 public class FtpUserInfo 
 {
 	private String userId="0";
 	private String userName="";
 	private String password="";
 	private boolean enabled=false;
-	private Hashtable<String,AccessRightEntry>accessRightEntries=new Hashtable<String,AccessRightEntry>();
+	private TreeMap<String,AccessRightEntry>accessRightEntries=new TreeMap<String,AccessRightEntry>();
 	public String getUserId() {
 		return userId;
 	}
@@ -31,9 +31,9 @@ public class FtpUserInfo
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-	public Hashtable<String,AccessRightEntry> getAccessRightEntries() {
+	public TreeMap<String,AccessRightEntry> getAccessRightEntries() {
 		return accessRightEntries;
 	}
-	public void setAccessRightEntries(Hashtable<String,AccessRightEntry> accessRightEntries) {
+	public void setAccessRightEntries(TreeMap<String,AccessRightEntry> accessRightEntries) {
 		this.accessRightEntries = accessRightEntries;
 	}}

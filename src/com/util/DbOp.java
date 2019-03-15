@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 
 import org.apache.logging.log4j.Logger;
 
+import com.admin.adminObj.FtpServerInfo;
 import com.ftp.FtpServer;
 
 //import com.myftpserver.server.FtpServer;
@@ -49,13 +50,12 @@ public class DbOp {
 		Class.forName(jdbcDriver);
 		dbConn = DriverManager.getConnection(jdbcURL);
 	}
-	public <T> ArrayList<FtpServer<T>> getAllServerList()
+	public TreeMap<String,FtpServerInfo> getAllServerList()
 	{
-		FtpServer<T> ftpServer; 
 		ResultSet rs = null;
 		PreparedStatement stmt=null;
 		String sql="select * from server";
-		ArrayList<FtpServer<T>> serverList=new ArrayList<FtpServer<T>>();
+		TreeMap<String,FtpServerInfo>  serverList=new TreeMap<String,FtpServerInfo>();
 		try 
 		{
 			stmt = dbConn.prepareStatement(sql);
@@ -63,8 +63,8 @@ public class DbOp {
 			rs=stmt.executeQuery();
 			while (rs.next())
 			{
-				ftpServer=new FtpServer<T>(rs.getString("config_json"));
-				serverList.add(ftpServer);
+				//rs.getString("config_json")
+				serverList.put(rs.getString("server_id"),new FtpServerInfo());
 			}
 		} 
 		catch (SQLException e) 

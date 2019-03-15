@@ -16,6 +16,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.TreeMap;
 
 import org.json.JSONObject;
 import org.apache.logging.log4j.Logger;
@@ -119,8 +120,8 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	        			actionResponse.setReturnObjects("userId",(String)requestObj.get("userId"));
 	        			actionResponse.setReturnObjects("accessRightId",(String)requestObj.get("accessRightId"));
 	        			break;
-	        	case "GetServerList":
-	        			ArrayList<FtpServer<T>> ftpServerList=ftpServerManager.getAllServerList();
+	        	case "GetFTPServerList":
+	        			TreeMap<String,FtpServerInfo>  ftpServerList=ftpServerManager.getAllServerList();
 	        			actionResponse.setResponseCode(0);
 	        			//ftpServerList.add(new FtpServer<T>("abc"));
 	        			actionResponse.setReturnObjects("ftpServerList",ftpServerList);
@@ -136,9 +137,9 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	        			AccessRightEntry accessRightEntry=new AccessRightEntry();
 	        			FtpUserInfo ftpUserInfo =new FtpUserInfo();
 	        			ArrayList<String> localIpList=Utility.getAllLocalIp();
-	        			Hashtable<String,FtpUserInfo> ftpUserInfoList=new Hashtable<String,FtpUserInfo>();
+	        			TreeMap<String,FtpUserInfo> ftpUserInfoList=new TreeMap<String,FtpUserInfo>();
 	        			ArrayList<BindingAddress>bindingAddressList=new ArrayList<BindingAddress>();
-	        			Hashtable<String,AccessRightEntry> accessRightEntries=new Hashtable<String,AccessRightEntry>();
+	        			TreeMap<String,AccessRightEntry> accessRightEntries=new TreeMap<String,AccessRightEntry>();
 	        			
 	        			bindingAddress.setBound(true);
 	        			bindingAddress.setIpAddress("*");
@@ -163,7 +164,7 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	        			ftpUserInfo.setUserId(Utility.getUniqueId());
 	        			ftpUserInfo.setPassword("密碼");
 	        			ftpUserInfo.setUserName("陳大文");
-	        			accessRightEntries=new Hashtable<String,AccessRightEntry>();
+	        			accessRightEntries=new TreeMap<String,AccessRightEntry>();
 	        			accessRightEntries.put(accessRightEntry.getEntryId(),accessRightEntry);
 	        			accessRightEntry=new AccessRightEntry();
 	        			accessRightEntry.setPhysicalDir("C:\\");
