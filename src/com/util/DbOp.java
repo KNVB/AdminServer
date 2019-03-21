@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 
 import org.apache.logging.log4j.Logger;
 
+import com.admin.adminObj.FtpAdminUserInfo;
 import com.admin.adminObj.FtpServerInfo;
 import com.ftp.FtpServer;
 
@@ -49,6 +50,38 @@ public class DbOp {
 		this.logger=logger;
 		Class.forName(jdbcDriver);
 		dbConn = DriverManager.getConnection(jdbcURL);
+	}
+	public TreeMap<String,FtpAdminUserInfo> getAdminUserList()
+	{
+		ResultSet rs = null;
+		PreparedStatement stmt=null;
+		FtpAdminUserInfo adminUserInfo;
+		String sql="select * from admin_user";
+		TreeMap<String,FtpAdminUserInfo>  adminUserList=new TreeMap<String,FtpAdminUserInfo>();
+		try 
+		{
+			stmt = dbConn.prepareStatement(sql);
+			stmt.setInt(1, 1);
+			rs=stmt.executeQuery();
+			while (rs.next()) 
+			{
+				adminUserInfo=new FtpAdminUserInfo();
+				adminUserInfo.setUserId(rs.getString("admin_id"));
+				adminUserInfo.setUserName(rs.getString("username"));
+				adminUserInfo.setPassword(rs.getString("password"));
+				adminUserInfo.setEnabled(rs.getBoolean("active"));
+				adminUserList.put(rs.getString("admin_id"), adminUserInfo);
+			}
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			releaseResource(rs, stmt);
+		}		
+		return adminUserList;
 	}
 	public TreeMap<String,FtpServerInfo> getAllServerList()
 	{

@@ -1,6 +1,10 @@
 package com.util;
 
+import java.util.TreeMap;
+
 import org.apache.logging.log4j.Logger;
+
+import com.admin.adminObj.FtpAdminUserInfo;
 
 public class AdminUserManager 
 {
@@ -14,5 +18,9 @@ public class AdminUserManager
 	public boolean login(String userName,String password)
 	{
 		return dbo.adminLogin(userName, password);
-	}	
+	}
+	public TreeMap<String,FtpAdminUserInfo> getAdminUserList()
+	{
+		return dbo.getAdminUserList();
+	}
 }

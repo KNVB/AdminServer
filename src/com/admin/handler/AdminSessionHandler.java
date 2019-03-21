@@ -3,6 +3,7 @@ package com.admin.handler;
 import com.admin.Server;
 import com.admin.adminObj.AccessRightEntry;
 import com.admin.adminObj.BindingAddress;
+import com.admin.adminObj.FtpAdminUserInfo;
 import com.admin.adminObj.FtpServerInfo;
 import com.admin.adminObj.FtpUserInfo;
 import com.ftp.FtpServer;
@@ -113,6 +114,11 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
         					actionResponse.setReturnMessage("Login failure");
     					}
     					break;
+	        	case "GetAdminUserList":
+	        		 	TreeMap<String,FtpAdminUserInfo>adminUserList=adminUserManager.getAdminUserList();
+	        		 	actionResponse.setResponseCode(0);
+	        		 	actionResponse.setReturnObjects("adminUserList",adminUserList);
+	        			break;
 	        	case "GetRemoteDir":
 	        			ArrayList<FileSystemObject> dirList=Utility.getSubFolderOnly((String)requestObj.get("physicalDir"));
 	        			actionResponse.setResponseCode(0);
