@@ -137,7 +137,7 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	        			actionResponse.setResponseCode(0);
 	        			actionResponse.setReturnObjects("uniqueId", uniqueId);
 	        			break;
-	        	case "GetInitialFtpServerInfo":
+	        	/*case "GetInitialFtpServerInfo":
 	        			BindingAddress bindingAddress=new BindingAddress();
 	        			FtpServerInfo ftpServerInfo=new FtpServerInfo();
 	        			AccessRightEntry accessRightEntry=new AccessRightEntry();
@@ -185,13 +185,13 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	        			actionResponse.setResponseCode(0);
 	        			actionResponse.setReturnObjects("ftpServerInfo",ftpServerInfo);      			
 	        			
-	        			break;
-	        	/*		
-	        	case "GetBindingAccess":
+	        			break;*/
+	
+	        	case "GetIPAddressList":
 	        			ArrayList<String> localIpList=Utility.getAllLocalIp();
 	        			actionResponse.setResponseCode(0);
-	        			actionResponse.setReturnObjects("bindingIpList",localIpList);
-	        			break;*/
+	        			actionResponse.setReturnObjects("ipAddressList",localIpList);
+	        			break;
         	}
         	responseString=(new JSONObject(actionResponse)).toString();
         	logger.debug("responseString={}",responseString);
