@@ -99,21 +99,12 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 			actionResponse.setAction((String)requestObj.get("action"));
         	switch ((String)requestObj.get("action"))
         	{
-	        	case "Login":
-    					String userName=(String)requestObj.get("userName");
-    					String password=(String)requestObj.get("password");
-    					logger.debug("user name={},password={}",userName,password);
-    					if (adminUserManager.login(userName, password))
-        				{
-        					actionResponse.setResponseCode(0);
-        					actionResponse.setReturnMessage("Login success");
-        				}
-    					else
-    					{
-        					actionResponse.setResponseCode(-1);
-        					actionResponse.setReturnMessage("Login failure");
-    					}
-    					break;
+        		case "AddFtpServer":
+        				JSONObject ftpServerObject=requestObj.getJSONObject("Objects").getJSONObject("ftpServerInfo");
+        				String ftpServerInfoString=ftpServerObject.toString();
+        				logger.debug(ftpServerInfoString);
+        				actionResponse.setResponseCode(0);
+        				break;
 	        	case "GetAdminUserList":
 	        		 	TreeMap<String,FtpAdminUserInfo>adminUserList=adminUserManager.getAdminUserList();
 	        		 	actionResponse.setResponseCode(0);
@@ -192,6 +183,21 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	        			actionResponse.setResponseCode(0);
 	        			actionResponse.setReturnObjects("ipAddressList",localIpList);
 	        			break;
+        		case "Login":
+    					String userName=(String)requestObj.get("userName");
+    					String password=(String)requestObj.get("password");
+    					logger.debug("user name={},password={}",userName,password);
+    					if (adminUserManager.login(userName, password))
+        				{
+        					actionResponse.setResponseCode(0);
+        					actionResponse.setReturnMessage("Login success");
+        				}
+    					else
+    					{
+        					actionResponse.setResponseCode(-1);
+        					actionResponse.setReturnMessage("Login failure");
+    					}
+    					break;
         	}
         	responseString=(new JSONObject(actionResponse)).toString();
         	logger.debug("responseString={}",responseString);
