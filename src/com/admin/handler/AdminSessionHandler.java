@@ -4,9 +4,11 @@ import com.admin.Server;
 import com.admin.adminObj.AccessRightEntry;
 import com.admin.adminObj.BindingAddress;
 import com.admin.adminObj.FtpAdminUserInfo;
-import com.admin.adminObj.FtpServerInfo;
-import com.admin.adminObj.FtpUserInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ftp.FtpServer;
+import com.ftp.FtpServerInfo;
+import com.ftp.FtpUserInfo;
 import com.util.*;
 
 import io.netty.channel.ChannelHandlerContext;
@@ -15,27 +17,36 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.TreeMap;
 
-import org.json.JSONObject;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 
 
 @Sharable
 public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocketFrame>
 {
 	private boolean isFirstConnect=true;
-	private JSONObject requestObj=null;
+	private boolean isLoginSuccess=false;
+	
 	private Logger logger=null;
+	private Login login=null;
 	private MessageCoder messageCoder;
 	private Server adminServer=null;
 	private String returnCoder=new String();
-	private String responseString,requestString;
-	
+	private String responseString,requestString,actionString;
+	private FtpServer ftpServer=null;  
 	private FtpServerManager ftpServerManager=null;  
 	private AdminUserManager adminUserManager=null;
+	private ObjectMapper objectMapper = new ObjectMapper();
+	private JSONObject requestObj;
+	private Response actionResponse;
 	public AdminSessionHandler(Server adminServer)
 	{
 		this.adminServer=adminServer;
@@ -92,117 +103,129 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
         }
         else
         {
-        	logger.debug(messageCoder.decode(requestString));
-        	requestObj=new JSONObject(messageCoder.decode(requestString));
-        	logger.debug("Request action:{}",requestObj.get("action"));
-        	Response actionResponse=new Response();
-			actionResponse.setAction((String)requestObj.get("action"));
-        	switch ((String)requestObj.get("action"))
+        	requestString=messageCoder.decode(requestString);
+        	logger.debug(requestString);
+        	requestObj=new JSONObject(requestString);
+    		
+    		Response actionResponse=new Response();
+        	if (isLoginSuccess)
         	{
-        		case "AddFtpServer":
-        				JSONObject ftpServerObject=requestObj.getJSONObject("Objects").getJSONObject("ftpServerInfo");
-        				String ftpServerInfoString=ftpServerObject.toString();
-        				logger.debug(ftpServerInfoString);
-        				actionResponse.setResponseCode(0);
-        				break;
-	        	case "GetAdminUserList":
-	        		 	TreeMap<String,FtpAdminUserInfo>adminUserList=adminUserManager.getAdminUserList();
-	        		 	actionResponse.setResponseCode(0);
-	        		 	actionResponse.setReturnObjects("adminUserList",adminUserList);
-	        			break;
-	        	case "GetRemoteDir":
-	        			ArrayList<FileSystemObject> dirList=Utility.getSubFolderOnly((String)requestObj.get("physicalDir"));
-	        			actionResponse.setResponseCode(0);
-	        			actionResponse.setReturnObjects("dirList",dirList);
-	        			actionResponse.setReturnObjects("userId",(String)requestObj.get("userId"));
-	        			actionResponse.setReturnObjects("accessRightId",(String)requestObj.get("accessRightId"));
-	        			break;
-	        	case "GetFTPServerList":
-	        			TreeMap<String,FtpServerInfo>  ftpServerList=ftpServerManager.getAllServerList();
-	        			actionResponse.setResponseCode(0);
-	        			//ftpServerList.add(new FtpServer<T>("abc"));
-	        			actionResponse.setReturnObjects("ftpServerList",ftpServerList);
-	        			break;
-	        	case "GetUniqueId":
-	        			String uniqueId=Utility.getUniqueId();
-	        			actionResponse.setResponseCode(0);
-	        			actionResponse.setReturnObjects("uniqueId", uniqueId);
-	        			break;
-	        	/*case "GetInitialFtpServerInfo":
-	        			BindingAddress bindingAddress=new BindingAddress();
-	        			FtpServerInfo ftpServerInfo=new FtpServerInfo();
-	        			AccessRightEntry accessRightEntry=new AccessRightEntry();
-	        			FtpUserInfo ftpUserInfo =new FtpUserInfo();
-	        			ArrayList<String> localIpList=Utility.getAllLocalIp();
-	        			TreeMap<String,FtpUserInfo> ftpUserInfoList=new TreeMap<String,FtpUserInfo>();
-	        			ArrayList<BindingAddress>bindingAddressList=new ArrayList<BindingAddress>();
-	        			TreeMap<String,AccessRightEntry> accessRightEntries=new TreeMap<String,AccessRightEntry>();
-	        			
-	        			bindingAddress.setBound(true);
-	        			bindingAddress.setIpAddress("*");
-	        			bindingAddressList.add(bindingAddress);
-	        			
-	        			for (String ipAddress : localIpList)
-	        			{
-	        				bindingAddress=new BindingAddress();
-		        			bindingAddress.setBound(false);
-		        			bindingAddress.setIpAddress(ipAddress);
+        		actionString=(String)requestObj.get("action");
+        		actionResponse.setAction(actionString);
+        		switch (actionString)
+        		{
+        			case "AddFtpServer":
+        					JSONObject ftpServerObject=requestObj.getJSONObject("ObjectMap").getJSONObject("ftpServerInfo");
+        					String ftpServerInfoString=ftpServerObject.toString();
+        				
+							logger.debug(ftpServerInfoString);
+							ftpServer=objectMapper.readValue(ftpServerInfoString, FtpServer.class);
+							ftpServer.setServerId(Utility.getUniqueId());
+							actionResponse.setResponseCode(ftpServerManager.addFtpServer(ftpServer));
+							actionResponse.setReturnObjects("ftpServerId",ftpServer.getServerId());
+							break;
+					case "GetAdminUserList":
+							TreeMap<String,FtpAdminUserInfo>adminUserList=adminUserManager.getAdminUserList();
+							actionResponse.setResponseCode(0);
+							actionResponse.setReturnObjects("adminUserList",adminUserList);
+							break;
+					case "GetRemoteDir":
+							ArrayList<FileSystemObject> dirList=Utility.getSubFolderOnly((String)requestObj.get("physicalDir"));
+							actionResponse.setResponseCode(0);
+							actionResponse.setReturnObjects("dirList",dirList);
+							actionResponse.setReturnObjects("userId",(String)requestObj.get("userId"));
+							actionResponse.setReturnObjects("accessRightId",(String)requestObj.get("userId"));
+							break;
+					case "GetFTPServerList":
+							TreeMap<String,FtpServerInfo>  ftpServerList=ftpServerManager.getAllServerList();
+							actionResponse.setResponseCode(0);
+							//ftpServerList.add(new FtpServer<T>("abc"));
+							actionResponse.setReturnObjects("ftpServerList",ftpServerList);
+							break;
+					case "GetUniqueId":
+							String uniqueId=Utility.getUniqueId();
+							actionResponse.setResponseCode(0);
+							actionResponse.setReturnObjects("uniqueId", uniqueId);
+							break;
+					/*
+					 case "GetInitialFtpServerInfo":
+		        			BindingAddress bindingAddress=new BindingAddress();
+		        			FtpServerInfo ftpServerInfo=new FtpServerInfo();
+		        			AccessRightEntry accessRightEntry=new AccessRightEntry();
+		        			FtpUserInfo ftpUserInfo =new FtpUserInfo();
+		        			ArrayList<String> localIpList=Utility.getAllLocalIp();
+		        			TreeMap<String,FtpUserInfo> ftpUserInfoList=new TreeMap<String,FtpUserInfo>();
+		        			ArrayList<BindingAddress>bindingAddressList=new ArrayList<BindingAddress>();
+		        			TreeMap<String,AccessRightEntry> accessRightEntries=new TreeMap<String,AccessRightEntry>();
+		        			
+		        			bindingAddress.setBound(true);
+		        			bindingAddress.setIpAddress("*");
 		        			bindingAddressList.add(bindingAddress);
-	        			}
-	        			
-	        			ftpUserInfo.setPassword("");
-	        			ftpUserInfo.setUserName("anonymous");
-	        			//accessRightEntry.setEntryId(Utility.getUniqueId());
-	        			accessRightEntries.put(accessRightEntry.getEntryId(),accessRightEntry);
-	        			ftpUserInfo.setAccessRightEntries(accessRightEntries);
-	        			ftpUserInfoList.put(ftpUserInfo.getUserId(),ftpUserInfo);
-
-	        			ftpUserInfo =new FtpUserInfo();
-	        			ftpUserInfo.setUserId(Utility.getUniqueId());
-	        			ftpUserInfo.setPassword("密碼");
-	        			ftpUserInfo.setUserName("陳大文");
-	        			accessRightEntries=new TreeMap<String,AccessRightEntry>();
-	        			accessRightEntries.put(accessRightEntry.getEntryId(),accessRightEntry);
-	        			accessRightEntry=new AccessRightEntry();
-	        			accessRightEntry.setPhysicalDir("C:\\");
-	        			accessRightEntry.setEntryId(Utility.getUniqueId());
-	        			accessRightEntries.put(accessRightEntry.getEntryId(),accessRightEntry);
-	        			ftpUserInfo.setAccessRightEntries(accessRightEntries);
-	        			ftpUserInfoList.put(ftpUserInfo.getUserId(),ftpUserInfo);
-	 
-	        			ftpServerInfo.setServerId(Utility.getUniqueId());
-	        			ftpServerInfo.setBindingAddresses(bindingAddressList);
-	        			ftpServerInfo.setFtpUserInfoList(ftpUserInfoList);
-	        			actionResponse.setResponseCode(0);
-	        			actionResponse.setReturnObjects("ftpServerInfo",ftpServerInfo);      			
-	        			
-	        			break;*/
-	
-	        	case "GetIPAddressList":
-	        			ArrayList<String> localIpList=Utility.getAllLocalIp();
-	        			actionResponse.setResponseCode(0);
-	        			actionResponse.setReturnObjects("ipAddressList",localIpList);
-	        			break;
-        		case "Login":
-    					String userName=(String)requestObj.get("userName");
-    					String password=(String)requestObj.get("password");
-    					logger.debug("user name={},password={}",userName,password);
-    					if (adminUserManager.login(userName, password))
-        				{
-        					actionResponse.setResponseCode(0);
-        					actionResponse.setReturnMessage("Login success");
-        				}
-    					else
-    					{
-        					actionResponse.setResponseCode(-1);
-        					actionResponse.setReturnMessage("Login failure");
-    					}
-    					break;
+		        			
+		        			for (String ipAddress : localIpList)
+		        			{
+		        				bindingAddress=new BindingAddress();
+			        			bindingAddress.setBound(false);
+			        			bindingAddress.setIpAddress(ipAddress);
+			        			bindingAddressList.add(bindingAddress);
+		        			}
+		        			
+		        			ftpUserInfo.setPassword("");
+		        			ftpUserInfo.setUserName("anonymous");
+		        			//accessRightEntry.setEntryId(Utility.getUniqueId());
+		        			accessRightEntries.put(accessRightEntry.getEntryId(),accessRightEntry);
+		        			ftpUserInfo.setAccessRightEntries(accessRightEntries);
+		        			ftpUserInfoList.put(ftpUserInfo.getUserId(),ftpUserInfo);
+		
+		        			ftpUserInfo =new FtpUserInfo();
+		        			ftpUserInfo.setUserId(Utility.getUniqueId());
+		        			ftpUserInfo.setPassword("密碼");
+		        			ftpUserInfo.setUserName("陳大文");
+		        			accessRightEntries=new TreeMap<String,AccessRightEntry>();
+		        			accessRightEntries.put(accessRightEntry.getEntryId(),accessRightEntry);
+		        			accessRightEntry=new AccessRightEntry();
+		        			accessRightEntry.setPhysicalDir("C:\\");
+		        			accessRightEntry.setEntryId(Utility.getUniqueId());
+		        			accessRightEntries.put(accessRightEntry.getEntryId(),accessRightEntry);
+		        			ftpUserInfo.setAccessRightEntries(accessRightEntries);
+		        			ftpUserInfoList.put(ftpUserInfo.getUserId(),ftpUserInfo);
+		 
+		        			ftpServerInfo.setServerId(Utility.getUniqueId());
+		        			ftpServerInfo.setBindingAddresses(bindingAddressList);
+		        			ftpServerInfo.setFtpUserInfoList(ftpUserInfoList);
+		        			actionResponse.setResponseCode(0);
+		        			actionResponse.setReturnObjects("ftpServerInfo",ftpServerInfo);      			
+		        			
+		        			break;*/
+					
+					case "GetIPAddressList":
+							ArrayList<String> localIpList=Utility.getAllLocalIp();
+							actionResponse.setResponseCode(0);
+							actionResponse.setReturnObjects("ipAddressList",localIpList);
+							break;        		
+				}
+				sendResponse(ctx,actionResponse);
         	}
-        	responseString=(new JSONObject(actionResponse)).toString();
-        	logger.debug("responseString={}",responseString);
-        	responseString=messageCoder.encode(responseString);        	
-        	ctx.channel().writeAndFlush(new TextWebSocketFrame(responseString));
+        	else
+        	{
+        		login=objectMapper.readValue(requestString, Login.class);
+        		logger.debug("user name={},password={}",login.userName,login.password);
+        		boolean loginSuccess=adminUserManager.login(login.userName, login.password);
+				if (loginSuccess)
+				{
+					isLoginSuccess=true;
+					actionResponse.setResponseCode(0);
+					actionResponse.setReturnMessage("Login success");
+					sendResponse(ctx,actionResponse);
+				}
+				else
+				{
+					actionResponse.setResponseCode(-1);
+					actionResponse.setReturnMessage("Login failure");
+					sendResponse(ctx,actionResponse);
+					ctx.close();
+				}
+        	}
         }
 	}
 	@Override
@@ -211,4 +234,11 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
         cause.printStackTrace();
         ctx.close();
     }
+	private void sendResponse(ChannelHandlerContext ctx,Response actionResponse) throws IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException, JsonProcessingException
+	{
+		responseString=objectMapper.writeValueAsString(actionResponse);
+    	logger.debug("responseString={}",responseString);
+    	responseString=messageCoder.encode(responseString);        	
+    	ctx.channel().writeAndFlush(new TextWebSocketFrame(responseString));
+	}
 }

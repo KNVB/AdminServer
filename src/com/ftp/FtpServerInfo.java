@@ -1,15 +1,15 @@
-package com.admin.adminObj;
+package com.ftp;
 import java.util.ArrayList;
 import java.util.TreeMap;
 public class FtpServerInfo 
 {
-	private int status=0;
+	private int status=FtpServerStatus.DISABLE;
 	private int controlPort=21;
 	private String serverId="";
 	private String passiveModePortRange="";
 	private String description="New Server";
 	private boolean passiveModeEnabled=false;
-	private ArrayList<BindingAddress> bindingAddresses=new ArrayList<BindingAddress>();
+	private ArrayList<String> bindingAddresses=new ArrayList<String>();
 	private TreeMap<String,FtpUserInfo> ftpUserInfoList=new TreeMap<String,FtpUserInfo>();
 	public int getStatus() {
 		return status;
@@ -47,10 +47,10 @@ public class FtpServerInfo
 	public void setPassiveModeEnabled(boolean passiveModeEnabled) {
 		this.passiveModeEnabled = passiveModeEnabled;
 	}
-	public ArrayList<BindingAddress> getBindingAddresses() {
+	public ArrayList<String> getBindingAddresses() {
 		return bindingAddresses;
 	}
-	public void setBindingAddresses(ArrayList<BindingAddress> bindingAddresses) {
+	public void setBindingAddresses(ArrayList<String> bindingAddresses) {
 		this.bindingAddresses = bindingAddresses;
 	}
 	public TreeMap<String,FtpUserInfo> getFtpUserInfoList() {

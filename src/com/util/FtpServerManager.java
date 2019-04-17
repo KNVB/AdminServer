@@ -1,6 +1,8 @@
 package com.util;
-import com.admin.adminObj.FtpServerInfo;
 import com.ftp.FtpServer;
+import com.ftp.FtpServerInfo;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -16,6 +18,19 @@ public class FtpServerManager
 	{
 		this.dbo=dbo;
 		this.logger=logger;
+	}
+	public <T> int addFtpServer(FtpServer<T> ftpServer)
+	{
+		int result=-1;
+		try 
+		{
+			result = dbo.addFtpServer(ftpServer);
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+		return result;
 	}
 	public TreeMap<String,FtpServerInfo>  getAllServerList()
 	{

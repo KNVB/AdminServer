@@ -1,6 +1,7 @@
 package com.util;
 import java.util.*;
 import java.sql.ResultSet;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.DriverManager;
@@ -9,8 +10,8 @@ import java.sql.PreparedStatement;
 import org.apache.logging.log4j.Logger;
 
 import com.admin.adminObj.FtpAdminUserInfo;
-import com.admin.adminObj.FtpServerInfo;
 import com.ftp.FtpServer;
+import com.ftp.FtpServerInfo;
 
 //import com.myftpserver.server.FtpServer;
 /*
@@ -50,6 +51,36 @@ public class DbOp {
 		this.logger=logger;
 		Class.forName(jdbcDriver);
 		dbConn = DriverManager.getConnection(jdbcURL);
+	}
+	public <T>int addFtpServer(FtpServer<T> ftpServer) throws SQLException
+	{
+		int result=0;
+		ResultSet rs = null;
+		PreparedStatement stmt=null;
+		logger.debug(ftpServer.getBindingAddresses().toString());
+		String sql="select * from server_binding where binding_address in (?) ";
+		
+		String addressList=new String();
+		for (String address : ftpServer.getBindingAddresses())
+		{
+			addressList+="'"+address+"',";
+		}
+		addressList=addressList.substring(0, addressList.length()-1);
+		try
+		{
+			stmt = dbConn.prepareStatement(sql);
+			stmt.setString(1,addressList);
+			rs=stmt.executeQuery();
+		}
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			releaseResource(rs, stmt);
+		}		
+		return result;
 	}
 	public TreeMap<String,FtpAdminUserInfo> getAdminUserList()
 	{

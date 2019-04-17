@@ -1,5 +1,7 @@
-package com.admin.adminObj;
+package com.ftp;
 import java.util.TreeMap;
+
+import com.admin.adminObj.AccessRightEntry;
 public class FtpUserInfo 
 {
 	private String userId="0";

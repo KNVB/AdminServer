@@ -32,15 +32,14 @@ import com.util.ServerTemplate;
  * @param <T>
  *
  */
-public class FtpServer<T>
+public class FtpServer<T>extends FtpServerInfo
 {
 	private DbOp dbo=null;
-	private int port;
 	private ServerTemplate<T> st=null;
 	private static Logger logger=null;
-	private String description=null;
+
 	
-	public FtpServer(String jsonString) 
+	/*public FtpServer(String jsonString) 
 	{
 		description=jsonString;
 		/*try {
@@ -54,12 +53,6 @@ public class FtpServer<T>
 		catch (Exception e) 
 		{
 			e.printStackTrace();
-		}*/
-	}
-	public int getPort() {
-		return port;
-	}
-	public String getDescription() {
-		return description;
-	}
+		}
+	}*/
 }
