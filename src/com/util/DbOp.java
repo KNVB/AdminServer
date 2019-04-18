@@ -54,11 +54,11 @@ public class DbOp {
 	}
 	public <T>int addFtpServer(FtpServer<T> ftpServer) throws SQLException
 	{
-		int result=0;
+		int result=-1;
 		ResultSet rs = null;
 		PreparedStatement stmt=null;
 		logger.debug(ftpServer.getBindingAddresses().toString());
-		String sql="select * from server_binding where binding_address in (?) ";
+		String sql="select * from server_binding where binding_address in ";
 		
 		String addressList=new String();
 		for (String address : ftpServer.getBindingAddresses())
@@ -66,11 +66,42 @@ public class DbOp {
 			addressList+="'"+address+"',";
 		}
 		addressList=addressList.substring(0, addressList.length()-1);
+		sql+="("+addressList+") and control_port=?";
+		logger.debug(sql);
 		try
 		{
 			stmt = dbConn.prepareStatement(sql);
-			stmt.setString(1,addressList);
+			stmt.setInt(1,ftpServer.getControlPort());					
 			rs=stmt.executeQuery();
+			if (rs.next())
+			{
+				result=1; //Some a ftp server bind the specified address and port already.
+			}
+			else
+			{
+				rs.close();
+				stmt.close();
+				dbConn.setAutoCommit(false);
+				sql="insert into server (server_id,status,description) values ( ?,?,?)";
+				stmt = dbConn.prepareStatement(sql);
+				stmt.setString(1, ftpServer.getServerId());
+				stmt.setInt(2,ftpServer.getStatus());
+				stmt.setString(3, ftpServer.getDescription());
+				stmt.executeUpdate();
+				sql="insert into server_binding (server_id,binding_address,control_port) values (?,?,?)";
+				for (String address : ftpServer.getBindingAddresses())
+				{
+					stmt.close();
+					stmt = dbConn.prepareStatement(sql);
+					stmt.setString(1, ftpServer.getServerId());
+					stmt.setString(2, address);
+					stmt.setInt(3,ftpServer.getControlPort());
+					stmt.executeUpdate();
+				}				
+				dbConn.commit();
+				dbConn.setAutoCommit(true);
+				result=0;//The specified address and port is available.
+			}
 		}
 		catch (SQLException e) 
 		{
