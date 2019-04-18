@@ -149,17 +149,40 @@ public class DbOp {
 	{
 		ResultSet rs = null;
 		PreparedStatement stmt=null;
-		String sql="select * from server";
+		String preServerId=new String();
+		String sql="select * from server a inner join server_binding b on a.server_id=b.server_id ";
+		FtpServerInfo ftpServerInfo=null;
+		ArrayList<String>addressList=null; 
 		TreeMap<String,FtpServerInfo>  serverList=new TreeMap<String,FtpServerInfo>();
 		try 
 		{
 			stmt = dbConn.prepareStatement(sql);
-			//stmt.setInt(1, 1);
 			rs=stmt.executeQuery();
 			while (rs.next())
 			{
 				//rs.getString("config_json")
-				serverList.put(rs.getString("server_id"),new FtpServerInfo());
+				
+				if (!preServerId.equals(rs.getString("server_id")))
+				{	
+					if (ftpServerInfo!=null)
+					{	
+						ftpServerInfo.setBindingAddresses(addressList);
+						serverList.put(rs.getString("server_id"),ftpServerInfo);
+					}
+					ftpServerInfo=new FtpServerInfo();
+					ftpServerInfo.setServerId(rs.getString("server_id"));
+					ftpServerInfo.setControlPort(rs.getInt("control_port"));
+					ftpServerInfo.setStatus(rs.getInt("status"));
+					ftpServerInfo.setDescription(rs.getString("description"));
+					preServerId=rs.getString("server_id");
+					addressList=new ArrayList<String>();
+				}
+				addressList.add(rs.getString("binding_address"));
+			}
+			if ((addressList!=null) && (addressList.size()>0))
+			{
+				ftpServerInfo.setBindingAddresses(addressList);
+				serverList.put(ftpServerInfo.getServerId(),ftpServerInfo);
 			}
 		} 
 		catch (SQLException e) 
