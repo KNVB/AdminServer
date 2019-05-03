@@ -3,12 +3,8 @@ import com.ftp.FtpServer;
 import com.ftp.FtpServerInfo;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.TreeMap;
-
 import org.apache.logging.log4j.Logger;
-
-
 
 public class FtpServerManager 
 {
@@ -36,5 +32,10 @@ public class FtpServerManager
 	{
 		TreeMap<String,FtpServerInfo> serverList=dbo.getAllServerList();
 		return serverList;
-	}	
+	}
+	public FtpServerInfo getFtpServerInfo(String serverId)
+	{
+		FtpServerInfo ftpServerInfo=dbo.getFtpServerInfo(serverId);
+		return ftpServerInfo;
+	}
 }

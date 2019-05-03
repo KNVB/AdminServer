@@ -136,6 +136,20 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 							actionResponse.setReturnObjects("userId",(String)requestObj.get("userId"));
 							actionResponse.setReturnObjects("accessRightId",(String)requestObj.get("userId"));
 							break;
+					case "GetFTPServerInfo":
+							String serverId=requestObj.getJSONObject("ObjectMap").getString("serverId");
+							FtpServerInfo ftpServerInfo=ftpServerManager.getFtpServerInfo(serverId);
+							if (ftpServerInfo==null)
+							{	
+								actionResponse.setResponseCode(-1);
+								actionResponse.setReturnObjects("ftpServerInfo",null);
+							}
+							else
+							{	
+								actionResponse.setResponseCode(0);
+								actionResponse.setReturnObjects("ftpServerInfo",ftpServerInfo);
+							}
+							break;
 					case "GetFTPServerList":
 							TreeMap<String,FtpServerInfo>  ftpServerList=ftpServerManager.getAllServerList();
 							actionResponse.setResponseCode(0);

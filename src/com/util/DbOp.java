@@ -1,12 +1,12 @@
 package com.util;
 import java.util.*;
 import java.sql.ResultSet;
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.admin.adminObj.FtpAdminUserInfo;
@@ -57,20 +57,32 @@ public class DbOp {
 		int result=-1;
 		ResultSet rs = null;
 		PreparedStatement stmt=null;
+		boolean hasWildCardAddress=false;
 		logger.debug(ftpServer.getBindingAddresses().toString());
-		String sql="select * from server_binding where binding_address in ";
+		String sql="select * from server inner join server_binding on server.control_port=? and server.server_id = server_binding.server_id ";
 		
 		String addressList=new String();
 		for (String address : ftpServer.getBindingAddresses())
 		{
-			addressList+="'"+address+"',";
+			if (address.equals("*"))
+			{	
+				hasWildCardAddress=true;
+				break;
+			}
+			else
+				addressList+="'"+address+"',";
 		}
-		addressList=addressList.substring(0, addressList.length()-1);
-		sql+="("+addressList+") and control_port=?";
+		
+		if (!hasWildCardAddress)
+		{
+			addressList=addressList.substring(0, addressList.length()-1);
+			sql+=" and server_binding.binding_address in("+addressList+")";
+		}
 		logger.debug(sql);
 		try
 		{
 			stmt = dbConn.prepareStatement(sql);
+			logger.debug("Requested control port "+ftpServer.getControlPort());	
 			stmt.setInt(1,ftpServer.getControlPort());					
 			rs=stmt.executeQuery();
 			if (rs.next())
@@ -82,20 +94,20 @@ public class DbOp {
 				rs.close();
 				stmt.close();
 				dbConn.setAutoCommit(false);
-				sql="insert into server (server_id,status,description) values ( ?,?,?)";
+				sql="insert into server (server_id,status,description,control_port) values (?,?,?,?)";
 				stmt = dbConn.prepareStatement(sql);
 				stmt.setString(1, ftpServer.getServerId());
 				stmt.setInt(2,ftpServer.getStatus());
 				stmt.setString(3, ftpServer.getDescription());
+				stmt.setInt(4,ftpServer.getControlPort());
 				stmt.executeUpdate();
-				sql="insert into server_binding (server_id,binding_address,control_port) values (?,?,?)";
+				sql="insert into server_binding (server_id,binding_address) values (?,?)";
 				for (String address : ftpServer.getBindingAddresses())
 				{
 					stmt.close();
 					stmt = dbConn.prepareStatement(sql);
 					stmt.setString(1, ftpServer.getServerId());
 					stmt.setString(2, address);
-					stmt.setInt(3,ftpServer.getControlPort());
 					stmt.executeUpdate();
 				}				
 				dbConn.commit();
@@ -112,6 +124,40 @@ public class DbOp {
 			releaseResource(rs, stmt);
 		}		
 		return result;
+	}
+	public boolean adminLogin(String userName, String password) 
+	{
+		boolean loginResult=false;
+		ResultSet rs = null;
+		PreparedStatement stmt=null;
+		String sql="select * from admin_user where username=? and password=? and active=?";
+		try 
+		{
+			stmt = dbConn.prepareStatement(sql);
+			stmt.setString(1, userName);
+			stmt.setString(2, password);
+			stmt.setInt(3, 1);
+			rs=stmt.executeQuery();
+			if (rs.next()) 
+			{
+				loginResult=true;
+				logger.debug("Login success");
+			}
+			else
+			{
+				logger.debug("Login Failure");				
+			}			
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			releaseResource(rs, stmt);
+		}		
+		return loginResult;
+		
 	}
 	public TreeMap<String,FtpAdminUserInfo> getAdminUserList()
 	{
@@ -150,7 +196,7 @@ public class DbOp {
 		ResultSet rs = null;
 		PreparedStatement stmt=null;
 		String preServerId=new String();
-		String sql="select * from server a inner join server_binding b on a.server_id=b.server_id ";
+		String sql="select * from server a inner join server_binding b on a.server_id=b.server_id order by a.server_id";
 		FtpServerInfo ftpServerInfo=null;
 		ArrayList<String>addressList=null; 
 		TreeMap<String,FtpServerInfo>  serverList=new TreeMap<String,FtpServerInfo>();
@@ -167,7 +213,7 @@ public class DbOp {
 					if (ftpServerInfo!=null)
 					{	
 						ftpServerInfo.setBindingAddresses(addressList);
-						serverList.put(rs.getString("server_id"),ftpServerInfo);
+						serverList.put(ftpServerInfo.getServerId(),ftpServerInfo);
 					}
 					ftpServerInfo=new FtpServerInfo();
 					ftpServerInfo.setServerId(rs.getString("server_id"));
@@ -184,6 +230,7 @@ public class DbOp {
 				ftpServerInfo.setBindingAddresses(addressList);
 				serverList.put(ftpServerInfo.getServerId(),ftpServerInfo);
 			}
+			logger.debug("No. of FTP server :"+serverList.size());
 		} 
 		catch (SQLException e) 
 		{
@@ -195,29 +242,35 @@ public class DbOp {
 		}		
 		return serverList;
 	}
-	public boolean adminLogin(String userName, String password) 
+	
+	public FtpServerInfo getFtpServerInfo(String serverId)
 	{
-		boolean loginResult=false;
 		ResultSet rs = null;
 		PreparedStatement stmt=null;
-		String sql="select * from admin_user where username=? and password=? and active=?";
+		String sql="select * from server a inner join server_binding b on a.server_id=? and a.server_id=b.server_id order by a.server_id";
+		FtpServerInfo ftpServerInfo=null;
+		ArrayList<String>addressList=null;
 		try 
 		{
 			stmt = dbConn.prepareStatement(sql);
-			stmt.setString(1, userName);
-			stmt.setString(2, password);
-			stmt.setInt(3, 1);
+			stmt.setString(1, serverId);
 			rs=stmt.executeQuery();
-			if (rs.next()) 
+			if (rs.next())
 			{
-				loginResult=true;
-				logger.debug("Login success");
+				ftpServerInfo=new FtpServerInfo();
+				ftpServerInfo.setServerId(rs.getString("server_id"));
+				ftpServerInfo.setControlPort(rs.getInt("control_port"));
+				ftpServerInfo.setStatus(rs.getInt("status"));
+				ftpServerInfo.setDescription(rs.getString("description"));
+				addressList=new ArrayList<String>();
+				addressList.add(rs.getString("binding_address"));
+				while (rs.next())
+				{
+					addressList.add(rs.getString("binding_address"));
+				}
+				ftpServerInfo.setBindingAddresses(addressList);
 			}
-			else
-			{
-				logger.debug("Login Failure");				
-			}			
-		} 
+		}
 		catch (SQLException e) 
 		{
 			e.printStackTrace();
@@ -226,8 +279,7 @@ public class DbOp {
 		{
 			releaseResource(rs, stmt);
 		}		
-		return loginResult;
-		
+		return ftpServerInfo;
 	}
 	/**
 	 * Close db connection
@@ -269,5 +321,18 @@ public class DbOp {
 		}
 		r = null;
 		s = null;
-	}		
+	}
+	public static void main(String[] args) 
+	{
+		Logger  logger = LogManager.getLogger(DbOp.class.getName());
+		try {
+			DbOp dbo=new DbOp(logger);
+			FtpServerInfo ftpServerList=dbo.getFtpServerInfo("26ffae4a-e89e-409d-94fa-80060564305c");
+			System.out.println(ftpServerList.getBindingAddresses().size());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 }
