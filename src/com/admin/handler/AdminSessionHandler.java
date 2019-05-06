@@ -41,7 +41,7 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	private Server adminServer=null;
 	private String returnCoder=new String();
 	private String responseString,requestString,actionString;
-	private FtpServer ftpServer=null;  
+	private FtpServer<T>ftpServer=null;  
 	private FtpServerManager ftpServerManager=null;  
 	private AdminUserManager adminUserManager=null;
 	private ObjectMapper objectMapper = new ObjectMapper();

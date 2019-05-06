@@ -94,12 +94,22 @@ public class DbOp {
 				rs.close();
 				stmt.close();
 				dbConn.setAutoCommit(false);
-				sql="insert into server (server_id,status,description,control_port) values (?,?,?,?)";
+				sql="insert into server (server_id,status,description,control_port,support_passive_mode,passive_mode_port_range) values (?,?,?,?,?,?)";
 				stmt = dbConn.prepareStatement(sql);
 				stmt.setString(1, ftpServer.getServerId());
 				stmt.setInt(2,ftpServer.getStatus());
 				stmt.setString(3, ftpServer.getDescription());
 				stmt.setInt(4,ftpServer.getControlPort());
+				if (ftpServer.isPassiveModeEnabled())
+				{	
+					stmt.setInt(5,1);
+					stmt.setString(6,ftpServer.getPassiveModePortRange());
+				}
+				else
+				{	
+					stmt.setInt(5,0);
+					stmt.setString(6,null);
+				}
 				stmt.executeUpdate();
 				sql="insert into server_binding (server_id,binding_address) values (?,?)";
 				for (String address : ftpServer.getBindingAddresses())
@@ -216,10 +226,21 @@ public class DbOp {
 						serverList.put(ftpServerInfo.getServerId(),ftpServerInfo);
 					}
 					ftpServerInfo=new FtpServerInfo();
+				
 					ftpServerInfo.setServerId(rs.getString("server_id"));
 					ftpServerInfo.setControlPort(rs.getInt("control_port"));
 					ftpServerInfo.setStatus(rs.getInt("status"));
 					ftpServerInfo.setDescription(rs.getString("description"));
+					if (rs.getInt("support_passive_mode")==1)
+					{	
+						ftpServerInfo.setPassiveModeEnabled(true);
+						ftpServerInfo.setPassiveModePortRange(rs.getString("passive_mode_port_range"));
+					}
+					else
+					{	
+						ftpServerInfo.setPassiveModeEnabled(false);
+						ftpServerInfo.setPassiveModePortRange(null);
+					}
 					preServerId=rs.getString("server_id");
 					addressList=new ArrayList<String>();
 				}
@@ -262,6 +283,16 @@ public class DbOp {
 				ftpServerInfo.setControlPort(rs.getInt("control_port"));
 				ftpServerInfo.setStatus(rs.getInt("status"));
 				ftpServerInfo.setDescription(rs.getString("description"));
+				if (rs.getInt("support_passive_mode")==1)
+				{	
+					ftpServerInfo.setPassiveModeEnabled(true);
+					ftpServerInfo.setPassiveModePortRange(rs.getString("passive_mode_port_range"));
+				}
+				else
+				{	
+					ftpServerInfo.setPassiveModeEnabled(false);
+					ftpServerInfo.setPassiveModePortRange(null);
+				}
 				addressList=new ArrayList<String>();
 				addressList.add(rs.getString("binding_address"));
 				while (rs.next())
@@ -269,6 +300,7 @@ public class DbOp {
 					addressList.add(rs.getString("binding_address"));
 				}
 				ftpServerInfo.setBindingAddresses(addressList);
+				
 			}
 		}
 		catch (SQLException e) 
