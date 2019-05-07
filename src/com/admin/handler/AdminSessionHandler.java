@@ -230,6 +230,7 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 					isLoginSuccess=true;
 					actionResponse.setResponseCode(0);
 					actionResponse.setReturnMessage("Login success");
+					actionResponse.setReturnObjects("ftpServerList",ftpServerManager.getAllServerList());
 					sendResponse(ctx,actionResponse);
 				}
 				else
