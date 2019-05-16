@@ -28,6 +28,19 @@ public class FtpServerManager
 		}
 		return result;
 	}
+	public int delFtpServer(String ftpServerId)
+	{
+		int result=-1;
+		try 
+		{
+			result = dbo.delFtpServer(ftpServerId);
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+		return result;
+	}
 	public <T> int updateFtpServerInfo(FtpServer<T> ftpServer)
 	{
 		int result=-1;

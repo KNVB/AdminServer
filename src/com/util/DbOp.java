@@ -79,6 +79,7 @@ public class DbOp {
 			sql+=" and server_binding.binding_address in("+addressList+")";
 		}
 		logger.debug(sql);
+	
 		try
 		{
 			stmt = dbConn.prepareStatement(sql);
@@ -168,6 +169,53 @@ public class DbOp {
 		}		
 		return loginResult;
 		
+	}
+	public int delFtpServer(String ftpServerId)throws SQLException
+	{
+		int result=-1;
+		ResultSet rs = null;
+		PreparedStatement stmt=null;
+		String sql="select * from server where server.server_id=?";
+		try
+		{
+			stmt = dbConn.prepareStatement(sql);
+			stmt.setString(1, ftpServerId);
+			rs=stmt.executeQuery();
+			if (rs.next())
+			{
+				rs.close();
+				stmt.close();
+				dbConn.setAutoCommit(false);
+				sql="delete from server_binding where server_id=?";
+				stmt = dbConn.prepareStatement(sql);
+				stmt.setString(1, ftpServerId);
+				stmt.executeUpdate();
+				stmt.close();
+				
+				sql="delete from server where server_id=?";
+				stmt = dbConn.prepareStatement(sql);
+				stmt.setString(1, ftpServerId);
+				stmt.executeUpdate();
+				stmt.close();
+				
+				dbConn.commit();
+				dbConn.setAutoCommit(true);
+				result=0;//The FTP server is deleted.
+			}
+			else
+			{
+				result=1;
+			}
+		}
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			releaseResource(rs, stmt);
+		}		
+		return result;
 	}
 	public TreeMap<String,FtpAdminUserInfo> getAdminUserList()
 	{
@@ -348,9 +396,7 @@ public class DbOp {
 			stmt.setInt(1,ftpServer.getControlPort());
 			stmt.setString(2,ftpServer.getServerId());
 			rs=stmt.executeQuery();
-			boolean checkResult=rs.next();
-			logger.debug("Requested control port "+ftpServer.getControlPort()+",server id="+ftpServer.getServerId()+",checkResult="+checkResult);
-			if (checkResult)
+			if (rs.next())
 			{
 				result=1; //Some a ftp server bind the specified address and port already.
 			}
@@ -394,7 +440,7 @@ public class DbOp {
 				}				
 				dbConn.commit();
 				dbConn.setAutoCommit(true);
-				result=0;
+				result=0;//The specified address and port is available.
 			}
 		}
 		catch (SQLException e) 

@@ -39,8 +39,8 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	private Login login=null;
 	private MessageCoder messageCoder;
 	private Server adminServer=null;
-	private String ftpServerInfoString=new String(),returnCoder=new String();
-	private String responseString,requestString,actionString;
+	private String ftpServerInfoString=new String(),ftpServerId=new String();
+	private String responseString,returnCoder=new String(),requestString,actionString;
 	private FtpServer<T>ftpServer=null;  
 	private FtpServerManager ftpServerManager=null;  
 	private AdminUserManager adminUserManager=null;
@@ -125,13 +125,10 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 							actionResponse.setResponseCode(ftpServerManager.addFtpServer(ftpServer));
 							actionResponse.setReturnObjects("ftpServerId",ftpServer.getServerId());
 							break;
-        			case "SaveFtpServerNetworkProperties":
-        					ftpServerObject=requestObj.getJSONObject("ObjectMap").getJSONObject("ftpServerInfo");
-        					ftpServerInfoString=ftpServerObject.toString();
-    				
-        					logger.debug(ftpServerInfoString);
-        					ftpServer=objectMapper.readValue(ftpServerInfoString, FtpServer.class);
-        					actionResponse.setResponseCode(ftpServerManager.updateFtpServerInfo(ftpServer));
+        			case "DelFTPServer":
+        					ftpServerId=requestObj.getJSONObject("ObjectMap").getString("ftpServerId");
+        					actionResponse.setResponseCode(ftpServerManager.delFtpServer(ftpServerId));
+							actionResponse.setReturnObjects("ftpServerId",ftpServerId);
         					break;
 					case "GetAdminUserList":
 							TreeMap<String,FtpAdminUserInfo>adminUserList=adminUserManager.getAdminUserList();
@@ -225,7 +222,15 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 							ArrayList<String> localIpList=Utility.getAllLocalIp();
 							actionResponse.setResponseCode(0);
 							actionResponse.setReturnObjects("ipAddressList",localIpList);
-							break;        		
+							break;
+					case "SaveFTPServerNetworkProperties":
+	    					ftpServerObject=requestObj.getJSONObject("ObjectMap").getJSONObject("ftpServerInfo");
+	    					ftpServerInfoString=ftpServerObject.toString();
+					
+	    					logger.debug(ftpServerInfoString);
+	    					ftpServer=objectMapper.readValue(ftpServerInfoString, FtpServer.class);
+	    					actionResponse.setResponseCode(ftpServerManager.updateFtpServerInfo(ftpServer));
+	    					break;
 				}
 				sendResponse(ctx,actionResponse);
         	}
