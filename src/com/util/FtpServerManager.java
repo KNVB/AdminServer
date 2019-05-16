@@ -28,6 +28,19 @@ public class FtpServerManager
 		}
 		return result;
 	}
+	public <T> int updateFtpServerInfo(FtpServer<T> ftpServer)
+	{
+		int result=-1;
+		try 
+		{
+			result = dbo.updateFtpServerInfo(ftpServer);
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+		return result;
+	}
 	public TreeMap<String,FtpServerInfo>  getAllServerList()
 	{
 		TreeMap<String,FtpServerInfo> serverList=dbo.getAllServerList();

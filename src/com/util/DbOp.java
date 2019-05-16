@@ -313,6 +313,100 @@ public class DbOp {
 		}		
 		return ftpServerInfo;
 	}
+	public <T>int updateFtpServerInfo(FtpServer<T> ftpServer) throws SQLException
+	{
+		int result=-1;
+		ResultSet rs = null;
+		PreparedStatement stmt=null;
+		boolean hasWildCardAddress=false;
+		logger.debug(ftpServer.getBindingAddresses().toString());
+		String addressList=new String();
+		String sql="select * from server inner join server_binding on server.control_port=? ";
+		sql+=" and server.server_id!=? and server.server_id = server_binding.server_id ";
+		
+		for (String address : ftpServer.getBindingAddresses())
+		{
+			if (address.equals("*"))
+			{	
+				hasWildCardAddress=true;
+				break;
+			}
+			else
+				addressList+="'"+address+"',";
+		}
+		
+		if (!hasWildCardAddress)
+		{
+			addressList=addressList.substring(0, addressList.length()-1);
+			sql+=" and server_binding.binding_address in("+addressList+")";
+		}
+		logger.debug(sql);
+		try
+		{
+			stmt = dbConn.prepareStatement(sql);
+				
+			stmt.setInt(1,ftpServer.getControlPort());
+			stmt.setString(2,ftpServer.getServerId());
+			rs=stmt.executeQuery();
+			boolean checkResult=rs.next();
+			logger.debug("Requested control port "+ftpServer.getControlPort()+",server id="+ftpServer.getServerId()+",checkResult="+checkResult);
+			if (checkResult)
+			{
+				result=1; //Some a ftp server bind the specified address and port already.
+			}
+			else
+			{
+				sql="update server set status=?,description=?,control_port=?,support_passive_mode=?,passive_mode_port_range=? where server_id=?";
+				rs.close();
+				stmt.close();
+				dbConn.setAutoCommit(false);
+				stmt = dbConn.prepareStatement(sql);
+				
+				stmt.setInt(1,ftpServer.getStatus());
+				stmt.setString(2, ftpServer.getDescription());
+				stmt.setInt(3,ftpServer.getControlPort());
+				if (ftpServer.isPassiveModeEnabled())
+				{	
+					stmt.setInt(4,1);
+					stmt.setString(5,ftpServer.getPassiveModePortRange());
+				}
+				else
+				{	
+					stmt.setInt(4,0);
+					stmt.setString(5,null);
+				}
+				stmt.setString(6, ftpServer.getServerId());
+				stmt.executeUpdate();
+				sql="delete from server_binding where server_id=?";
+				stmt.close();
+				stmt = dbConn.prepareStatement(sql);
+				stmt.setString(1, ftpServer.getServerId());
+				stmt.executeUpdate();
+				
+				sql="insert into server_binding (server_id,binding_address) values (?,?)";
+				for (String address : ftpServer.getBindingAddresses())
+				{
+					stmt.close();
+					stmt = dbConn.prepareStatement(sql);
+					stmt.setString(1, ftpServer.getServerId());
+					stmt.setString(2, address);
+					stmt.executeUpdate();
+				}				
+				dbConn.commit();
+				dbConn.setAutoCommit(true);
+				result=0;
+			}
+		}
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			releaseResource(rs, stmt);
+		}		
+		return result;
+	}
 	/**
 	 * Close db connection
 	 * @throws Exception

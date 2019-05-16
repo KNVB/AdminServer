@@ -39,13 +39,14 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	private Login login=null;
 	private MessageCoder messageCoder;
 	private Server adminServer=null;
-	private String returnCoder=new String();
+	private String ftpServerInfoString=new String(),returnCoder=new String();
 	private String responseString,requestString,actionString;
 	private FtpServer<T>ftpServer=null;  
 	private FtpServerManager ftpServerManager=null;  
 	private AdminUserManager adminUserManager=null;
 	private ObjectMapper objectMapper = new ObjectMapper();
 	private JSONObject requestObj;
+	private JSONObject ftpServerObject;
 	private Response actionResponse;
 	public AdminSessionHandler(Server adminServer)
 	{
@@ -106,7 +107,7 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
         	requestString=messageCoder.decode(requestString);
         	logger.debug(requestString);
         	requestObj=new JSONObject(requestString);
-    		
+        	
     		Response actionResponse=new Response();
         	if (isLoginSuccess)
         	{
@@ -115,8 +116,8 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
         		switch (actionString)
         		{
         			case "AddFtpServer":
-        					JSONObject ftpServerObject=requestObj.getJSONObject("ObjectMap").getJSONObject("ftpServerInfo");
-        					String ftpServerInfoString=ftpServerObject.toString();
+        					ftpServerObject=requestObj.getJSONObject("ObjectMap").getJSONObject("ftpServerInfo");
+        					ftpServerInfoString=ftpServerObject.toString();
         				
 							logger.debug(ftpServerInfoString);
 							ftpServer=objectMapper.readValue(ftpServerInfoString, FtpServer.class);
@@ -124,6 +125,14 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 							actionResponse.setResponseCode(ftpServerManager.addFtpServer(ftpServer));
 							actionResponse.setReturnObjects("ftpServerId",ftpServer.getServerId());
 							break;
+        			case "SaveFtpServerNetworkProperties":
+        					ftpServerObject=requestObj.getJSONObject("ObjectMap").getJSONObject("ftpServerInfo");
+        					ftpServerInfoString=ftpServerObject.toString();
+    				
+        					logger.debug(ftpServerInfoString);
+        					ftpServer=objectMapper.readValue(ftpServerInfoString, FtpServer.class);
+        					actionResponse.setResponseCode(ftpServerManager.updateFtpServerInfo(ftpServer));
+        					break;
 					case "GetAdminUserList":
 							TreeMap<String,FtpAdminUserInfo>adminUserList=adminUserManager.getAdminUserList();
 							actionResponse.setResponseCode(0);
@@ -231,6 +240,7 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 					actionResponse.setResponseCode(0);
 					actionResponse.setReturnMessage("Login success");
 					actionResponse.setReturnObjects("ftpServerList",ftpServerManager.getAllServerList());
+					actionResponse.setReturnObjects("ipAddressList",Utility.getAllLocalIp());
 					sendResponse(ctx,actionResponse);
 				}
 				else
