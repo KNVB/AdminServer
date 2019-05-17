@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.admin.adminObj.FtpAdminUserInfo;
-import com.ftp.FtpServer;
 import com.ftp.FtpServerInfo;
 
 //import com.myftpserver.server.FtpServer;
@@ -52,88 +51,85 @@ public class DbOp {
 		Class.forName(jdbcDriver);
 		dbConn = DriverManager.getConnection(jdbcURL);
 	}
-	public <T>int addFtpServer(FtpServer<T> ftpServer) throws SQLException
+	public int addFtpServer(FtpServerInfo ftpServerInfo) throws AdminServerException
 	{
 		int result=-1;
-		ResultSet rs = null;
-		PreparedStatement stmt=null;
-		boolean hasWildCardAddress=false;
-		logger.debug(ftpServer.getBindingAddresses().toString());
-		String sql="select * from server inner join server_binding on server.control_port=? and server.server_id = server_binding.server_id ";
 		
-		String addressList=new String();
-		for (String address : ftpServer.getBindingAddresses())
+		if (isAddressAndPortAvailable(ftpServerInfo))
 		{
-			if (address.equals("*"))
-			{	
-				hasWildCardAddress=true;
-				break;
-			}
-			else
-				addressList+="'"+address+"',";
-		}
-		
-		if (!hasWildCardAddress)
-		{
-			addressList=addressList.substring(0, addressList.length()-1);
-			sql+=" and server_binding.binding_address in("+addressList+")";
-		}
-		logger.debug(sql);
-	
-		try
-		{
-			stmt = dbConn.prepareStatement(sql);
-			logger.debug("Requested control port "+ftpServer.getControlPort());	
-			stmt.setInt(1,ftpServer.getControlPort());					
-			rs=stmt.executeQuery();
-			if (rs.next())
+			String sql;
+			int startPort,endPort;
+			PreparedStatement stmt=null;
+			
+			try
 			{
-				result=1; //Some a ftp server bind the specified address and port already.
-			}
-			else
-			{
-				rs.close();
-				stmt.close();
 				dbConn.setAutoCommit(false);
-				sql="insert into server (server_id,status,description,control_port,support_passive_mode,passive_mode_port_range) values (?,?,?,?,?,?)";
+				sql="insert into server (server_id,status,description,control_port,support_passive_mode) values (?,?,?,?,?)";
 				stmt = dbConn.prepareStatement(sql);
-				stmt.setString(1, ftpServer.getServerId());
-				stmt.setInt(2,ftpServer.getStatus());
-				stmt.setString(3, ftpServer.getDescription());
-				stmt.setInt(4,ftpServer.getControlPort());
-				if (ftpServer.isPassiveModeEnabled())
+				stmt.setString(1, ftpServerInfo.getServerId());
+				stmt.setInt(2,ftpServerInfo.getStatus());
+				stmt.setString(3, ftpServerInfo.getDescription());
+				stmt.setInt(4,ftpServerInfo.getControlPort());
+				if (ftpServerInfo.isPassiveModeEnabled())
 				{	
 					stmt.setInt(5,1);
-					stmt.setString(6,ftpServer.getPassiveModePortRange());
 				}
 				else
 				{	
 					stmt.setInt(5,0);
-					stmt.setString(6,null);
 				}
 				stmt.executeUpdate();
 				sql="insert into server_binding (server_id,binding_address) values (?,?)";
-				for (String address : ftpServer.getBindingAddresses())
+				for (String address : ftpServerInfo.getBindingAddresses())
 				{
 					stmt.close();
 					stmt = dbConn.prepareStatement(sql);
-					stmt.setString(1, ftpServer.getServerId());
+					stmt.setString(1, ftpServerInfo.getServerId());
 					stmt.setString(2, address);
 					stmt.executeUpdate();
+				}
+				if (ftpServerInfo.isPassiveModeEnabled())
+				{
+					String[] temp;
+					isPassivePortAvailable(ftpServerInfo);
+					sql="insert into passive_port_range (server_id,start,end) values(?,?,?)";
+					for(String portRange : ftpServerInfo.getPassiveModePortRange())
+					{
+						stmt.close();
+						stmt = dbConn.prepareStatement(sql);
+						temp=portRange.split("-");
+						startPort=Integer.parseInt(temp[0]);
+						endPort=Integer.parseInt(temp[1]);
+						stmt.setString(1,ftpServerInfo.getServerId());
+						stmt.setInt(2, startPort);
+						stmt.setInt(3, endPort);
+						stmt.executeUpdate();
+					}
 				}				
 				dbConn.commit();
 				dbConn.setAutoCommit(true);
-				result=0;//The specified address and port is available.
+				result=0;
+			}
+			catch(NumberFormatException e)
+			{
+				String temp=e.getMessage();
+				temp=temp.substring(temp.indexOf("\""));
+				throw new AdminServerException(temp+",6");
+				//throw new AdminServerException("Invalid port no.:"+temp);
+			}
+			catch (SQLException e) 
+			{
+				throw new AdminServerException(e.getMessage());
+			}
+			finally
+			{
+				releaseResource(null, stmt);
 			}
 		}
-		catch (SQLException e) 
+		else
 		{
-			e.printStackTrace();
+			result=1;
 		}
-		finally
-		{
-			releaseResource(rs, stmt);
-		}		
 		return result;
 	}
 	public boolean adminLogin(String userName, String password) 
@@ -254,9 +250,14 @@ public class DbOp {
 		ResultSet rs = null;
 		PreparedStatement stmt=null;
 		String preServerId=new String();
-		String sql="select * from server a inner join server_binding b on a.server_id=b.server_id order by a.server_id";
+		String sql="select * from server a "; 
+		sql+=" inner join server_binding b on a.server_id=b.server_id"; 
+		sql+=" left join passive_port_range c on a.server_id=c.server_id"; 
+		sql+=" order by a.server_id";	
+		
 		FtpServerInfo ftpServerInfo=null;
-		ArrayList<String>addressList=null; 
+		ArrayList<String>addressList=null;
+		ArrayList<String> passiveModePortRange=null;
 		TreeMap<String,FtpServerInfo>  serverList=new TreeMap<String,FtpServerInfo>();
 		try 
 		{
@@ -271,6 +272,8 @@ public class DbOp {
 					if (ftpServerInfo!=null)
 					{	
 						ftpServerInfo.setBindingAddresses(addressList);
+						if (passiveModePortRange!=null)
+							ftpServerInfo.setPassiveModePortRange(passiveModePortRange);
 						serverList.put(ftpServerInfo.getServerId(),ftpServerInfo);
 					}
 					ftpServerInfo=new FtpServerInfo();
@@ -282,18 +285,24 @@ public class DbOp {
 					if (rs.getInt("support_passive_mode")==1)
 					{	
 						ftpServerInfo.setPassiveModeEnabled(true);
-						ftpServerInfo.setPassiveModePortRange(rs.getString("passive_mode_port_range"));
+						passiveModePortRange=new ArrayList<String>();
 					}
 					else
 					{	
 						ftpServerInfo.setPassiveModeEnabled(false);
-						ftpServerInfo.setPassiveModePortRange(null);
+						passiveModePortRange=null;
 					}
 					preServerId=rs.getString("server_id");
 					addressList=new ArrayList<String>();
 				}
 				addressList.add(rs.getString("binding_address"));
+				if (rs.getInt("support_passive_mode")==1)
+				{
+					passiveModePortRange.add(rs.getString("start")+"-"+rs.getString("end"));
+				}
 			}
+			if (passiveModePortRange!=null)
+				ftpServerInfo.setPassiveModePortRange(passiveModePortRange);
 			if ((addressList!=null) && (addressList.size()>0))
 			{
 				ftpServerInfo.setBindingAddresses(addressList);
@@ -310,8 +319,7 @@ public class DbOp {
 			releaseResource(rs, stmt);
 		}		
 		return serverList;
-	}
-	
+	}	
 	public FtpServerInfo getFtpServerInfo(String serverId)
 	{
 		ResultSet rs = null;
@@ -334,12 +342,12 @@ public class DbOp {
 				if (rs.getInt("support_passive_mode")==1)
 				{	
 					ftpServerInfo.setPassiveModeEnabled(true);
-					ftpServerInfo.setPassiveModePortRange(rs.getString("passive_mode_port_range"));
+					//ftpServerInfo.setPassiveModePortRange(rs.getString("passive_mode_port_range"));
 				}
 				else
 				{	
 					ftpServerInfo.setPassiveModeEnabled(false);
-					ftpServerInfo.setPassiveModePortRange(null);
+					//ftpServerInfo.setPassiveModePortRange(null);
 				}
 				addressList=new ArrayList<String>();
 				addressList.add(rs.getString("binding_address"));
@@ -361,18 +369,15 @@ public class DbOp {
 		}		
 		return ftpServerInfo;
 	}
-	public <T>int updateFtpServerInfo(FtpServer<T> ftpServer) throws SQLException
+	private boolean isAddressAndPortAvailable(FtpServerInfo ftpServerInfo)throws AdminServerException
 	{
-		int result=-1;
+		boolean hasWildCardAddress=false,result=false;
 		ResultSet rs = null;
 		PreparedStatement stmt=null;
-		boolean hasWildCardAddress=false;
-		logger.debug(ftpServer.getBindingAddresses().toString());
+		logger.debug(ftpServerInfo.getBindingAddresses().toString());
+		String sql="select server.server_id from server inner join server_binding on server.control_port=? and server.server_id !=? and server.server_id = server_binding.server_id ";
 		String addressList=new String();
-		String sql="select * from server inner join server_binding on server.control_port=? ";
-		sql+=" and server.server_id!=? and server.server_id = server_binding.server_id ";
-		
-		for (String address : ftpServer.getBindingAddresses())
+		for (String address : ftpServerInfo.getBindingAddresses())
 		{
 			if (address.equals("*"))
 			{	
@@ -382,75 +387,108 @@ public class DbOp {
 			else
 				addressList+="'"+address+"',";
 		}
-		
 		if (!hasWildCardAddress)
 		{
-			addressList=addressList.substring(0, addressList.length()-1);
+			addressList+="'*'";
 			sql+=" and server_binding.binding_address in("+addressList+")";
 		}
 		logger.debug(sql);
 		try
 		{
 			stmt = dbConn.prepareStatement(sql);
-				
-			stmt.setInt(1,ftpServer.getControlPort());
-			stmt.setString(2,ftpServer.getServerId());
+			logger.debug("Requested control port:"+ftpServerInfo.getControlPort()+",server id="+ftpServerInfo.getServerId());	
+			stmt.setInt(1,ftpServerInfo.getControlPort());
+			stmt.setString(2,ftpServerInfo.getServerId());
 			rs=stmt.executeQuery();
 			if (rs.next())
 			{
-				result=1; //Some a ftp server bind the specified address and port already.
+				result=false;
 			}
 			else
 			{
-				sql="update server set status=?,description=?,control_port=?,support_passive_mode=?,passive_mode_port_range=? where server_id=?";
-				rs.close();
-				stmt.close();
-				dbConn.setAutoCommit(false);
-				stmt = dbConn.prepareStatement(sql);
-				
-				stmt.setInt(1,ftpServer.getStatus());
-				stmt.setString(2, ftpServer.getDescription());
-				stmt.setInt(3,ftpServer.getControlPort());
-				if (ftpServer.isPassiveModeEnabled())
-				{	
-					stmt.setInt(4,1);
-					stmt.setString(5,ftpServer.getPassiveModePortRange());
-				}
-				else
-				{	
-					stmt.setInt(4,0);
-					stmt.setString(5,null);
-				}
-				stmt.setString(6, ftpServer.getServerId());
-				stmt.executeUpdate();
-				sql="delete from server_binding where server_id=?";
-				stmt.close();
-				stmt = dbConn.prepareStatement(sql);
-				stmt.setString(1, ftpServer.getServerId());
-				stmt.executeUpdate();
-				
-				sql="insert into server_binding (server_id,binding_address) values (?,?)";
-				for (String address : ftpServer.getBindingAddresses())
-				{
-					stmt.close();
-					stmt = dbConn.prepareStatement(sql);
-					stmt.setString(1, ftpServer.getServerId());
-					stmt.setString(2, address);
-					stmt.executeUpdate();
-				}				
-				dbConn.commit();
-				dbConn.setAutoCommit(true);
-				result=0;//The specified address and port is available.
+				result=true;
 			}
 		}
 		catch (SQLException e) 
 		{
-			e.printStackTrace();
+			throw new AdminServerException(e.getMessage());
 		}
 		finally
 		{
 			releaseResource(rs, stmt);
-		}		
+		}
+		return result;
+	}
+	private void isPassivePortAvailable(FtpServerInfo ftpServerInfo) throws AdminServerException
+	{
+		int startPort,endPort;
+		ResultSet rs = null;
+		PreparedStatement stmt=null;
+		String sql=new String();
+		try
+		{
+			for(String portRange : ftpServerInfo.getPassiveModePortRange())
+			{
+				String[] temp=portRange.split("-");
+				startPort=Integer.parseInt(temp[0]);
+				endPort=Integer.parseInt(temp[1]);
+				if (endPort < startPort)
+				{
+					throw new AdminServerException(portRange+",2");
+					//throw new AdminServerException("Invalid Port Range:"+port);
+				}
+				else
+				{
+					logger.debug("server id="+ftpServerInfo.getServerId()+",start Port="+startPort+",End Port="+endPort);
+					sql="select * from passive_port_range where server_id!=? and start<=? and end>=?";
+					stmt = dbConn.prepareStatement(sql);
+					stmt.setString(1,ftpServerInfo.getServerId());
+					stmt.setInt(2, startPort);
+					stmt.setInt(3, endPort);
+					rs=stmt.executeQuery();
+					if (rs.next())
+					{
+						throw new AdminServerException(portRange+",3");
+						//throw new AdminServerException("Passive Port Range:"+port+" is not available.");
+					}
+					else
+					{
+						rs.close();
+						stmt.close();
+						sql="select * from passive_port_range where server_id!=? and start<=? or end>=?";
+						stmt = dbConn.prepareStatement(sql);
+						stmt.setString(1,ftpServerInfo.getServerId());
+						stmt.setInt(2, endPort);
+						stmt.setInt(3, startPort);
+						rs=stmt.executeQuery();
+						if (rs.next())
+						{
+							throw new AdminServerException(portRange+",4");
+							//throw new AdminServerException("Passive Port Range:"+port+" is not available.");
+						}
+					}
+				}
+			}
+		}
+		catch(NumberFormatException e)
+		{
+			String temp=e.getMessage();
+			temp=temp.substring(temp.indexOf("\""));
+			throw new AdminServerException(temp+",6");
+			//throw new AdminServerException("Invalid port no.:"+temp);
+		}
+		catch (SQLException e) 
+		{
+			throw new AdminServerException(e.getMessage());
+		}
+		finally
+		{
+			releaseResource(rs, stmt);
+		}
+	}
+	public int updateFtpServerInfo(FtpServerInfo ftpServerInfo)throws AdminServerException
+	{
+		int result=-1;
 		return result;
 	}
 	/**
@@ -497,14 +535,35 @@ public class DbOp {
 	public static void main(String[] args) 
 	{
 		Logger  logger = LogManager.getLogger(DbOp.class.getName());
+		int returnCode=-1;
 		try {
 			DbOp dbo=new DbOp(logger);
-			FtpServerInfo ftpServerList=dbo.getFtpServerInfo("26ffae4a-e89e-409d-94fa-80060564305c");
-			System.out.println(ftpServerList.getBindingAddresses().size());
-		} catch (Exception e) {
+			ArrayList<String>bindingAddresses=new ArrayList<String>();
+			ArrayList<String>passiveModePortRange=new ArrayList<String>();
+			bindingAddresses.add("169.254.21.130");
+			//bindingAddresses.add("*");
+			//passiveModePortRange.add("31-35");
+			//passiveModePortRange.add("1700-1801");
+			passiveModePortRange.add("1900-9000");
+			//passiveModePortRange.add("31-33");
+			FtpServerInfo ftpServerInfo=new FtpServerInfo();
+			ftpServerInfo.setDescription("Passive Server");
+			ftpServerInfo.setServerId("2");
+			ftpServerInfo.setControlPort(21);
+			ftpServerInfo.setBindingAddresses(bindingAddresses);
+			ftpServerInfo.setPassiveModePortRange(passiveModePortRange);
+			//ftpServerInfo.setPassiveModeEnabled(true);
+			logger.debug("isAddressAndPortAvailable="+dbo.isAddressAndPortAvailable(ftpServerInfo));
+			//dbo.isAddressAndPortAvailable(ftpServerInfo);
+			//dbo.isPassivePortAvailable(ftpServerInfo);
+			logger.debug(dbo.addFtpServer(ftpServerInfo));
+		}		
+		catch (Exception e) 
+		{
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
+			logger.debug(e.getMessage());
 		}
 		
-	}
+	}	
 }

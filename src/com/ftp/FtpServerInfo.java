@@ -3,14 +3,15 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 public class FtpServerInfo 
 {
-	private int status=FtpServerStatus.DISABLE;
-	private int controlPort=21;
-	private String serverId="";
-	private String passiveModePortRange="";
-	private String description="New Server";
-	private boolean passiveModeEnabled=false;
 	private ArrayList<String> bindingAddresses=new ArrayList<String>();
+	private int controlPort=21;
+	private String description="New Server";
 	private TreeMap<String,FtpUserInfo> ftpUserInfoList=new TreeMap<String,FtpUserInfo>();
+	private ArrayList<String>passiveModePortRange=new ArrayList<String>();
+	private boolean passiveModeEnabled=false;
+	private String serverId="";
+	private int status=FtpServerStatus.DISABLE;
+
 	public int getStatus() {
 		return status;
 	}
@@ -29,10 +30,10 @@ public class FtpServerInfo
 	public void setServerId(String serverId) {
 		this.serverId = serverId;
 	}
-	public String getPassiveModePortRange() {
+	public ArrayList<String> getPassiveModePortRange() {
 		return passiveModePortRange;
 	}
-	public void setPassiveModePortRange(String passiveModePortRange) {
+	public void setPassiveModePortRange(ArrayList<String> passiveModePortRange) {
 		this.passiveModePortRange = passiveModePortRange;
 	}
 	public String getDescription() {

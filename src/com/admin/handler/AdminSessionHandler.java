@@ -41,7 +41,8 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	private Server adminServer=null;
 	private String ftpServerInfoString=new String(),ftpServerId=new String();
 	private String responseString,returnCoder=new String(),requestString,actionString;
-	private FtpServer<T>ftpServer=null;  
+	private FtpServer<T>ftpServer=null; 
+	private FtpServerInfo ftpServerInfo=null;
 	private FtpServerManager ftpServerManager=null;  
 	private AdminUserManager adminUserManager=null;
 	private ObjectMapper objectMapper = new ObjectMapper();
@@ -91,7 +92,8 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	}
 	private void handleRequest(ChannelHandlerContext ctx, WebSocketFrame frame) throws Exception
 	{
-        requestString = ((TextWebSocketFrame) frame).text();
+        String errorMessage;
+		requestString = ((TextWebSocketFrame) frame).text();
         logger.debug("{} received {}", ctx.channel(),requestString);
         if (isFirstConnect)
         {
@@ -120,10 +122,20 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
         					ftpServerInfoString=ftpServerObject.toString();
         				
 							logger.debug(ftpServerInfoString);
-							ftpServer=objectMapper.readValue(ftpServerInfoString, FtpServer.class);
-							ftpServer.setServerId(Utility.getUniqueId());
-							actionResponse.setResponseCode(ftpServerManager.addFtpServer(ftpServer));
-							actionResponse.setReturnObjects("ftpServerId",ftpServer.getServerId());
+							ftpServerInfo=objectMapper.readValue(ftpServerInfoString, FtpServerInfo.class);
+							ftpServerInfo.setServerId(Utility.getUniqueId());
+							try
+							{
+								actionResponse.setResponseCode(ftpServerManager.addFtpServer(ftpServer));
+								actionResponse.setReturnObjects("ftpServerId",ftpServer.getServerId());
+							}
+							catch (AdminServerException err)
+							{
+								errorMessage=err.getMessage();
+								String []temp=errorMessage.split(",");
+								actionResponse.setResponseCode(Integer.parseInt(temp[1]));
+								actionResponse.setReturnMessage(temp[0]);
+							}
 							break;
         			case "DelFTPServer":
         					ftpServerId=requestObj.getJSONObject("ObjectMap").getString("ftpServerId");
@@ -144,7 +156,7 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 							break;
 					case "GetFTPServerInfo":
 							String serverId=requestObj.getJSONObject("ObjectMap").getString("serverId");
-							FtpServerInfo ftpServerInfo=ftpServerManager.getFtpServerInfo(serverId);
+							ftpServerInfo=ftpServerManager.getFtpServerInfo(serverId);
 							if (ftpServerInfo==null)
 							{	
 								actionResponse.setResponseCode(-1);
@@ -228,8 +240,8 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	    					ftpServerInfoString=ftpServerObject.toString();
 					
 	    					logger.debug(ftpServerInfoString);
-	    					ftpServer=objectMapper.readValue(ftpServerInfoString, FtpServer.class);
-	    					actionResponse.setResponseCode(ftpServerManager.updateFtpServerInfo(ftpServer));
+	    					ftpServerInfo=objectMapper.readValue(ftpServerInfoString, FtpServerInfo.class);
+	    					actionResponse.setResponseCode(ftpServerManager.updateFtpServerInfo(ftpServerInfo));
 	    					break;
 				}
 				sendResponse(ctx,actionResponse);

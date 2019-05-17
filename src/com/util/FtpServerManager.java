@@ -15,17 +15,10 @@ public class FtpServerManager
 		this.dbo=dbo;
 		this.logger=logger;
 	}
-	public <T> int addFtpServer(FtpServer<T> ftpServer)
+	public int addFtpServer(FtpServerInfo ftpServerInfo) throws AdminServerException
 	{
 		int result=-1;
-		try 
-		{
-			result = dbo.addFtpServer(ftpServer);
-		} 
-		catch (SQLException e) 
-		{
-			e.printStackTrace();
-		}
+		result = dbo.addFtpServer(ftpServerInfo);
 		return result;
 	}
 	public int delFtpServer(String ftpServerId)
@@ -41,17 +34,10 @@ public class FtpServerManager
 		}
 		return result;
 	}
-	public <T> int updateFtpServerInfo(FtpServer<T> ftpServer)
+	public <T> int updateFtpServerInfo(FtpServerInfo ftpServerInfo)throws AdminServerException
 	{
 		int result=-1;
-		try 
-		{
-			result = dbo.updateFtpServerInfo(ftpServer);
-		} 
-		catch (SQLException e) 
-		{
-			e.printStackTrace();
-		}
+		result = dbo.updateFtpServerInfo(ftpServerInfo);
 		return result;
 	}
 	public TreeMap<String,FtpServerInfo>  getAllServerList()
