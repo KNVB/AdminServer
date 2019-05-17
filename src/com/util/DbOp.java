@@ -54,16 +54,34 @@ public class DbOp {
 	public int addFtpServer(FtpServerInfo ftpServerInfo) throws AdminServerException
 	{
 		int result=-1;
-		
 		if (isAddressAndPortAvailable(ftpServerInfo))
 		{
 			String sql;
 			int startPort,endPort;
 			PreparedStatement stmt=null;
-			
 			try
 			{
 				dbConn.setAutoCommit(false);
+				if (ftpServerInfo.isPassiveModeEnabled())
+				{
+					isPassivePortAvailable(ftpServerInfo);
+					String[] temp;
+					sql="insert into passive_port_range (server_id,start,end) values(?,?,?)";
+					for(String portRange : ftpServerInfo.getPassiveModePortRange())
+					{
+						stmt = dbConn.prepareStatement(sql);
+						temp=portRange.split("-");
+						startPort=Integer.parseInt(temp[0]);
+						endPort=Integer.parseInt(temp[1]);
+						stmt.setString(1,ftpServerInfo.getServerId());
+						stmt.setInt(2, startPort);
+						stmt.setInt(3, endPort);
+						stmt.executeUpdate();
+						stmt.close();
+					}
+					
+				}
+				
 				sql="insert into server (server_id,status,description,control_port,support_passive_mode) values (?,?,?,?,?)";
 				stmt = dbConn.prepareStatement(sql);
 				stmt.setString(1, ftpServerInfo.getServerId());
@@ -88,24 +106,6 @@ public class DbOp {
 					stmt.setString(2, address);
 					stmt.executeUpdate();
 				}
-				if (ftpServerInfo.isPassiveModeEnabled())
-				{
-					String[] temp;
-					isPassivePortAvailable(ftpServerInfo);
-					sql="insert into passive_port_range (server_id,start,end) values(?,?,?)";
-					for(String portRange : ftpServerInfo.getPassiveModePortRange())
-					{
-						stmt.close();
-						stmt = dbConn.prepareStatement(sql);
-						temp=portRange.split("-");
-						startPort=Integer.parseInt(temp[0]);
-						endPort=Integer.parseInt(temp[1]);
-						stmt.setString(1,ftpServerInfo.getServerId());
-						stmt.setInt(2, startPort);
-						stmt.setInt(3, endPort);
-						stmt.executeUpdate();
-					}
-				}				
 				dbConn.commit();
 				dbConn.setAutoCommit(true);
 				result=0;
@@ -127,9 +127,7 @@ public class DbOp {
 			}
 		}
 		else
-		{
 			result=1;
-		}
 		return result;
 	}
 	public boolean adminLogin(String userName, String password) 
@@ -440,32 +438,23 @@ public class DbOp {
 				else
 				{
 					logger.debug("server id="+ftpServerInfo.getServerId()+",start Port="+startPort+",End Port="+endPort);
-					sql="select * from passive_port_range where server_id!=? and start<=? and end>=?";
+					sql="select * from passive_port_range where server_id!=? ";
+					sql+=" and (start<=? and end>=?) or (start<=? and end>=?) or (start>=? and end<=?)";
+					logger.debug(sql);
 					stmt = dbConn.prepareStatement(sql);
 					stmt.setString(1,ftpServerInfo.getServerId());
 					stmt.setInt(2, startPort);
-					stmt.setInt(3, endPort);
+					stmt.setInt(3, startPort);
+					stmt.setInt(4, endPort);
+					stmt.setInt(5, endPort);
+					stmt.setInt(6, startPort);
+					stmt.setInt(7, endPort);
+
 					rs=stmt.executeQuery();
 					if (rs.next())
 					{
 						throw new AdminServerException(portRange+",3");
 						//throw new AdminServerException("Passive Port Range:"+port+" is not available.");
-					}
-					else
-					{
-						rs.close();
-						stmt.close();
-						sql="select * from passive_port_range where server_id!=? and start<=? or end>=?";
-						stmt = dbConn.prepareStatement(sql);
-						stmt.setString(1,ftpServerInfo.getServerId());
-						stmt.setInt(2, endPort);
-						stmt.setInt(3, startPort);
-						rs=stmt.executeQuery();
-						if (rs.next())
-						{
-							throw new AdminServerException(portRange+",4");
-							//throw new AdminServerException("Passive Port Range:"+port+" is not available.");
-						}
 					}
 				}
 			}
@@ -540,22 +529,22 @@ public class DbOp {
 			DbOp dbo=new DbOp(logger);
 			ArrayList<String>bindingAddresses=new ArrayList<String>();
 			ArrayList<String>passiveModePortRange=new ArrayList<String>();
-			bindingAddresses.add("169.254.21.130");
+			bindingAddresses.add("169.254.21.133");
 			//bindingAddresses.add("*");
-			//passiveModePortRange.add("31-35");
+			passiveModePortRange.add("30-33");
 			//passiveModePortRange.add("1700-1801");
-			passiveModePortRange.add("1900-9000");
+			//passiveModePortRange.add("8990-8999");
 			//passiveModePortRange.add("31-33");
 			FtpServerInfo ftpServerInfo=new FtpServerInfo();
 			ftpServerInfo.setDescription("Passive Server");
-			ftpServerInfo.setServerId("2");
+			ftpServerInfo.setServerId("4");
 			ftpServerInfo.setControlPort(21);
 			ftpServerInfo.setBindingAddresses(bindingAddresses);
 			ftpServerInfo.setPassiveModePortRange(passiveModePortRange);
-			//ftpServerInfo.setPassiveModeEnabled(true);
+			ftpServerInfo.setPassiveModeEnabled(true);
 			logger.debug("isAddressAndPortAvailable="+dbo.isAddressAndPortAvailable(ftpServerInfo));
 			//dbo.isAddressAndPortAvailable(ftpServerInfo);
-			//dbo.isPassivePortAvailable(ftpServerInfo);
+			//dbo.isPassivePortsAvailable(ftpServerInfo);
 			logger.debug(dbo.addFtpServer(ftpServerInfo));
 		}		
 		catch (Exception e) 
