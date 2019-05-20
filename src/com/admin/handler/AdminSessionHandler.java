@@ -41,7 +41,7 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 	private Server adminServer=null;
 	private String ftpServerInfoString=new String(),ftpServerId=new String();
 	private String responseString,returnCoder=new String(),requestString,actionString;
-	private FtpServer<T>ftpServer=null; 
+//	private FtpServer<T>ftpServer=null; 
 	private FtpServerInfo ftpServerInfo=null;
 	private FtpServerManager ftpServerManager=null;  
 	private AdminUserManager adminUserManager=null;
@@ -126,8 +126,8 @@ public class AdminSessionHandler<T> extends SimpleChannelInboundHandler<WebSocke
 							ftpServerInfo.setServerId(Utility.getUniqueId());
 							try
 							{
-								actionResponse.setResponseCode(ftpServerManager.addFtpServer(ftpServer));
-								actionResponse.setReturnObjects("ftpServerId",ftpServer.getServerId());
+								actionResponse.setResponseCode(ftpServerManager.addFtpServer(ftpServerInfo));
+								actionResponse.setReturnObjects("ftpServerId",ftpServerInfo.getServerId());
 							}
 							catch (AdminServerException err)
 							{

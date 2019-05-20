@@ -372,7 +372,7 @@ public class DbOp {
 		boolean hasWildCardAddress=false,result=false;
 		ResultSet rs = null;
 		PreparedStatement stmt=null;
-		logger.debug(ftpServerInfo.getBindingAddresses().toString());
+		logger.debug(ftpServerInfo.getBindingAddresses()==null);
 		String sql="select server.server_id from server inner join server_binding on server.control_port=? and server.server_id !=? and server.server_id = server_binding.server_id ";
 		String addressList=new String();
 		for (String address : ftpServerInfo.getBindingAddresses())
